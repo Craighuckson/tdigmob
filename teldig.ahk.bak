@@ -5292,7 +5292,7 @@ recordsLookup()
 			long := substr(A_LoopField, 13)
 		}
 	}
-	msgbox % "(" lat "," long ")"
+	;msgbox % "(" lat "," long ")"
 	if (stationCode = "ROGYRK01") || if (stationCode = "ROGSIM01")
 
 	{

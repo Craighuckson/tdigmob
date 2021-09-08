@@ -5099,7 +5099,7 @@ vpnOn() ; Logs into VPN automatically
         ;driver.findElementByCss("#loginform > div:nth-child(4) > div.col-md-2.col-sm-12.col-xs-12 > div > button").click() ; click ok on orange window
 			wait()
 
-			;driver.findElementbyId("form_marqueezoom_btn").click() ;clicks marquee zoom to clear previous
+			driver.findElementbyId("form_marqueezoom_btn").click() ;clicks marquee zoom to clear previous
 			driver.findElementbyCss("#form_btn").click() ;search button
 			driver.findElementbyxpath("//*[@id='tab_featureform']/div[1]/div[3]/ul/li[1]/a/span[1]").click() ; quick search tab
 			if (location.choice = "a")
@@ -5324,6 +5324,7 @@ recordsLookup()
 			driver.findElementbyxpath("/html/body/div/form/div[3]/div[2]/div/button").click()
 			sleep 1000
 		}
+		driver.findElementbyId("form_marqueezoom_btn").click() ; clicks marquee zoom to clear stuff
 		if !(driver.findElementbyId("id_search_div").IsDisplayed())
 			driver.findElementbyId("form_btn").click() ;search button
 		
