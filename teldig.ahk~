@@ -13,10 +13,10 @@ ListLines, On
 #MenuMaskKey,VK07
 #include <findtext>
 #include <DebugWindow>
-;#include <V2TOV1FUNC>
+#include <V2TOV1FUNC>
 #include <acc>
 #include <cpuload>
-#include <AHKEZ>
+;#include <AHKEZ>
 BlockInput, SendAndMouse
 SetControlDelay, 50
 
@@ -481,6 +481,15 @@ setOffsetLabel(landbase)
 	label := InputBox("Enter label for cable")
 	StringUpper, label, label
 	list:=["meas1.skt","meas2.skt","cablelabel.skt"]
+    ; for i in list
+    ; {
+    ;     if !FileExist("C:\Users\Cr\Documents" landbase i)
+    ;     {
+    ;         Msgbox, Unable to load sketch (template not created)
+    ;         return
+    ;     }
+    ; }
+
 	setTemplateText(landbase "meas1.skt",meas1)
 	wait()
 	setTemplateText(landbase "meas2.skt",meas2)
@@ -730,7 +739,7 @@ sketchAutoFill()
 				totalpages := 2
 			}
 				units := Inputbox("Enter units")
-				primary_template := FileSelectFile(,"C:\Users\Cr\Documents\","Choose bell primary form to open")
+				primary_template := Fileselect(,"C:\Users\Cr\Documents\","Choose bell primary form to open")
 				focusSketchtool()
 				loadImage("bell primary.skt")
 				wait()
@@ -2200,38 +2209,6 @@ treeAutoFill()
 		treeAutoFill()
 	pagetimeend := ((A_TickCount - timestart) / 1000)
 	FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
-}
-
-setTreeLabels(street, cabloc, landbase)
-{
-	setTemplateText(landbase "street.skt", street)
-	if (cabloc != 3) {
-		meas1 := setMeasurement()
-		label := getCableLabel()
-		setTemplateText(landbase "treemeas" cabloc ".skt", meas1)
-		wait()
-		setTemplateText(landbase "treecablelabel" cabloc ".skt", label)
-	}
-	else {
-		meas1 := setMeasurement()
-		meas2 := setMeasurement()
-		label := getCableLabel()
-		label := getCableLabel()
-		setTemplateText(landbase "treemeas1.skt", meas1)
-		wait()
-		setTemplateText(landbase "treemeas2.skt", meas2)
-		wait()
-		setTemplateText(landbase "treecablelabel1.skt", label)
-		wait()
-		setTemplateText(landbase "treecablelabel2.skt", label)
-	}
-}
-
-getCableLabel()
-{
-	label = Inputbox("Enter label for cable")
-	StringUpper, label, label
-	return label
 }
 
 treeSketchBuilder(landbase, cabloc := "")
@@ -4151,14 +4128,13 @@ setMeasurement()
 return
 
 setMeasurement()
-;returns a measurement string ending in ".m" that only requires integer input
 {
 
 	InputBox, string, Measurement, Insert Measurement ;gets measurement
 	if (strlen(string) = 1)
 	{
 		string := "0." string " m"
-		Send, %string%{enter}
+		Send, %string%{enter} ; allows for measurements to be input without decimal and metre
 	}
 
 	else if (strlen(string) = 2)
@@ -6774,9 +6750,9 @@ editTimesheet()
 {
 global today
 if (fileexist("C:\Users\Cr\timesheet" today ".txt"))
-	Run,  C:\Users\Cr\timesheet%today%.txt
+	Run,  "C:\Program Files (x86)\Vim\vim82\vim.exe" C:\Users\Cr\timesheet%today%.txt
 else
-	Run,  C:\Users\Cr\Desktop\archived\autohotkey\timesheet%today%.txt
+	Run, "C:\Program Files (x86)\Vim\vim82\vim.exe" C:\Users\Cr\timesheet%today%.txt
 }
 
 ::propfib::
