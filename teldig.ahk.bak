@@ -21,6 +21,7 @@ BlockInput, SendAndMouse
 SetControlDelay, 50
 
 
+
 ;CONSTANTS
 
 today:= A_DD . " " . A_MM . " " . A_YYYY
@@ -2192,7 +2193,6 @@ treeAutoFill()
          ;           loadImage("treew.skt")
 		;	else if (landbase = "e")
          ;           loadImage("treee.skt")
-			ST_SAVEEXIT()
 			WinWaitClose, AHK_EXE SKETCHTOOLAPPLICATION.EXE
 		}
 	}
@@ -2694,7 +2694,8 @@ getPoint(inst1) {
 	arccoord := [x1, y1]
 	return arccoord
 }
-#IFWINACTIVE ahk_exe SketchToolApplication.exe
+#IFWINACTIVE Tel ahk_exe SketchToolApplication.exe
+c::
 \::
 autoDrawCable() { ;auto cable draw with 2 points
 	points := getPoints("Click line origin", "Click line destination")
@@ -2726,7 +2727,10 @@ autoDrawCable() { ;auto cable draw with 2 points
 	Send, ^q
 }
 
-|:: ; draw cable with 2 points but straightLineTool()
+|::
+twoPointSL()
+; draw cable with 2 points but straightLineTool()
+{
 points := getPoints("Click line origin","Click line destination")
 SetTitleMatchMode, 2
 CoordMode, Mouse, Window
@@ -2754,8 +2758,9 @@ MouseClick, L, % points.3, % points.4,,, U
 Send, {Blind}{Shift Up}
 Click, 2
 Send, ^q
-return
+}
 
+r::
 !+r:: ;draw rectangle
 points:="",ulx:="",uly:="",lrx:="",lry:=""
 points:=getPoints("Click upper left corner","Click lower right corner")
@@ -2954,6 +2959,7 @@ HorizontalArrowTool()
 VerticalArrowTool()
 return
 
+a::
 _::
 drawCorner()
 {
@@ -3217,7 +3223,7 @@ newtimesheetentry(){
 	SplashTextOff
 	return
 }
-#ifwinactive ahk_exe sketchtoolapplication.exe
+#ifwinactive Tel ahk_exe sketchtoolapplication.exe
 ^o::
                 ::insimg::
                 :::L::
@@ -3237,7 +3243,7 @@ clickSelection()
 loadImage("qacorrection.skt")
 return
                 ;HOTKEY WIN + T FOR TEXT BOX
-#T::
+t::
 ralt::
                 ::txbx::
 textboxplus() {
@@ -3251,6 +3257,7 @@ textboxplus() {
 	clickSelection()
 }
 
++t::
 +RAlt::
 textboxplusVertical(){
 	mousegetpos, xpos, ypos
@@ -3291,13 +3298,43 @@ saveFile()
 return
 
 				; HOTKEY CTRL ALT X FOR JPG SAVE
-#ifwinactive ahk_exe SketchToolApplication.exe
+#ifwinactive Tel ahk_exe SketchToolApplication.exe
 !^X::
 saveFile()
 waitDialogBox()
 Send {TAB}{DOWN 4}{ENTER} ; changes file type to save to jpeg
 return
                 ;WIN NUMPAD INSERT for ok in auxilliary, SAVES FIRST and prompts page numbers now
+				
+				
+;NEW KEYBINDING
+#IfWinActive Tel AHK_EXE Sketchtoolapplication.EXE
++c::
+twoPointSL()
+return
+
+h::
+HorizontalArrowTool()
+return
+
+v::
+VerticalArrowTool()
+return
+
+u::
+send, {Ctrl Down}z{Ctrl Up}
+return
+
+y::
+send, {ctrl down}c{ctrl up}
+return
+
+p::
+send, {ctrl down}v{ctrl up}
+return
+
+#IfWinActive
+				
 getCurrentDate(){
 	today := A_YYYY "-" A_MM "-" A_DD
 	return today
@@ -4133,13 +4170,17 @@ return
 
 #IfWinActive ahk_exe sketchtoolapplication.exe
 +BackSpace::
+changeText(){
         ;SendInput,{f2}{Backspace 50}
 SendInput("{F2}{Backspace 50}")
+text := Inputbox("Enter text")
+Send(text)
+Send("{Enter}")
         ;MouseClick("R")
         ;SendInput("{Up 2}{Enter}")
         ;wait()
         ;SendInput("{Tab 14}")
-return
+}
 
 #IFWINACTIVE AHK_EXE SKETCHTOOLAPPLICATION.EXE
         ;measurement tool
@@ -4255,11 +4296,13 @@ return
 SendInput, %number%
 return
 
-#IFWINACTIVE AHK_EXE SKETCHTOOLAPPLICATION.EXE
+#IFWINACTIVE Tel AHK_EXE SKETCHTOOLAPPLICATION.EXE
+b::
 ^numpadclear::
 ::dbldg:: ; insert building
 loadImage("building.skt")
 return
++b::
 ^!numpadclear::
 ::2dsmhse:: ; insert small house
 loadImage("sbuilding.skt")
@@ -4594,15 +4637,18 @@ RETURN
 		Run, hotstringlog.txt, %A_ScriptDir%
 	}
 	#IfWinActive
+	
 	#ifwinactive ahk_exe mobile.exe
 	RShift::
 	MBUTTON::
 	Menu, Mobile, Show
 	return
+	
 	NewPage:
 	focusTeldig()
 	setForm()
 	return
+	
 	addtotimesheet:
 	focusTeldig()
 	addtotimesheet()
@@ -5330,7 +5376,7 @@ recordsLookup()
 			}
 			else break
 		}
-		
+		WinClose, ahk_exe vpnui.exe
 		if !WinExist("ahk_exe chrome.exe")
 		{
 			Run, C:\Program Files\Google\Chrome\Application\chrome.exe  --remote-debugging-port=9222
@@ -5806,7 +5852,8 @@ recordsLookup()
 	}
 	return
 
-	changetext(text)
+	;changetext(text)
+	
 	{
 		WinActivate, ahk_exe sketchtoolapplication.exe
 		mousegetpos, xpos, ypos
@@ -6471,10 +6518,12 @@ writeDamageRemarks()
 
 	displayTimesheet(date)
 	{
+		;count := 0
 		FileRead, TS, C:\Users\Cr\Desktop\archived\autohotkey\timesheet%date%.txt
 		if !(FileExist("C:\Users\Cr\Desktop\archived\autohotkey\timesheet" . date . ".txt"))
 			FileRead, TS, C:\Users\Cr\timesheet%date%.txt
-		MsgBox % TS
+		count := StrSplit(TS, "`n").Length()
+		MsgBox % "Tickets = " count "`n" TS
 	}
 
 ::PAPERONLYVALID::
@@ -6696,6 +6745,7 @@ send, {down}{enter}
 #IfWinActive, ahk_exe SketchToolApplication.exe
 `::LButton
 Esc::Delete
+x::Delete
 return
 
 ;SKETCH RECTANGLE BOUNDARIES 

@@ -3,3 +3,24 @@
 20210909091325 - Cannot access ChildPath Item #2 -> 7
 20210909091337 - Cannot access ChildPath Item #2 -> 7
 20210909104328 - Cannot access ChildPath Item #2 -> 7
+20210910124907 - Cannot access ChildPath Item #2 -> 7
+20210910143119 - Cannot access ChildPath Item #2 -> 7
+20210912215051 - Cannot access ChildPath Item #2 -> 7
+20210912215516 - Cannot access ChildPath Item #2 -> 7
+20210912220724 - Cannot access ChildPath Item #2 -> 7
+20210913090921 - Invalid IAccessible Object
+20210913090921 - Cannot access ChildPath Item #9 -> 4
+20210913095214 - Cannot access ChildPath Item #2 -> 7
+20210913095230 - Cannot access ChildPath Item #2 -> 7
+20210913100711 - Cannot access ChildPath Item #2 -> 7
+20210913110036 - Cannot access ChildPath Item #2 -> 7
+20210913124219 - Invalid IAccessible Object
+20210913124219 - Cannot access ChildPath Item #9 -> 4
+20210913132530 - Cannot access ChildPath Item #4 -> 2
+20210914072923 - Cannot access ChildPath Item #8 -> 37
+20210914083710 - Cannot access ChildPath Item #2 -> 7
+20210914085612 - Cannot access ChildPath Item #2 -> 7
+20210914100732 - Cannot access ChildPath Item #8 -> 37
+20210914112006 - Invalid IAccessible Object
+20210914112006 - Cannot access ChildPath Item #9 -> 4
+20210915121027 - Cannot access ChildPath Item #2 -> 7
