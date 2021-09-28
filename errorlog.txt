@@ -24,3 +24,18 @@
 20210914112006 - Invalid IAccessible Object
 20210914112006 - Cannot access ChildPath Item #9 -> 4
 20210915121027 - Cannot access ChildPath Item #2 -> 7
+20210916113527 - Invalid IAccessible Object
+20210916113527 - Cannot access ChildPath Item #9 -> 4
+20210916113529 - Invalid IAccessible Object
+20210916113529 - Cannot access ChildPath Item #9 -> 4
+20210917085537 - "DoDefaultAction" Cmd Not Implemented
+20210917090507 - Cannot access ChildPath Item #2 -> 7
+20210917112343 - Invalid IAccessible Object
+20210917112343 - Cannot access ChildPath Item #9 -> 4
+20210917113940 - Invalid IAccessible Object
+20210917113940 - Cannot access ChildPath Item #9 -> 4
+20210917113942 - Invalid IAccessible Object
+20210917113942 - Cannot access ChildPath Item #9 -> 4
+20210920090900 - Cannot access ChildPath Item #2 -> 7
+20210922114445 - Cannot access ChildPath Item #2 -> 1
+20210922122922 - Cannot access ChildPath Item #2 -> 7

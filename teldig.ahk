@@ -2028,7 +2028,6 @@ F10::
     openExistingPrompt()
     {
       MsgBox, 4132, Open Existing?, Open existing sketch?
-      focusSketchTool()
     }
 
     ;radius dig area
@@ -2152,6 +2151,8 @@ treeAutoFill()
 {
   global
   setForm()
+  waitSTLoad()
+  
   if (form = "BP")
   {
     bellPrimaryPoleAutofill()
@@ -2166,7 +2167,7 @@ treeAutoFill()
     }
     IfMsgBox, No
     {
-      setTreeDigArea()
+      treetype := setTreeDigArea()
       rclear := rogClear()
       if (rclear)
       {
@@ -2175,10 +2176,11 @@ treeAutoFill()
         ST_SAVEEXIT()
         return
       }
+      InputBox, street, Street, Street?,,,,,,, %street%
       InputBox, landbase, landbase, Which Direction?
       InputBox, cabloc, Location, Where is cable relative to tree?`n1 = closer to road`n2 = closer to property`n3 = both sides of tree
-      treestring = treeSketchBuilder(landbase, cabloc)
       loadImage(treeSketchBuilder(landbase,cabloc))
+      setTreeLabels(street, cabloc, landbase, treetype)
       ;if (landbase = "n")
       ;       loadImage("treen.skt")
       ;else if (landbase = "s")
@@ -2196,34 +2198,38 @@ treeAutoFill()
   FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
 }
 
-setTreeLabels(street, cabloc, landbase)
+setTreeLabels(street, cabloc, landbase, treetype)
 {
-  setTemplateText(landbase "street.skt", street)
+  setTemplateText(landbase "streettree.skt", street)
   if (cabloc != 3) {
     meas1 := setMeasurement()
     label := getCableLabel()
-    setTemplateText(landbase "treemeas" cabloc ".skt", meas1)
+    setTemplateText(landbase "treemeas1.skt", meas1)
     wait()
-    setTemplateText(landbase "treecablelabel" cabloc ".skt", label)
+    setTemplateText(landbase "treecablelabel1.skt", label)
+    wait()
+    setTemplateText(landbase "treetype.skt", treetype)
   }
   else {
     meas1 := setMeasurement()
     meas2 := setMeasurement()
     label := getCableLabel()
-    label := getCableLabel()
+    label2 := getCableLabel()
     setTemplateText(landbase "treemeas1.skt", meas1)
     wait()
     setTemplateText(landbase "treemeas2.skt", meas2)
     wait()
     setTemplateText(landbase "treecablelabel1.skt", label)
     wait()
-    setTemplateText(landbase "treecablelabel2.skt", label)
+    setTemplateText(landbase "treecablelabel2.skt", label2)
+    wait()
+    setTemplateText(landbase "treetype.skt", treetype)
   }
 }
 
 getCableLabel()
 {
-  label = Inputbox("Enter label for cable")
+  label := Inputbox("Enter label for cable")
   StringUpper, label, label
   return label
 }
@@ -3084,6 +3090,13 @@ Return
   loadImageNG("high risk fibre.png")
 return
 
+
+isInt(var){
+  if var is Integer
+    return true
+  else
+    return false
+}
 ; AUTO LOAD - CHANGE FILENAME AS NEEDED
 ;#F11::
 ;openSketchForm2()
@@ -3116,64 +3129,34 @@ return
     ;ts := FileOpen("timesheet" . today . ".txt", "a")
     ;ts := fileopen("timesheet21 08 2020.txt", 5)
     Loop{
-      InputBox, rogersMarked, Enter rogers Marked (int)
-      if (rogersMarked > 20)
-      {
-        MsgBox, Please enter an integer between 1 and 20 or leave blank
-        continue
-      }
-      else if rogersmarked is digit
-      {
-        break
-      }
-      else
+      InputBox, ROGERSMARKED, Enter Rogers Marked (1 -20 or blank)
+      if ROGERSMARKED is not digit
         continue
     }
+    until ROGERMARKED <= 20
+    if ErrorLevel
+      return
 
     Loop{
-      InputBox, rogersClear, Enter rogers Clear (int)
-      if (rogersClear > 20)
-      {
-        MsgBox, Please enter an integer between 1 and 20 or leave blank
-        continue
-      }
-      else if rogersClear is digit
-      {
-        break
-      }
-      else
+      InputBox, ROGERSCLEAR, Enter rogers Clear (1 - 20 or blank)
+      if rc is not digit
         continue
     }
+    until ROGERSCLEAR <= 20
 
     Loop{
-      InputBox, bellMarked, Enter bell Marked (int)
-      if (bellMarked > 20)
-      {
-        MsgBox, Please enter an integer between 1 and 20 or leave blank
-        continue
-      }
-      else if bellmarked is digit
-      {
-        break
-      }
-      else
+      InputBox, BELLMARKED, Enter bell Marked (int)
+      if BELLMARKED is not digit
         continue
     }
+    until BELLMARKED <= 20
 
     Loop{
-      InputBox, BellClear, Enter Bell clear (int)
-      if (bellClear > 20)
-      {
-        MsgBox, Please enter an integer between 1 and 20 or leave blank
-        continue
-      }
-      else if bellclear is digit
-      {
-        break
-      }
-      else
+      InputBox, BELLCLEAR, Enter Bell clear (int)
+      if BELLCLEAR is not digit
         continue
     }
+    until BELLCLEAR <= 20
 
     if (rogersMarked)
       rogersMarked .= "M"
@@ -3956,8 +3939,8 @@ setTreeDigArea() {
   Sendinput, {f2}
   Send, 5M E OF %TREETYPE% %treenum%{enter}
   wait()
-  TREETYPE := ""
   clickSelection()
+  return treetype
 }
 
 setPoleDigArea() {
@@ -5387,11 +5370,13 @@ recordsLookup()
 		driver.findElementbyId("latitudeSearchInput").clear()
 		driver.findElementbyId("latitudeSearchInput").SendKeys(lat)
 		driver.findElementbyCss("#id_search_div > div:nth-child(1) > table > tbody > tr:nth-child(8) > td:nth-child(4) > a").click()
+        driver.findElementbyCss("body > div:nth-child(7) > div.panel-header.panel-header-noborder.window-header > div.panel-tool > a.panel-tool-close").click()
 	}
 
 	else if (stationCode "BCGN01") || if (stationCode = "BCGN02")
 	{
 		MV := "ahk_exe lacmultiviewer.exe"
+        WINACTIVATE, %MV%
 		Controlclick, WindowsForms10.BUTTON.app.0.378734a32, %MV%
 		winwaitactive, Zoom to Coordinate
 		sleep 50
@@ -6647,11 +6632,13 @@ writeDamageRemarks()
 	}
 
 	#m::
+    ;turns off monitor with Win-m
 	Sleep 1000
 	SendMessage, 0x112, 0xF170, 2,, Program Manager
 	return
 
 ::owcovid::
+; covid tracking form
 	Run, https://docs.google.com/forms/d/e/1FAIpQLScU2XCTGCNtohl9KvmqoYOWenK4MvwPDRKa-BIZ0a3eGxrEZg/viewform?vc=0&c=0&w=1&flr=0&gxids=7628
 	SetTitleMatchMode, 2
 	CoordMode, Mouse, Screen
@@ -6734,15 +6721,44 @@ return
 ; SKETCH_WIDTH := 756
 ; SKETCH_HEIGHT := 640
 
+^F3::
 ::lineMOVE::
      WinActivate, ahk_exe sketchtoolapplication.exe
-     loadImageNG("vline.skt")
+     loadImageNG("vTEXT.SKT")
 	Sleep 250
-	movex := (((2*sketch_bounds.width // 3) + sketch_bounds.ulx) // 5)
-	movey:= (((sketch_bounds.height // 5) + sketch_bounds.uly) // 5)
-	MsgBox % "(" . movex . "," . movey ")" 
-	SendInput, {right %movex%}{down %movey%}
-	return
+	;~ movex := 482
+	;~ movey:= 798
+	;~ MsgBox % "(" . movex . "," . movey ")" 
+	;~ SendInput, {right 476}{down 772}
+    ;~ msgbox % "Done
+    accessProperties()
+    Send, {tab 9}
+    send, 476,772{enter}
+    send, {tab 5}
+    send, TV{enter}
+    
+drawElement(filename,x,y,w := "",h := "",rotation := "")
+{
+  WinActivate, ahk_exe sketchtoolapplication.exe
+  loadImageNG(filename)
+  sleep 250
+  accessProperties()
+  ; element position
+  Send, {Tab 9}
+  send, %x%,%y%{enter}
+}
+
+drawText(filename, string,x,y,w := "",h := "",rotation := "")
+{
+  winactivate, ahk_exe sketchtoolapplication.exe
+  loadImageNG(filename)
+  ;text position
+  send, {Tab 9}
+  send, %x%,%y%{enter}
+  ;text string
+  send, {tab 5}
+  send, %string%enter
+}
 
 ::rectsize::
 	SetKeyDelay, 25
@@ -6830,3 +6846,12 @@ return
 Send,{End}{Backspace 5}
 Send, R.skt{Enter}
 return
+#IfWinActive
+
+::chvar::
+changeVariable(){
+editedvar := Inputbox("Enter variable name")
+newval := Inputbox("Enter new value for " . editedvar)
+%editedvar% := newval
+}
+
