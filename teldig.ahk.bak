@@ -386,6 +386,7 @@ F8::
     Else
       sketch.form := "BA"
     waitSTLoad()
+    changeGridSizeTo16()
     writeDigArea()
     if (digboundary)
     {
@@ -709,6 +710,8 @@ F10::
         }
         ; wait for SketchTool to be loaded via rotation arrow
         waitSTLoad()
+        changeGridSizeTo16()
+        MouseClick,l,% A_ScreenWidth/2, % A_ScreenHeight/2
         Winget,stpid,PID,A
         if (form = "BP")
         {
@@ -2053,6 +2056,7 @@ transformerAutoFill()
   global
   setForm()
   waitSTLoad()
+  changeGridSizeTo16()
   if (form = "BP")
   {
     bellPrimaryPoleAutofill()
@@ -2152,7 +2156,7 @@ treeAutoFill()
   global
   setForm()
   waitSTLoad()
-  
+  changeGridSizeTo16()
   if (form = "BP")
   {
     bellPrimaryPoleAutofill()
@@ -5376,6 +5380,7 @@ recordsLookup()
 	else if (stationCode "BCGN01") || if (stationCode = "BCGN02")
 	{
 		MV := "ahk_exe lacmultiviewer.exe"
+        WINACTIVATE, %MV%
 		Controlclick, WindowsForms10.BUTTON.app.0.378734a32, %MV%
 		winwaitactive, Zoom to Coordinate
 		sleep 50

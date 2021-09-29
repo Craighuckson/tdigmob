@@ -496,7 +496,7 @@ bellPrimaryPoleAutofill()
   {
     global totalpages
     setform()
-    waitSTLoad()
+  
     if (stationcode = "BCGN01") or if (stationcode = "BCGN02")
       loadImage("bell cua.skt")
     else
@@ -709,6 +709,8 @@ F10::
         }
         ; wait for SketchTool to be loaded via rotation arrow
         waitSTLoad()
+        ;changeGridSizeTo16()
+        MouseClick,l,% A_ScreenWidth/2, % A_ScreenHeight/2
         Winget,stpid,PID,A
         if (form = "BP")
         {
@@ -2152,7 +2154,6 @@ treeAutoFill()
   global
   setForm()
   waitSTLoad()
-  
   if (form = "BP")
   {
     bellPrimaryPoleAutofill()
