@@ -3,7 +3,6 @@
 ;TODO: ROGERS LOOKUP USING IE AND COM
 
 ;~ /* ;AUTOEXECUTE SECTION  */
-#Warn,,stdout
 #NoEnv
 
 ListLines, On
@@ -80,6 +79,7 @@ Gui,2: Add, CheckBox, x172 y170 w100 h30 vinaccuraterecords, Inaccurate Records
 Gui,2: Add, CheckBox, x172 y200 w100 h30 vrailway, Railway
 Gui,2: Add, Button, x82 y310 w100 h30 , OK
 Gui,2: Add, Button, x272 y310 w100 h30 , Cancel
+
 ; SETUP OF GUI FOR SKETCH TOOL
 Menu, forms, Add, Bell Auxilliary, 2buttonbaux
 Menu, forms, Add, Bell Primary, 2buttonbprim
@@ -97,6 +97,7 @@ Menu, drawingtools, Add, Insert UDraw Sketch, insertUdrawSketch
 Menu, drawingtools, Add, Dig Box, digbox
 Menu, drawingtools, Add, Corner Tool, drawCorner
 Menu, drawingtools, Add, Delete Sketch Contents,deleteoldbell
+Menu, drawingtools, Add, Clear Rogers From Bell, clearRogersFromBell
 Menu, drawingtools, Add, Rogers Aux Dig Area Shift,radigsh
 Menu, warninglabels, Add, Rogers Clear, 2buttonrogersclear
 Menu, warninglabels, Add, Rogers FTTH, 2buttonrogersftth
@@ -710,18 +711,18 @@ F10::
         ; wait for SketchTool to be loaded via rotation arrow
         waitSTLoad()
         ;changeGridSizeTo16()
-        MouseClick,l,% A_ScreenWidth/2, % A_ScreenHeight/2
+        ;MouseClick,l,% A_ScreenWidth/2, % A_ScreenHeight/2
         Winget,stpid,PID,A
         if (form = "BP")
         {
           ;QUICK FILL FOR SINGLE VS PROJECT
-          btickettype := Inputbox("&Single or &Project?")
+          btickettype := Inputbox("Single or Project?")
           if btickettype in s,S,p,P
           {
             if (btickettype = "s")
             {
               totalpages := 2
-            }
+            
             units := Inputbox("Enter units")
             primary_template := FileSelectFile(,"C:\Users\Cr\Documents\","Choose bell primary form to open")
             focusSketchtool()
@@ -743,7 +744,7 @@ F10::
             pagetimeend := ((A_TickCount - timestart) / 1000)
             FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
             return
-          }
+            }
           else if (btickettype = "p")
           {
             bellPrimStart()
@@ -756,6 +757,7 @@ F10::
             return
           }
         }
+      }
 
         ;getexisting := InputBox("Open existing sketch? Y/N")
         MsgBox,4,Open Existing?,Open Existing Sketch?
@@ -883,6 +885,7 @@ F10::
           return
         }
       }
+    
 
       ; Dig Box PROMPT WIN D
       #ifwinactive ahk_exe sketchtoolapplication.exe
@@ -938,6 +941,7 @@ F10::
               }
             }
           }
+        
 
           getRegDA()
           {
@@ -1431,69 +1435,95 @@ F10::
             }
           }
 
+          PL4ButtonOK:
+              
+              Gui, PL4: Submit
+              Gui, PL4: Destroy
+              return
+          
           setPL4DigArea(num1:="", num2:="")
           {
             global
-            landbase:=getLandbase()
-            num:=getBLNum()
+            ;Inputbox, dwgcount, Drawing count, How many drawings?,,,,,,,,1
+            ; Generated using SmartGUI Creator for SciTE
+            ;GUI FOR PL4
+            Gui, PL4:Add, Edit, x252 y40 w180 h20 vlandbase , 
+            Gui, PL4:Add, Edit, x252 y100 w180 h20 vPL4num1 , 
+            Gui, PL4:Add, Edit, x252 y170 w180 h20 vPL4num2, 
+            Gui, PL4:Add, Edit, x252 y240 w180 h20 vstreet , %street%
+            Gui, PL4:Add, Text, x102 y40 w120 h20 , Landbase
+            Gui, PL4:Add, Text, x102 y100 w120 h20 , Address 1
+            Gui, PL4:Add, Text, x102 y170 w120 h20 , Address 2
+            Gui, PL4:Add, Text, x102 y240 w120 h20 , Street
+            Gui, PL4:Add, Button, x222 y320 w80 h30 , OK
+            Gui, PL4:Show, w479 h379, PL to PL Generator
+            WinWaitClose, PL to PL Generator
+            
+             ; Gui, PL4: Destroy
+             ;landbase:=getLandbase()
+            ;num:=getBLNum()
             fixstreetName()
-            ;num := [num1,num2]
+            ;Inputbox,street,Street,Enter street name,,,,,,,,%street%
+            num1 := pl4num1, num2 := pl4num2
+            num := [num1,num2]
             switch landbase
             {
-            case "n":
-              north:="NPL " num.1 " " street
-              south:="SPL " num.1 " "street
-              west:="WPL " num.1 " " street
-              (num.2)?(east:="EPL " num.2 " " street):(east:= "EPL " num.1 " " street)
+              
+              case "n":
+                north:="NPL " num.1 " " street
+                south:="SPL " num.1 " "street
+                west:="WPL " num.1 " " street
+                (num.2)?(east:="EPL " num.2 " " street):(east:= "EPL " num.1 " " street)
 
-            case "s":
-              north:="SPL " num.1 " " street
-              south:="NPL " num.1 " " street
-              west:="WPL " num.1 " " street
-              ;east:="EPL " num.2 " " street
-              (num.2)?(east:="EPL " num.2 " " street):(east:= "EPL " num.1 " " street)
+              case "s":
+                north:="SPL " num.1 " " street
+                south:="NPL " num.1 " " street
+                west:="WPL " num.1 " " street
+                ;east:="EPL " num.2 " " street
+                (num.2)?(east:="EPL " num.2 " " street):(east:= "EPL " num.1 " " street)
 
-            case "w":
-              north:="NPL " num.1 " " street
-              south:="SPL " num.2 " " street
-              (num.2)?(south:="SPL " num.2 " " street):(south:= "SPL " num.1 " " street)
-              west:="WPL " num.1 " " street
-              east:="EPL " num.1 " " street
+              case "w":
+                north:="NPL " num.1 " " street
+                south:="SPL " num.2 " " street
+                (num.2)?(south:="SPL " num.2 " " street):(south:= "SPL " num.1 " " street)
+                west:="WPL " num.1 " " street
+                east:="EPL " num.1 " " street
 
-            case "e":
-              north:="NPL " num.1 " " street
-              ;south:="SPL " num.2 " " street
-              (num.2)?(south:="SPL " num.2 " " street):(south:= "SPL " num.1 " " street)
-              west:="WPL " num.1 " "street
-              east:="EPL " num.1 " " street
+              case "e":
+                north:="NPL " num.1 " " street
+                ;south:="SPL " num.2 " " street
+                (num.2)?(south:="SPL " num.2 " " street):(south:= "SPL " num.1 " " street)
+                west:="WPL " num.1 " "street
+                east:="EPL " num.1 " " street
 
-            case "nw":
-              north:="NPL " num.1 " " street,south:= "SPL " num.1 " " street, west:="WPL " num.1 " " street, east:="EPL " num.1 " " street
+              case "nw":
+                north:="NPL " num.1 " " street,south:= "SPL " num.1 " " street, west:="WPL " num.1 " " street, east:="EPL " num.1 " " street
 
-            case "sw":
-              north:="NPL " num.1 " " street, south:= "SPL " num.1 " " street, west:= "WPL " num.1 " " street, east:="EPL " num.1 " " street
+              case "sw":
+                north:="NPL " num.1 " " street, south:= "SPL " num.1 " " street, west:= "WPL " num.1 " " street, east:="EPL " num.1 " " street
 
-            case "ne":
-              north:="NPL " num.1 " " street,south:= "SPL " num.1 " " street, west:="WPL " num.1 " " street, east:="EPL " num.1 " " street
+              case "ne":
+                north:="NPL " num.1 " " street,south:= "SPL " num.1 " " street, west:="WPL " num.1 " " street, east:="EPL " num.1 " " street
 
-            case "se":
-              north:="NPL " num.1 " " street,south:= "SPL " num.1 " " street, west:="WPL " num.1 " " street, east:="EPL " num.1 " " street
-            }
+              case "se":
+                north:="NPL " num.1 " " street,south:= "SPL " num.1 " " street, west:="WPL " num.1 " " street, east:="EPL " num.1 " " street
+              }
 
-            IF (FORM = "RA")
-            {
-              setTemplateText("RANboundary.skt",north)
-              setTemplateText("RAsboundary.skt",south)
-              setTemplateText("RAWBoundary.skt",west)
-              setTemplateText("RAEBoundary.skt",east)
-            }
-            else
-            {
-              setTemplateText("Nboundary.skt",north)
-              setTemplateText("sboundary.skt",south)
-              setTemplateText("WBoundary.skt",west)
-              setTemplateText("EBoundary.skt",east)
-            }
+              IF (FORM = "RA")
+              {
+                setTemplateText("RANboundary.skt",north)
+                setTemplateText("RAsboundary.skt",south)
+                setTemplateText("RAWBoundary.skt",west)
+                setTemplateText("RAEBoundary.skt",east)
+              }
+              else
+              {
+                setTemplateText("Nboundary.skt",north)
+                setTemplateText("sboundary.skt",south)
+                setTemplateText("WBoundary.skt",west)
+                setTemplateText("EBoundary.skt",east)
+              }
+              
           }
 
           setStreetToStreetDigArea()
@@ -1724,7 +1754,9 @@ F10::
 
           }
 
-          bellPrimStart()
+
+
+bellPrimStart()
           {
             WinGet,stpid,PID,A
             global bellclear
@@ -1758,7 +1790,6 @@ F10::
           }
           else
             bellPrimStart()
-          return
         }
 
         rogClear()
@@ -5767,10 +5798,12 @@ recordsLookup()
 		switch command
 		{
 			Case "edit sketch" :
-			focusTeldig()
+              focusTeldig()
 			Send, !ls
 			Case "emergency" :
-			emergency()
+              emergency()
+            Case "grid":
+              changeGridSizeTo16()
 		}
 	}
 	
