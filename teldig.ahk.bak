@@ -18,11 +18,18 @@ SetControlDelay, 50
 
 ;CONSTANTS
 
+; used for on the go hotstrings
+tempvar1 := ""
+tempvar2 := ""
+tempvar3 := ""
+tempvar4 := ""
+tempvar5 := ""
+
 today:= A_DD . " " . A_MM . " " . A_YYYY
 sketch_bounds := {ulx:192, uly:512,lrx:948,lry:1152,width:756,height:640}
 getVPNPass()
 {
-VPNPASS := ")?g2{:\4.;Sr3Lgy"
+VPNPASS := "2SxBJzLA"
   return VPNPaSS
 }
 
@@ -313,7 +320,7 @@ resetFormVar()
         ;openBellAux()
         break
       }
-      else if (stationCode == "ROGYRK01" and form = "") or if (stationCode == "ROGSIM01" and form = "")
+      else if (stationCode == "ROGYRK01" and form = "") or if (stationCode == "ROGSIM01" and form = "") or if (stationCode == "ROGPEL01" and form = "")
       {
         openForm("|<>*138$51.D33l1sTw+0MF880EWU2W91024I0YF880EWU4Xl1s22Y0WF880EIUDm91022W12F880EADM/lxw214","RP")
         TrayTip,Form,Opening Rogers Primary form,5
@@ -490,6 +497,7 @@ bellPrimaryPoleAutofill()
 {
   global
   bell_stickers()
+  WinWaitClose, Please select all that apply
 }
 
 ::autocua::
@@ -498,7 +506,7 @@ bellPrimaryPoleAutofill()
     global totalpages
     setform()
   
-    if (stationcode = "BCGN01") or if (stationcode = "BCGN02")
+    if (stationcode = "BCGN01") or if (stationcode = "BCGN02")t
       loadImage("bell cua.skt")
     else
       loadImage("cua rogers.skt")
@@ -643,7 +651,7 @@ F10::
         }
         else
         {
-          MsgBox, % "Template formatting error!"
+          MsgBox, % "Template formatting error!"S
           return
         }
       }
@@ -757,6 +765,7 @@ F10::
             return
           }
         }
+      }
 
         ;getexisting := InputBox("Open existing sketch? Y/N")
         MsgBox,4,Open Existing?,Open Existing Sketch?
@@ -884,7 +893,7 @@ F10::
           return
         }
       }
-    }
+    
 
       ; Dig Box PROMPT WIN D
       #ifwinactive ahk_exe sketchtoolapplication.exe
@@ -1841,7 +1850,6 @@ bellPrimStart()
             return
           }
         }
-
         newPagePrompt()
         {
           global
@@ -1938,7 +1946,13 @@ bellPrimStart()
           rclear := rogclear()
           if(rclear)
           {
-            loadImage("rogclear.skt")
+            clearreason := Inputbox("Clear reason","Regular (r)`nFTTH (f)`nClear For Fibre Only(c)")
+          switch clearreason
+          {
+            case "r": loadImage("rogclear.skt")
+            case "f": loadImage("ftth.skt")
+            case "c": loadImage("exclusion agreement r.skt")
+          }
             return
           }
         }
@@ -2178,7 +2192,122 @@ transformerAutoFill()
     }
   }
 }
+^F12::
+sptreeAutofill()
+{
+  global
+  setForm()
+  waitSTLoad()
 
+    if (form = "BP")
+        {
+          ;QUICK FILL FOR SINGLE VS PROJECT
+          btickettype := Inputbox("Single or Project?")
+          if btickettype in s,S,p,P
+          {
+            if (btickettype = "s")
+            {
+              totalpages := 2
+            
+            units := Inputbox("Enter units")
+            primary_template := "bellprimcabconcc.skt"
+            focusSketchtool()
+            loadImage("bell primary.skt")
+            wait()
+            loadImage(primary_template)
+            wait()
+            setTemplateText("bellprimarydate.skt",getCurrentDate())
+            wait()
+            setTemplateText("units.skt",units)
+            wait()
+            setTemplateText("RPtotalpages.skt",totalpages)
+            wait()
+            if !currentpage
+              currentpage := 1
+            Controlclick("OK","ahk_exe sketchtoolapplication.exe")
+            focusTeldig()
+            }
+          else if (btickettype = "p")
+          {
+            bellPrimaryPoleAutofill()
+            ST_SAVEEXIT()
+          }
+
+          else
+          {
+            bellPrimaryPoleAutofill()
+            ST_SAVEEXIT()
+          }
+        }
+      }
+  
+  else 
+  {
+    inputbox,number,Number, Enter house number
+    inputbox,street,Street, Street name?
+
+    (form = "RA") ? loadImageNG("RANBoundary.skt") : loadImageNG("NBoundary.skt")
+    SendInput {f2}
+    Sendinput, 2M N OF STUMP %number% %street%{Enter}
+    (form = "RA") ? loadImageNG("RASBoundary.skt") : loadImageNG("SBoundary.skt")
+    ;Sleep
+    SendInput, {f2}
+    Send, 2M S OF STUMP %number% %street%{enter}
+    (form = "RA") ? loadImageNG("RAWBoundary.skt") : loadImageNG("WBoundary.skt")
+    ;Sleep
+    Sendinput, {f2}
+    Send, 2M W OF STUMP %number% %street%{enter}
+    (form = "RA") ? loadImageNG("RAEBoundary.skt") : loadImageNG("EBoundary.skt")
+    ; Sleep 500
+    Sendinput, {f2}
+    Send, 2M E OF STUMP %number% %street%{enter}
+    wait()
+    clickSelection()
+        rclear := rogClear()
+        if (rclear)
+        {
+          setRogersClear()
+          rclear := ""
+          ST_SAVEEXIT()
+          return
+        }
+        InputBox, landbase, landbase, Which Direction?
+        if (form = "RP") or if (form = "RA")
+        {
+        loadimageNG("tree" landbase "3.skt")
+        }
+      else
+      {
+        loadImageNG("tree" landbase "2.skt")
+      }
+      WAIT()
+      setTemplateText(landbase "streettree.skt", street)
+        wait()
+        setTemplateText(landbase "treenumber.skt",number)
+        wait()
+        setTemplateText(landbase "treetype.skt", "STUMP")
+        if (form = "RP") || if (form = "RA") 
+        {
+      setTemplateText(landbase "treemeas1.skt", "1.0m")
+      wait()
+      setTemplateText(landbase "treemeas2.skt", "2.7m")
+      wait()
+      setTemplateText(landbase "treecablelabel1.skt","FO")
+      wait()
+      setTemplateText(landbase "treecablelabel2.skt", "TV")
+      }
+    else
+    {
+      setTemplateText(landbase "treemeas2.skt","2.7m")
+    wait()
+    setTemplateText(landbase "treecablelabel2.skt","1B1C")
+      WinWaitClose, AHK_EXE SKETCHTOOLAPPLICATION.EXE
+    if (currentpage < totalpages)
+      sptreeAutoFill()
+}
+}
+}
+  
 treeAutoFill()
 {
   global
@@ -2209,9 +2338,10 @@ treeAutoFill()
       }
       InputBox, street, Street, Street?,,,,,,, %street%
       InputBox, landbase, landbase, Which Direction?
+      InputBox, number,Number, Enter house number?
       InputBox, cabloc, Location, Where is cable relative to tree?`n1 = closer to road`n2 = closer to property`n3 = both sides of tree
-      loadImage(treeSketchBuilder(landbase,cabloc))
-      setTreeLabels(street, cabloc, landbase, treetype)
+      loadimageNG(treeSketchBuilder(landbase,cabloc))
+      setTreeLabels(street, cabloc, landbase, treetype,number)
       ;if (landbase = "n")
       ;       loadImage("treen.skt")
       ;else if (landbase = "s")
@@ -2229,10 +2359,10 @@ treeAutoFill()
   FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
 }
 
-setTreeLabels(street, cabloc, landbase, treetype)
+setTreeLabels(street, cabloc, landbase, treetype, number := "")
 {
   setTemplateText(landbase "streettree.skt", street)
-  if (cabloc != 3) {
+  if (cabloc = 1) {
     meas1 := setMeasurement()
     label := getCableLabel()
     setTemplateText(landbase "treemeas1.skt", meas1)
@@ -2240,8 +2370,29 @@ setTreeLabels(street, cabloc, landbase, treetype)
     setTemplateText(landbase "treecablelabel1.skt", label)
     wait()
     setTemplateText(landbase "treetype.skt", treetype)
+    wait()
+    if (number)
+    {
+      setTemplateText(landbase "treenumber.skt", number)
+    }
   }
-  else {
+  else if (cabloc = 2)
+  {
+    meas2 := setMeasurement()
+    label2 := getCablelabel()
+    setTemplateText(landbase "treemeas2.skt",meas2)
+    wait()
+    setTemplateText(landbase "treecablelabel2.skt",label2)
+    wait()
+    setTemplateText(landbase "treetype.skt", treetype)
+    wait()
+    if (number)
+    {
+      setTemplateText(landbase "treenumber.skt", number)
+    }
+  }
+  else 
+  {
     meas1 := setMeasurement()
     meas2 := setMeasurement()
     label := getCableLabel()
@@ -2255,6 +2406,11 @@ setTreeLabels(street, cabloc, landbase, treetype)
     setTemplateText(landbase "treecablelabel2.skt", label2)
     wait()
     setTemplateText(landbase "treetype.skt", treetype)
+    wait()
+    if (number)
+    {
+      setTemplateText(landbase "treenumber.skt", number)
+    }
   }
 }
 
@@ -3256,6 +3412,9 @@ isInt(var){
       textboxplus() {
         mousegetpos, xpos, ypos
         InputBox, STRING, Enter Text
+        if ErrorLevel {
+          return
+        }
         StringUpper,string,string
         clickTextTool()
         newx := xpos + (strlen(STRING)*10)
@@ -3269,6 +3428,9 @@ isInt(var){
       textboxplusVertical(){
         mousegetpos, xpos, ypos
         InputBox, STRING, Enter Text
+        if ErrorLevel {
+          return
+        }
         StringUpper, string, string
         clickTextTool()
         newx := xpos + (strlen(STRING)*10)
@@ -3337,6 +3499,9 @@ isInt(var){
 
     p::
       send, {ctrl down}v{ctrl up}
+    return
+    
+    x::Delete
     return
 
 #IfWinActive
@@ -3939,7 +4104,7 @@ getTreeType()
   else if (treetype = 2)
     treetype := "STUMP"
   else
-    treetype := "FLAG"
+    treetype := "TREE"
   return treetype
 }
 
@@ -3956,19 +4121,19 @@ setTreeDigArea() {
 
   loadImageNG("NBoundary.skt")
   SendInput {f2}
-  Sendinput, 5M N OF %TREETYPE% %treenum%{Enter}
+  Sendinput, 2M N OF %TREETYPE% %treenum%{Enter}
   loadImageNG("SBoundary.skt")
   ;Sleep
   SendInput, {f2}
-  Send, 5M S OF %TREETYPE% %treenum%{enter}
+  Send, 2M S OF %TREETYPE% %treenum%{enter}
   loadImageNG("WBoundary.skt")
   ;Sleep
   Sendinput, {f2}
-  Send, 5M W OF %TREETYPE% %treenum%{enter}
+  Send, 2M W OF %TREETYPE% %treenum%{enter}
   loadImageNG("EBoundary.skt")
   ; Sleep 500
   Sendinput, {f2}
-  Send, 5M E OF %TREETYPE% %treenum%{enter}
+  Send, 2M E OF %TREETYPE% %treenum%{enter}
   wait()
   clickSelection()
   return treetype
@@ -5363,17 +5528,17 @@ recordsLookup()
 	if (stationCode = "ROGYRK01") || if (stationCode = "ROGSIM01")
 
 	{
-		vpnstatus := isvpn()
-		loop 
-		{
-			if (vpnstatus = false)
-			{
-				vpnToggle()
-				vpnstatus := true
-			}
-			else break
-		}
-		WinClose, ahk_exe vpnui.exe
+		;~ vpnstatus := isvpn()
+		;~ loop 
+		;~ {
+			;~ if (vpnstatus = false)
+			;~ {
+				;~ vpnToggle()
+				;~ vpnstatus := true
+			;~ }
+			;~ else break
+		;~ }
+		;~ WinClose, ahk_exe vpnui.exe
 		if !WinExist("ahk_exe chrome.exe")
 		{
 			Run, C:\Program Files\Google\Chrome\Application\chrome.exe  --remote-debugging-port=9222
@@ -5924,10 +6089,15 @@ recordsLookup()
 	LShift & RControl::
 	quickLabel()
 	return
+    
 	#IfWinActive
+    
 	quickLabel()
 	{
 		label := InputBox("Enter label name")
+        if ErrorLevel {
+          return
+        }
 		loadImageNG(label ".skt")
 	}
 	+!s::
@@ -6745,7 +6915,6 @@ send, {down}{enter}
 #IfWinActive, ahk_exe SketchToolApplication.exe
 `::LButton
 Esc::Delete
-x::Delete
 return
 
 ;SKETCH RECTANGLE BOUNDARIES 
@@ -6836,7 +7005,7 @@ MsgBox % "You have " . belllist.length() . " Bell tickets and " . roglist.length
 
 sketchSearch()
 {
-	run, C:\Users\Cr\sketchsearch.bat
+	run, C:\Users\Cr\Desktop\drawingsearch.ahk
 }
 
 :::note::
@@ -6887,4 +7056,12 @@ editedvar := Inputbox("Enter variable name")
 newval := Inputbox("Enter new value for " . editedvar)
 %editedvar% := newval
 }
+
+::shvar::
+showVariableName(){
+editedvar := Inputbox("Enter variable name")
+MsgBox % %editedvar%
+}
+;ON THE GO HOTSTRINGS
+
 
