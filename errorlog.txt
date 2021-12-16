@@ -74,3 +74,56 @@
 20211104120600 - Cannot access ChildPath Item #8 -> 37
 20211104125026 - Cannot access ChildPath Item #4 -> 1
 20211105144335 - Cannot access ChildPath Item #2 -> 7
+20211109093323 - Cannot access ChildPath Item #2 -> 7
+20211109093328 - Cannot access ChildPath Item #2 -> 7
+20211118121347 - Cannot access ChildPath Item #2 -> 7
+20211118135244 - Cannot access ChildPath Item #2 -> 7
+20211118135756 - Cannot access ChildPath Item #2 -> 7
+20211119145132 - Invalid IAccessible Object
+20211119145132 - Cannot access ChildPath Item #9 -> 4
+20211119153331 - Cannot access ChildPath Item #8 -> 37
+20211122114528 - Cannot access ChildPath Item #2 -> 7
+20211122114529 - Cannot access ChildPath Item #2 -> 7
+20211122115127 - Cannot access ChildPath Item #2 -> 7
+20211122131202 - Cannot access ChildPath Item #2 -> 7
+20211123073003 - Invalid IAccessible Object
+20211123073003 - Cannot access ChildPath Item #9 -> 4
+20211123105249 - Cannot access ChildPath Item #8 -> 37
+20211123223651 - Cannot access ChildPath Item #2 -> 7
+20211123224511 - Cannot access ChildPath Item #2 -> 7
+20211123225519 - Cannot access ChildPath Item #2 -> 7
+20211123231123 - Cannot access ChildPath Item #2 -> 7
+20211123231859 - Cannot access ChildPath Item #2 -> 7
+20211124165547 - Cannot access ChildPath Item #2 -> 7
+20211124214649 - Cannot access ChildPath Item #2 -> 7
+20211124214956 - Cannot access ChildPath Item #2 -> 7
+20211124215247 - Cannot access ChildPath Item #2 -> 7
+20211124220543 - Cannot access ChildPath Item #2 -> 7
+20211124220832 - Cannot access ChildPath Item #2 -> 7
+20211126111724 - Cannot access ChildPath Item #2 -> 7
+20211126112328 - Cannot access ChildPath Item #2 -> 7
+20211126112609 - Cannot access ChildPath Item #2 -> 7
+20211126115221 - Cannot access ChildPath Item #2 -> 7
+20211126121806 - Cannot access ChildPath Item #8 -> 37
+20211126123528 - Cannot access ChildPath Item #2 -> 7
+20211126124011 - Cannot access ChildPath Item #2 -> 7
+20211129144632 - "DoDefaultAction" Cmd Not Implemented
+20211202142656 - "DoDefaultAction" Cmd Not Implemented
+20211202154842 - "DoDefaultAction" Cmd Not Implemented
+20211202235117 - Cannot access ChildPath Item #2 -> 7
+20211203000554 - Cannot access ChildPath Item #8 -> 37
+20211203121311 - AccessibleChildren DllCall Failed
+20211203121312 - Cannot access ChildPath Item #1 -> 4
+20211207080037 - Cannot access ChildPath Item #8 -> 37
+20211207115002 - Cannot access ChildPath Item #2 -> 7
+20211207115836 - Cannot access ChildPath Item #2 -> 7
+20211207120829 - Cannot access ChildPath Item #2 -> 7
+20211207121322 - Cannot access ChildPath Item #2 -> 7
+20211207124934 - Cannot access ChildPath Item #2 -> 7
+20211208121601 - "DoDefaultAction" Cmd Not Implemented
+20211209162957 - Invalid IAccessible Object
+20211209162957 - Cannot access ChildPath Item #9 -> 4
+20211209162958 - Invalid IAccessible Object
+20211209162958 - Cannot access ChildPath Item #9 -> 4
+20211213163122 - Cannot access ChildPath Item #2 -> 1
+20211214112539 - "DoDefaultAction" Cmd Not Implemented
