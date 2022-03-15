@@ -127,3 +127,139 @@
 20211209162958 - Cannot access ChildPath Item #9 -> 4
 20211213163122 - Cannot access ChildPath Item #2 -> 1
 20211214112539 - "DoDefaultAction" Cmd Not Implemented
+20211223095733 - "DoDefaultAction" Cmd Not Implemented
+20211223095747 - "DoDefaultAction" Cmd Not Implemented
+20211223103812 - "DoDefaultAction" Cmd Not Implemented
+20211223120405 - "DoDefaultAction" Cmd Not Implemented
+20211223120420 - "DoDefaultAction" Cmd Not Implemented
+20211230153016 - Cannot access ChildPath Item #2 -> 7
+20211230235141 - Cannot access ChildPath Item #2 -> 7
+20211230235144 - Cannot access ChildPath Item #2 -> 7
+20211230235148 - Cannot access ChildPath Item #2 -> 7
+20211231101422 - Cannot access ChildPath Item #2 -> 7
+20220103200522 - Invalid IAccessible Object
+20220103200522 - Cannot access ChildPath Item #9 -> 4
+20220108205109 - Cannot access ChildPath Item #4 -> 1
+20220108205110 - Cannot access ChildPath Item #4 -> 1
+20220108205114 - Cannot access ChildPath Item #4 -> 1
+20220108205115 - Cannot access ChildPath Item #4 -> 1
+20220108205118 - Cannot access ChildPath Item #4 -> 1
+20220108205119 - Cannot access ChildPath Item #4 -> 1
+20220108205123 - Cannot access ChildPath Item #4 -> 1
+20220108205334 - Cannot access ChildPath Item #4 -> 1
+20220108205335 - Cannot access ChildPath Item #4 -> 1
+20220108205339 - Cannot access ChildPath Item #4 -> 1
+20220108205340 - Cannot access ChildPath Item #4 -> 1
+20220108205603 - Invalid IAccessible Object
+20220108205603 - Cannot access ChildPath Item #9 -> 4
+20220108205609 - Invalid IAccessible Object
+20220108205609 - Cannot access ChildPath Item #9 -> 4
+20220108210241 - Cannot access ChildPath Item #4 -> 1
+20220108210242 - Cannot access ChildPath Item #4 -> 1
+20220108210246 - Cannot access ChildPath Item #4 -> 1
+20220117110119 - Invalid IAccessible Object
+20220117110119 - Cannot access ChildPath Item #9 -> 4
+20220117110119 - Invalid IAccessible Object
+20220117110119 - Cannot access ChildPath Item #9 -> 4
+20220118151452 - Cannot access ChildPath Item #2 -> 7
+20220118165100 - Cannot access ChildPath Item #2 -> 7
+20220118165109 - Cannot access ChildPath Item #2 -> 7
+20220125160352 - "DoDefaultAction" Cmd Not Implemented
+20220126120518 - Cannot access ChildPath Item #2 -> 7
+20220201122906 - Cannot access ChildPath Item #2 -> 7
+20220202161431 - Invalid IAccessible Object
+20220202161431 - Cannot access ChildPath Item #9 -> 4
+20220202163033 - Invalid IAccessible Object
+20220202163033 - Cannot access ChildPath Item #9 -> 4
+20220207113953 - Invalid IAccessible Object
+20220207113953 - Cannot access ChildPath Item #9 -> 4
+20220207150900 - "DoDefaultAction" Cmd Not Implemented
+20220208122248 - Cannot access ChildPath Item #2 -> 7
+20220208122636 - Cannot access ChildPath Item #2 -> 7
+20220208133343 - Cannot access ChildPath Item #2 -> 7
+20220208133744 - Cannot access ChildPath Item #2 -> 7
+20220208134118 - Cannot access ChildPath Item #2 -> 7
+20220208134202 - Cannot access ChildPath Item #2 -> 7
+20220208172951 - Cannot access ChildPath Item #2 -> 7
+20220208173004 - Cannot access ChildPath Item #2 -> 7
+20220208173424 - Cannot access ChildPath Item #2 -> 7
+20220208201834 - Cannot access ChildPath Item #2 -> 7
+20220209112352 - Cannot access ChildPath Item #2 -> 7
+20220211133630 - Cannot access ChildPath Item #2 -> 7
+20220211133658 - Cannot access ChildPath Item #2 -> 7
+20220211133729 - Cannot access ChildPath Item #2 -> 7
+20220211134805 - Cannot access ChildPath Item #2 -> 7
+20220211135156 - Cannot access ChildPath Item #2 -> 7
+20220213203201 - Cannot access ChildPath Item #2 -> 7
+20220213203700 - Cannot access ChildPath Item #2 -> 7
+20220213205335 - Cannot access ChildPath Item #2 -> 7
+20220213205801 - Cannot access ChildPath Item #2 -> 7
+20220213211423 - Cannot access ChildPath Item #2 -> 7
+20220213212503 - Cannot access ChildPath Item #2 -> 7
+20220213212607 - Cannot access ChildPath Item #2 -> 7
+20220213213754 - Cannot access ChildPath Item #2 -> 7
+20220214211120 - Cannot access ChildPath Item #4 -> 1
+20220214215752 - Cannot access ChildPath Item #2 -> 7
+20220215211945 - Cannot access ChildPath Item #2 -> 7
+20220216104920 - Cannot access ChildPath Item #2 -> 1
+20220216104921 - Cannot access ChildPath Item #2 -> 1
+20220216220322 - Cannot access ChildPath Item #2 -> 7
+20220216221834 - Cannot access ChildPath Item #2 -> 7
+20220216222019 - Cannot access ChildPath Item #2 -> 7
+20220216222602 - Cannot access ChildPath Item #2 -> 7
+20220216224236 - Cannot access ChildPath Item #2 -> 7
+20220216225739 - Cannot access ChildPath Item #2 -> 7
+20220216230327 - Cannot access ChildPath Item #2 -> 7
+20220222133103 - Cannot access ChildPath Item #2 -> 7
+20220222133748 - Cannot access ChildPath Item #2 -> 7
+20220222133826 - Cannot access ChildPath Item #2 -> 7
+20220222140309 - Cannot access ChildPath Item #2 -> 7
+20220222211955 - Cannot access ChildPath Item #2 -> 7
+20220222212006 - Cannot access ChildPath Item #2 -> 7
+20220222212231 - Cannot access ChildPath Item #2 -> 7
+20220222213241 - Cannot access ChildPath Item #2 -> 7
+20220222213300 - Cannot access ChildPath Item #2 -> 7
+20220222213852 - Cannot access ChildPath Item #2 -> 7
+20220222221545 - Cannot access ChildPath Item #2 -> 7
+20220222221928 - Cannot access ChildPath Item #2 -> 7
+20220223215057 - Cannot access ChildPath Item #2 -> 7
+20220223215732 - Cannot access ChildPath Item #2 -> 7
+20220223223344 - Cannot access ChildPath Item #2 -> 7
+20220223224237 - Cannot access ChildPath Item #2 -> 7
+20220223225037 - Cannot access ChildPath Item #2 -> 7
+20220223225454 - Cannot access ChildPath Item #2 -> 7
+20220224002540 - Cannot access ChildPath Item #2 -> 7
+20220224003315 - Cannot access ChildPath Item #2 -> 7
+20220224003553 - Cannot access ChildPath Item #2 -> 7
+20220224003819 - Cannot access ChildPath Item #2 -> 7
+20220224004444 - Cannot access ChildPath Item #2 -> 7
+20220224135942 - Cannot access ChildPath Item #2 -> 7
+20220224140548 - Cannot access ChildPath Item #2 -> 7
+20220224140934 - Cannot access ChildPath Item #2 -> 7
+20220224141027 - Cannot access ChildPath Item #2 -> 7
+20220224141741 - Cannot access ChildPath Item #2 -> 7
+20220224162113 - Cannot access ChildPath Item #2 -> 7
+20220224163233 - Cannot access ChildPath Item #2 -> 7
+20220224163319 - Cannot access ChildPath Item #2 -> 7
+20220224164742 - Cannot access ChildPath Item #2 -> 7
+20220224164939 - Cannot access ChildPath Item #2 -> 7
+20220224164957 - Cannot access ChildPath Item #2 -> 7
+20220224165745 - Cannot access ChildPath Item #2 -> 7
+20220302142013 - Cannot access ChildPath Item #2 -> 7
+20220303002136 - Cannot access ChildPath Item #2 -> 7
+20220303210929 - Cannot access ChildPath Item #2 -> 7
+20220303211001 - Cannot access ChildPath Item #2 -> 7
+20220304105008 - Cannot access ChildPath Item #2 -> 6
+20220304115153 - Cannot access ChildPath Item #2 -> 7
+20220306215556 - "DoDefaultAction" Cmd Not Implemented
+20220309121643 - Cannot access ChildPath Item #2 -> 7
+20220310224943 - Cannot access ChildPath Item #2 -> 7
+20220310225701 - Cannot access ChildPath Item #2 -> 7
+20220311133751 - Cannot access ChildPath Item #4 -> 1
+20220311134003 - Cannot access ChildPath Item #4 -> 1
+20220311134016 - Invalid IAccessible Object
+20220311134016 - Cannot access ChildPath Item #9 -> 4
+20220311134016 - Invalid IAccessible Object
+20220311134016 - Cannot access ChildPath Item #9 -> 4
+20220313224107 - AccessibleChildren DllCall Failed
+20220313224107 - Cannot access ChildPath Item #10 -> 11
