@@ -99,6 +99,8 @@ Menu, mobile, Add, Get Ticket Picture, getticketpicture
 Menu, Mobile, Add, Load from Project, autoinsertSketches
 Menu, mobile, Add, Mark &job number as 2(clear), markJobNumberas2Clear
 Menu, mobile, Add, Open Sketch E&ditor, openSketchEditor
+Menu, Mobile, Add, &Write Template File, writeTemplateFile
+Menu("Mobile","Add","Load From Template","readClearTemplate")
 Menu, Mobile, Add, Regular Sync, mobilesyncr
 Menu, mobile, Add, Reset Form&Var, resetFormVar
 Menu,mobile, Add, View ticket count, utilCount
@@ -837,6 +839,31 @@ setDWToDWDA()
 		setTemplateText("WBoundary.skt", west)
 		setTemplateText("EBoundary.skt", east)
 	}
+}
+
+setDWToDWSketch()
+{
+	global
+	if (stationcode="ROGYRK01") or if (stationcode = "ROGSIM01")
+	{
+		rclear := rogclear()
+		if(rclear)
+		{
+			clearreason := Inputbox("Clear reason","Regular (r)`nFTTH (f)`nClear For Fibre Only(c)")
+			switch clearreason
+			{
+				case "r": loadImage("rogclear.skt")
+				case "f": loadImage("ftth.skt")
+				case "c": loadImage("exclusion agreement r.skt")
+			}
+			return
+		}
+	}
+	if(intdir)
+		loadimage(landbase "dwtodw" intdir ".skt")
+	Else
+		loadImage(landbase "dwtodw.skt")
+	wait()
 }
 
 setPL4DigArea(num1:="", num2:="")
