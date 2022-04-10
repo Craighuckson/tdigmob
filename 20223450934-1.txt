@@ -1,0 +1,7 @@
+1
+1
+north
+south
+west
+east
+clear_reason
