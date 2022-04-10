@@ -1,0 +1,346 @@
+[
+  {
+    "civic": "",
+    "id": 1,
+    "intersection": "RAMP",
+    "intersection2": "HIGHWAY 407",
+    "name": "2022113030",
+    "street": "MCCOWAN RD (REGIONAL ROAD 67)"
+  },
+  {
+    "civic": "",
+    "id": 2,
+    "intersection": "KIRK DR",
+    "intersection2": "SHADY LANE CRES",
+    "name": "2022111402",
+    "street": "ROYAL ORCHARD BLVD"
+  },
+  {
+    "civic": "",
+    "id": 3,
+    "intersection": "BAY THORN DR",
+    "intersection2": "KIRK DR",
+    "name": "2022111388",
+    "street": "ROYAL ORCHARD BLVD"
+  },
+  {
+    "civic": "",
+    "id": 4,
+    "intersection": "SHADY LANE CRES",
+    "intersection2": "BLUE SPRUCE LANE",
+    "name": "2022111411",
+    "street": "ROYAL ORCHARD BLVD"
+  },
+  {
+    "civic": "",
+    "id": 5,
+    "intersection": "BLUE SPRUCE LANE",
+    "intersection2": "BAYVIEW AVE (REGIONAL ROAD 34)",
+    "name": "2022111423",
+    "street": "ROYAL ORCHARD BLVD"
+  },
+  {
+    "civic": "314",
+    "id": 6,
+    "intersection": "VILLA ADA DR",
+    "intersection2": "RIZAL AVE",
+    "name": "20221114909",
+    "street": "COPPER CREEK DR"
+  },
+  {
+    "civic": "312",
+    "id": 7,
+    "intersection": "DONCREST RD",
+    "intersection2": "BAYVIEW AVE (REGIONAL ROAD 34)",
+    "name": "2022113721",
+    "street": "HIGHWAY 7"
+  },
+  {
+    "civic": "",
+    "id": 8,
+    "intersection": "PHELPS LANE",
+    "intersection2": "N/A",
+    "name": "2022111774",
+    "street": "SAYERS LANE"
+  },
+  {
+    "civic": "41",
+    "id": 9,
+    "intersection": "PALACE CRT",
+    "intersection2": "HIGHWAY 7",
+    "name": "2022113662",
+    "street": "DONCREST RD"
+  },
+  {
+    "civic": "37",
+    "id": 10,
+    "intersection": "PALACE CRT",
+    "intersection2": "HIGHWAY 7",
+    "name": "2022113490",
+    "street": "DONCREST RD"
+  },
+  {
+    "civic": "106",
+    "id": 11,
+    "intersection": "NIGHT SKY CRT",
+    "intersection2": "",
+    "name": "2022117636",
+    "street": "HILLSVIEW DR"
+  },
+  {
+    "civic": "",
+    "id": 12,
+    "intersection": "BLOOMINGTON RD (REGIONAL ROAD 40)",
+    "intersection2": "YONGE ST (REGIONAL ROAD 1)",
+    "name": "2022090518",
+    "street": "YONGE ST (REGIONAL ROAD 1)"
+  },
+  {
+    "civic": "",
+    "id": 13,
+    "intersection": "STONEY STANTON RD",
+    "intersection2": "CORNELL CENTRE BLVD",
+    "name": "2022118074",
+    "street": "HIGHWAY 7"
+  },
+  {
+    "civic": "",
+    "id": 14,
+    "intersection": "LESLIE ST (REGIONAL ROAD 12)",
+    "intersection2": "FORESTWOOD ST",
+    "name": "2022112712",
+    "street": "MAJOR MACKENZIE DR E (REGIONAL ROAD 25)"
+  },
+  {
+    "civic": "155",
+    "id": 15,
+    "intersection": "GOLF CLUB CRT",
+    "intersection2": "MARLA CRT",
+    "name": "20221014854",
+    "street": "RUMBLE AVE"
+  },
+  {
+    "civic": "9301",
+    "id": 16,
+    "intersection": "16TH AVE (REGIONAL ROAD 73)",
+    "intersection2": "OBSERVATORY LANE",
+    "name": "20221010885",
+    "street": "YONGE ST (REGIONAL ROAD 1)"
+  },
+  {
+    "civic": "16",
+    "id": 17,
+    "intersection": "SACHET DR",
+    "intersection2": "PARADELLE DR",
+    "name": "20221013653",
+    "street": "FINESSE CRT"
+  },
+  {
+    "civic": "",
+    "id": 18,
+    "intersection": "KENT MATTHEW ST",
+    "intersection2": "N/A",
+    "name": "20221013134",
+    "street": "SEGUIN ST"
+  },
+  {
+    "civic": "8808",
+    "id": 19,
+    "intersection": "AUTUMN HILL BLVD",
+    "intersection2": "SUMMERIDGE DR",
+    "name": "20221013664",
+    "street": "BATHURST ST (REGIONAL ROAD 38)"
+  },
+  {
+    "civic": "",
+    "id": 20,
+    "intersection": "KINGSVILLE LANE",
+    "intersection2": "TIVOLI AVE",
+    "name": "2022105098",
+    "street": "OXFORD ST"
+  },
+  {
+    "civic": "85",
+    "id": 21,
+    "intersection": "ORLANDO AVE",
+    "intersection2": "BRODIE DR",
+    "name": "2022108200",
+    "street": "VOGELL RD"
+  },
+  {
+    "civic": "9121",
+    "id": 22,
+    "intersection": "DALEMOUNT GATE",
+    "intersection2": "NORTHERN HEIGHTS DR",
+    "name": "2022106603",
+    "street": "YONGE ST (REGIONAL ROAD 1)"
+  },
+  {
+    "civic": "",
+    "id": 23,
+    "intersection": "BAYFIELD DR",
+    "intersection2": "GOLDEN OAK AVE",
+    "name": "2022107369",
+    "street": "SHIRLEY DR"
+  },
+  {
+    "civic": "",
+    "id": 24,
+    "intersection": "SILVER STREAM AVE",
+    "intersection2": "BAYFIELD DR",
+    "name": "2022107362",
+    "street": "SHIRLEY DR"
+  },
+  {
+    "civic": "",
+    "id": 25,
+    "intersection": "FARMSTEAD RD",
+    "intersection2": "SILVER STREAM AVE",
+    "name": "2022107354",
+    "street": "SHIRLEY DR"
+  },
+  {
+    "civic": "",
+    "id": 26,
+    "intersection": "LIBRA AVE",
+    "intersection2": "FARMSTEAD RD",
+    "name": "2022107334",
+    "street": "SHIRLEY DR"
+  },
+  {
+    "civic": "",
+    "id": 27,
+    "intersection": "MAJOR MACKENZIE DR E (REGIONAL ROAD 25)",
+    "intersection2": "YOHO AVE",
+    "name": "2022107330",
+    "street": "SHIRLEY DR"
+  },
+  {
+    "civic": "",
+    "id": 28,
+    "intersection": "OXFORD ST",
+    "intersection2": "DIREZZE CRT",
+    "name": "2022105102",
+    "street": "TIVOLI AVE"
+  },
+  {
+    "civic": "",
+    "id": 29,
+    "intersection": "SOUTHGATE CRES",
+    "intersection2": "HORIZON CRT",
+    "name": "2022105694",
+    "street": "VALLEYMEDE DR"
+  },
+  {
+    "civic": "",
+    "id": 30,
+    "intersection": "16TH AVE (REGIONAL ROAD 73)",
+    "intersection2": "LAGANI AVE",
+    "name": "2022105647",
+    "street": "STRATHEARN AVE"
+  },
+  {
+    "civic": "",
+    "id": 31,
+    "intersection": "HEATH ST",
+    "intersection2": "VALLEYMEDE DR",
+    "name": "2022105656",
+    "street": "STRATHEARN AVE"
+  },
+  {
+    "civic": "",
+    "id": 32,
+    "intersection": "16TH AVE (REGIONAL ROAD 73)",
+    "intersection2": "HEATH ST",
+    "name": "2022105651",
+    "street": "STRATHEARN AVE"
+  },
+  {
+    "civic": "",
+    "id": 33,
+    "intersection": "STRATHEARN AVE",
+    "intersection2": "SOUTHGATE CRES",
+    "name": "2022105668",
+    "street": "VALLEYMEDE DR"
+  },
+  {
+    "civic": "",
+    "id": 34,
+    "intersection": "STRATHEARN AVE",
+    "intersection2": "SOUTHGATE CRES",
+    "name": "2022105677",
+    "street": "VALLEYMEDE DR"
+  },
+  {
+    "civic": "",
+    "id": 35,
+    "intersection": "STRATHEARN AVE",
+    "intersection2": "SOUTHGATE CRES",
+    "name": "2022105671",
+    "street": "VALLEYMEDE DR"
+  },
+  {
+    "civic": "",
+    "id": 36,
+    "intersection": "STRATHEARN AVE",
+    "intersection2": "SOUTHGATE CRES",
+    "name": "2022105691",
+    "street": "VALLEYMEDE DR"
+  },
+  {
+    "civic": "",
+    "id": 37,
+    "intersection": "HORIZON CRT",
+    "intersection2": "16TH AVE (REGIONAL ROAD 73)",
+    "name": "2022105717",
+    "street": "VALLEYMEDE DR"
+  },
+  {
+    "civic": "",
+    "id": 38,
+    "intersection": "YONGE ST (REGIONAL ROAD 1)",
+    "intersection2": "RED MAPLE RD",
+    "name": "2022077869",
+    "street": "HIGH TECH RD"
+  },
+  {
+    "civic": "",
+    "id": 39,
+    "intersection": "16TH AVE (REGIONAL ROAD 73)",
+    "intersection2": "HORIZON CRT",
+    "name": "2022105708",
+    "street": "VALLEYMEDE DR"
+  },
+  {
+    "civic": "",
+    "id": 40,
+    "intersection": "YONGE ST",
+    "intersection2": "ROCHESTER HILL ST",
+    "name": "2022098002",
+    "street": "19TH AVENUE"
+  },
+  {
+    "civic": "",
+    "id": 41,
+    "intersection": "MARKHAM RD (REGIONAL ROAD 68)",
+    "intersection2": "MIDDLEFIELD RD",
+    "name": "2022111570",
+    "street": "14TH AVE (REGIONAL ROAD 71)"
+  },
+  {
+    "civic": "",
+    "id": 42,
+    "intersection": "BAYVIEW AVE (REGIONAL ROAD 34)",
+    "intersection2": "LESLIE STREET",
+    "name": "2022097520",
+    "street": "GREEN LANE"
+  },
+  {
+    "civic": "",
+    "id": 43,
+    "intersection": "",
+    "intersection2": "",
+    "name": "2",
+    "street": "-"
+  }
+]

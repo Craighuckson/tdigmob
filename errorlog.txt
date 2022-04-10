@@ -263,3 +263,70 @@
 20220311134016 - Cannot access ChildPath Item #9 -> 4
 20220313224107 - AccessibleChildren DllCall Failed
 20220313224107 - Cannot access ChildPath Item #10 -> 11
+20220316154253 - Invalid IAccessible Object
+20220316154254 - Cannot access ChildPath Item #9 -> 4
+20220316154255 - Invalid IAccessible Object
+20220316154255 - Cannot access ChildPath Item #9 -> 4
+20220321140813 - Cannot access ChildPath Item #2 -> 7
+20220322100014 - Invalid IAccessible Object
+20220322100014 - Cannot access ChildPath Item #9 -> 4
+20220322100055 - Invalid IAccessible Object
+20220322100055 - Cannot access ChildPath Item #9 -> 4
+20220322100227 - Invalid IAccessible Object
+20220322100227 - Cannot access ChildPath Item #9 -> 4
+20220322100317 - Invalid IAccessible Object
+20220322100317 - Cannot access ChildPath Item #9 -> 4
+20220322100319 - Invalid IAccessible Object
+20220322100319 - Cannot access ChildPath Item #9 -> 4
+20220322100338 - Invalid IAccessible Object
+20220322100338 - Cannot access ChildPath Item #9 -> 4
+20220322100352 - Invalid IAccessible Object
+20220322100352 - Cannot access ChildPath Item #9 -> 4
+20220322100526 - Invalid IAccessible Object
+20220322100526 - Cannot access ChildPath Item #9 -> 4
+20220322100706 - Invalid IAccessible Object
+20220322100706 - Cannot access ChildPath Item #9 -> 4
+20220322100743 - Invalid IAccessible Object
+20220322100743 - Cannot access ChildPath Item #9 -> 4
+20220322100820 - Invalid IAccessible Object
+20220322100820 - Cannot access ChildPath Item #9 -> 4
+20220322100912 - Invalid IAccessible Object
+20220322100912 - Cannot access ChildPath Item #9 -> 4
+20220322100950 - Invalid IAccessible Object
+20220322100950 - Cannot access ChildPath Item #9 -> 4
+20220322101035 - Invalid IAccessible Object
+20220322101035 - Cannot access ChildPath Item #9 -> 4
+20220322101651 - Invalid IAccessible Object
+20220322101651 - Cannot access ChildPath Item #9 -> 4
+20220322101757 - Invalid IAccessible Object
+20220322101757 - Cannot access ChildPath Item #9 -> 4
+20220322102746 - Invalid IAccessible Object
+20220322102746 - Cannot access ChildPath Item #9 -> 4
+20220322102926 - Invalid IAccessible Object
+20220322102926 - Cannot access ChildPath Item #9 -> 4
+20220322103001 - Invalid IAccessible Object
+20220322103001 - Cannot access ChildPath Item #9 -> 4
+20220322103129 - Invalid IAccessible Object
+20220322103129 - Cannot access ChildPath Item #9 -> 4
+20220323171506 - "DoDefaultAction" Cmd Not Implemented
+20220323171518 - "DoDefaultAction" Cmd Not Implemented
+20220323235948 - Cannot access ChildPath Item #2 -> 7
+20220324000627 - Cannot access ChildPath Item #2 -> 7
+20220324001503 - Cannot access ChildPath Item #2 -> 7
+20220324003355 - Cannot access ChildPath Item #2 -> 7
+20220324003435 - Cannot access ChildPath Item #2 -> 7
+20220325001311 - Cannot access ChildPath Item #4 -> 1
+20220330162737 - Cannot access ChildPath Item #2 -> 7
+20220331115428 - Cannot access ChildPath Item #2 -> 7
+20220331135809 - Invalid IAccessible Object
+20220331135809 - Cannot access ChildPath Item #9 -> 4
+20220405155908 - Invalid IAccessible Object
+20220405155908 - Cannot access ChildPath Item #9 -> 4
+20220407165934 - Could not access an IAccessible Object
+20220407170335 - Could not access an IAccessible Object
+20220408000239 - Could not access an IAccessible Object
+20220408000248 - Could not access an IAccessible Object
+20220408001748 - Could not access an IAccessible Object
+20220408001836 - Could not access an IAccessible Object
+20220408001840 - Could not access an IAccessible Object
+20220408001950 - Could not access an IAccessible Object

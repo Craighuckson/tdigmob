@@ -5,20 +5,18 @@
 ; TAKE HOTSTRINGS OUT OF MULTIVIEWER.AHK AND ADD TO MAIN SCRIPT
 ; SPLIT SCRIPT INTO MAIN WORK SCRIPT AND THEN INDIVIDUAL PROGRAMS ETC
 
-
 ;~ /* ;AUTOEXECUTE SECTION  */
 
-
-
-
-#NoEnv
+;#NoEnv
 #Persistent
 ListLines, On
 #MenuMaskKey,VK07
 #include <findtext>
 #include <DebugWindow>
 ;#include <V2TOV1FUNC>
+;#include json.ahk
 #include <acc>
+#include scrollbox.ahk
 #include <cpuload>
 #include <AHKEZ>
 #Include <AHKEZ_Debug>
@@ -31,7 +29,6 @@ SetControlDelay, 50
 Menu, Tray, Icon, %A_ScriptDir%\tico.png
 
 ;Runs on startup to preload variables
-
 iniread, form, C:\Users\Cr\teldig\teldig.ini, variables, form, ""
 iniread, stationcode, C:\Users\Cr\teldig\teldig.ini, variables, stationcode, ""
 iniread, bellmarked, C:\Users\Cr\teldig\teldig.ini, variables, bellmarked, ""
@@ -57,8 +54,6 @@ today:= A_DD . " " . A_MM . " " . A_YYYY
 sketch_bounds := {ulx:192, uly:512,lrx:948,lry:1152,width:756,height:640}
 YorkMaps := "https://maps.york.ca/Html5ViewerPublic/Index.html?viewer=GeneralInteractiveMap.YorkMaps"
 
-
-
 ;setup of GUI for Bell primary sheet
 Gui, Add, CheckBox, x172 y80 w100 h30 vbellhydro, Bell Hydro
 Gui, Add, CheckBox, x172 y110 w100 h30 vbridgealert, Bridge Alert
@@ -71,7 +66,6 @@ Gui, Add, Button, x82 y310 w100 h30 , OK
 Gui, Add, Button, x272 y310 w100 h30 , Cancel
 Gui, Add, CheckBox, x72 y20 w100 h30 VCABLE, Cable
 Gui, Add, CheckBox, x272 y20 w100 h30 VCONDUIT, Conduit
-
 
 ;setup of GUI for Rogers warnings rog gui
 Gui,2: Add, CheckBox, x172 y80 w100 h30 vfibreonly, Fibre Only
@@ -99,6 +93,8 @@ Menu, mobile, Add, Get Ticket Picture, getticketpicture
 Menu, Mobile, Add, Load from Project, autoinsertSketches
 Menu, mobile, Add, Mark &job number as 2(clear), markJobNumberas2Clear
 Menu, mobile, Add, Open Sketch E&ditor, openSketchEditor
+Menu, Mobile, Add, &Write Template File, writeTemplateFile
+Menu("Mobile","Add","Load From Template","AFFromClearTemplate")
 Menu, Mobile, Add, Regular Sync, mobilesyncr
 Menu, mobile, Add, Reset Form&Var, resetFormVar
 Menu,mobile, Add, View ticket count, utilCount
@@ -139,34 +135,29 @@ Menu, ST, Add, HotString list, showHotStrings
 
 ; mobile menu
 
-	;Menu, Mobile, Add,
-
+;Menu, Mobile, Add,
 
 ;SKETCHTOOL SPECIFIC HOTKEYS/BUTTON HANDLERS
 #IfWinActive ahk_exe SKETCHTOOLAPPLICATION.EXE
 
-#D::
-::dgarea::
-	writeDigArea()
-return
+	#D::
+	::dgarea::
+		writeDigArea()
+	return
 
+	F10::
+		autoinsertSketches()
+	return
 
+	MButton::
+		Menu, ST, Show
+	return
 
-F10::
-	autoinsertSketches()
-return
+	;SKETCHTOOL HOTSTRINGS
 
-
-MButton::
-	Menu, ST, Show
-return
-
-;SKETCHTOOL HOTSTRINGS
-
-::autocua::
-	autofillCUA()
-return
-
+	::autocua::
+		autofillCUA()
+	return
 
 #IfWinActive
 
@@ -177,7 +168,7 @@ autofillCUA()
 	global totalpages
 	setform()
 
-	if (stationcode = "BCGN01") or if (stationcode = "BCGN02")t
+	if (stationcode = "BCGN01") or if (stationcode = "BCGN02")
 		loadImage("bell cua.skt")
 	else
 		loadImage("cua rogers.skt")
@@ -191,6 +182,57 @@ bellPrimaryPoleAutofill()
 	global
 	bell_stickers()
 	WinWaitClose, Please select all that apply
+}
+
+bellPrimStart()
+{
+	WinGet,stpid,PID,A
+	global bellclear
+	MsgBox,36,Load Previous?,Load previous sketch?
+	focusSketchTool()
+	ifMsgBox,Yes
+	{
+		autofillExistingSketch()
+		newPagePrompt()
+		pagetimeend := ((A_TickCount - timestart) / 1000)
+		FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
+	return
+}
+bellclear := InputBox("Ticket Clear? Y / N")
+if (bellclear = "y")
+{
+	ST_SAVEEXIT()
+	newPagePrompt()
+	pagetimeend := ((A_TickCount - timestart) / 1000)
+	FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
+}
+else if (bellclear = "n")
+{
+	bell_stickers()
+	;waitCloseDialogBox()
+	;ST_SAVEEXIT()
+	WinWaitClose, ahk_exe SketchToolApplication.exe
+	newPagePrompt()
+	pagetimeend := ((A_TickCount - timestart) / 1000)
+	FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
+}
+else
+	bellPrimStart()
+}
+
+newPagePrompt()
+{
+	global
+	;MsgBox, 4132, New Page?, Start a new page?
+	if (currentpage < totalpages)
+	{
+		sketchAutoFill()
+	}
+	else
+	{
+		MsgBox % "Continue to Timesheet / Email"
+	return
+}
 }
 
 getRegDA()
@@ -207,25 +249,24 @@ getRegDA()
 	Gui,DA: Add, Button, Default W80, OK
 	Gui,DA: Show, ,Enter Dig Area
 	WinWaitClose, Enter Dig Area
-	
-	
+
 	digarea := {}
 	;~ INPUTBOX, north, Dig Box, ENTER THE NORTH MOST BOUNDARY,,,,,,,,%NORTH%
 	;~ StringUpper, north, north
 	;~ if ErrorLevel
-		;~ Return
+	;~ Return
 	;~ INPUTBOX, south, Dig Box, ENTER THE SOUTH MOST BOUNDARY,,,,,,,,%SOUTH%
 	;~ StringUpper, south, south
 	;~ if ErrorLevel
-		;~ Return
+	;~ Return
 	;~ INPUTBOX, west, Dig Box, ENTER THE WEST MOST BOUNDARY,,,,,,,,%WEST%
 	;~ Stringupper, west, west
 	;~ if ErrorLevel
-		;~ Return
+	;~ Return
 	;~ inputbox, east, Dig Box, ENTER THE EAST MOST BOUNDARY,,,,,,,,%EAST%
 	;~ StringUpper, east, east
 	;~ if ErrorLevel
-		;~ Return
+	;~ Return
 	digarea["north"] := north
 	digarea["south"] := south
 	digarea["west"] := west
@@ -234,7 +275,15 @@ getRegDA()
 
 }
 
+isErrorNoSketchTemplate(path)
+{
 
+	if !FileExist("C:\Users\Cr\Documents\" path)
+	{
+		Msgbox, Unable to load sketch (template not created)
+	return
+}
+}
 
 killTemplate()
 {
@@ -245,1119 +294,40 @@ killTemplate()
 	}
 }
 
-setDWToDWDA()
-;needs cleanup, can be condensed
+rogClear()
 {
-	global
-	Gui, DW:Add, Edit, x242 y50 w150 h30 vlandbase,
-	Gui, DW:Add, Edit, x242 y130 w150 h30 vDWnum1,
-	Gui, DW:Add, Edit, x242 y210 w150 h30 vDWnum2,
-	Gui, DW:Add, Edit, x242 y290 w150 h30 vstreet, %street%
-	Gui, DW:Add, Text, x112 y50 w100 h30 , Landbase
-	Gui, DW:Add, Text, x112 y130 w100 h30 , DW 1
-	Gui, DW:Add, Text, x112 y210 w100 h30 , DW 2
-	Gui, DW:Add, Text, x112 y290 w100 h30 , Street
-	Gui, DW:Add, Button, x220 y360 w90 h30 +Center, OK
-	; Generated using SmartGUI Creator for SciTE
-	Gui, DW:Show, w534 h433, DW to DW Generator
-	WinWaitClose, DW to DW Generator
-	
-	num1 := DWnum1
-	num2 := DWnum2
-	num := [num1,num2]
-	fixstreetName()
-	if(landbase = "nw" || landbase = "ne" || landbase = "se" || landbase = "sw")
-	{
-		xstreet := "", vstreet := ""
-		intdir := InputBox("Horizontal (H), Vertical (V)") ;, Both(B)?")
-		loop
-		{
-			if(intdir="h")
-				Break
-			else if(intdir="v")
-				Break
-			;else if(intdir="b")
-			;Break
-			else Continue
-			}
-		InputBox, xstreet,,Horizontal Street? `n1 = %street%`n2 = %intersection%`n3 = %intersection2%
-		if(xstreet = "1")
-			xstreet := street
-		else if(xstreet = "2")
-			xstreet := intersection
-		else if(xstreet = "3")
-			xstreet := intersection2
-		InputBox, vstreet,,Vertical Street? `n1 = %street%`n2 = %intersection%`n3 = %intersection2%
-		if(vstreet = "1")
-			vstreet := street
-		else if(vstreet = "2")
-			vstreet := intersection
-		else if(vstreet = "3")
-			vstreet := intersection2
-		;xstreet := InputBox("Which is the horizontal street?`n1=" street"`n2=" intersection"`n3=" intersection2)
-		;ystreet := InputBox("Which is the vertical street?`n1=" street"`n2=" intersection"`n3=" intersection2)
-	}
-
-	signs := INPUTBOX("Signs? ")
-	if (signs = "y"){
-		signs := true
-	}
-	if signs {
-		signdist := InputBox("Distance from curb? ")
-	}
-
-	switch landbase
-	{
-	Case "n":
-		if signs {
-			north := signdist . " N/NCL " . street
-		}
-		else {
-			north := "NPL " street
-		}
-		south := "NCL " street
-		west := "ERE DW " num.1 " " street
-		east := "ERE DW " num.2 " " street
-	
-	Case "nrc":
-		if signs {
-			north := signdist .  " N/NCL " . street
-		}
-		else {
-			north := "NPL " street
-		}
-		south := "SCL " street
-		west := "ERE DW " num.1 " " street
-		east := "ERE DW " num.2 " " street
-		
-	Case "nw":
-		if (intdir = "h")
-		{
-			north :="NPL " xstreet
-			south :="NCL " xstreet
-			west :="ERE DW " num.1 " " xstreet
-			east :="WCL " vstreet
-		}
-		else
-		{
-			north :="NRE DW " num.1 " " vstreet
-			south :="NCL " xstreet
-			west :="WPL " vstreet
-			east :="WCL " vstreet
-		}
-
-	Case "ne":
-		if (intdir = "h")
-		{
-			north :="NPL " xstreet
-			south :="NCL " xstreet
-			west :="ERE DW " num.1 " " xstreet
-			east :="ECL " vstreet
-		}
-		else
-		{
-			north :="NRE DW " num.1 " " vstreet
-			south :="NCL " xstreet
-			west :="EPL " vstreet
-			east :="ECL " vstreet
-		}
-
-	Case "s":
-		north := "SCL " street
-		if signs {
-			south := signdist . " S/SCL " . street
-		}
-		else {
-			south := "SPL " street
-		}
-		west := "ERE of DW" . num1 . " " . street
-		east := "ERE of DW " . num.2 . " " . street
-		
-	Case "src":
-		north := "NCL " street
-		if signs {
-			south := signdist . " S/SCL " . street
-		}
-		else {
-			south := "SPL " street
-		}
-		west := "ERE of DW" . num1 . " " . street
-		east := "ERE of DW " . num.2 . " " . street
-		
-	Case "se":
-		if (intdir = "h")
-		{
-			north :="SCL " xstreet
-			south :="SPL " xstreet
-			west :="ERE DW " num.1 " " xstreet
-			east :="ECL " vstreet
-		}
-		else
-		{
-			south :="NRE DW " num.1 " " vstreet
-			north :="SCL " xstreet
-			west :="EPL " vstreet
-			east :="ECL " vstreet
-		}
-
-	Case "SW":
-		if (intdir = "h")
-		{
-			south :="SPL " xstreet
-			north :="SCL " xstreet
-			west :="ERE DW " num.1 " " xstreet
-			east :="WCL " vstreet
-		}
-		else
-		{
-			north :="NRE DW " num.1 " " vstreet
-			south :="SCL " xstreet
-			west :="WPL " vstreet
-			east :="WCL " vstreet
-		}
-
-	Case "w":
-		north := "WCL " street
-		if signs
-		{
-			south := signdist . " W/WCL " . street
-		}
-		Else
-			south := "WPL " street
-		west := "NRE of DW " . num.1 . " " . street
-		east := "NRE of DW " . num.2 . " " . street
-
-	Case "e":
-		north := "ECL " street
-		if signs
-		{
-			south := signdist . " E/ECL " . street
-		}
-		else
-			south := "EPL " street
-		west := "NRE of DW " . num.1 . " " . street
-		east := "NRE of DW " . num.2 . " " . street
-	}
-
-	if (form = "RA")
-	{
-		setTemplateText("RANBoundary.skt", north)
-		setTemplateText("RASBoundary.skt", south)
-		setTemplateText("RAWBoundary.skt", west)
-		setTemplateText("RAEBoundary.skt", east)
-	}
-	else
-	{
-		setTemplateText("NBoundary.skt", north) ; ie HERE, this writes the dig area
-		setTemplateText("SBoundary.skt", south)
-		setTemplateText("WBoundary.skt", west)
-		setTemplateText("EBoundary.skt", east)
-	}
-
-}
-
-
-waitSTLoad()
-{
-	Text:="|<>*135$14.TwIka49n64kVax8tn08MA3w8"
-	while !(ok:=FindText(347-150000, 53-150000, 347+150000, 53+150000, 0, 0, Text)) ; wait for image of rotation tool in ST
-		continue
-}
-
-writeRAdigarea()
-{
-	global
-	loadImageNG("RANBoundary.skt")
-	wait()
-	SendInput {f2}
-	SendInput, %north%{enter}
-	wait()
-	loadImageNG("RASBoundary.skt")
-	;Sleep 500
-	SendInput, {f2}
-	SendInput, %south%{enter}
-	;wait()
-	loadImageNG("RAWBoundary.skt")
-	;Sleep 500
-	SendInput, {f2}
-	SendInput, %west%{enter}
-	;wait()
-	loadImageNG("RAEBoundary.skt")
-	;Sleep 500
-	SendInput, {f2}
-	SendInput,%east%{enter}
-	;wait()
-	clickSelection()
-}
-
-
-;SKETCHTOOL MODULES
-
-autoinsertSketches()
-{
-	global
-	project := []
-
-	;COMMENT EITHER THE NEXT TWO LINES OR THE FOLLOWING 2 LINES AT A TIME - NOT BOTH
-
-	FileSelectFile, projfile,,%A_ScriptDir%, Select project,
-	units := Inputbox("Enter units")
-
-	;projfile:="C:\Users\Cr\Desktop\archived\autohotkey\STONEHAM 50 TO 28 R.TXT"
-	;units:="1m"
-	loop, Read, %projfile%
-	{
-		project.Push(A_LoopReadLine)
-	}
-	totalpages := project.Length()
-	Loop % project.Length()
-	{
-		setform()
-		waitSTLoad()
-		loadImage(project[A_Index])
-		Sleep 500
-		stproj_saveexit()
-		ControlClick("OK", "ahk_exe sketchtoolapplication.exe")
-		focusTeldig()
-	}
-	;Msgbox, Done!
-	proj:=""
-	addtotimesheet()
-	finishemail()
-	;SetTimer,checkforNewTicket, 200 ;use this for looping
-}
-
-projectSketch()
-{
-	;global
-	t := new Ticket()
-	s := new Sketch()
-	focusTeldig()
-	clickLocationTab()
-	t:= t.GetData()
-	;getTicketData(number,street,intersection,intersection2,stationCode,diginfo,ticketNumber,town,ticketdata)
-	;worktype := getWorkType()
-	openSketchEditor()
-	; if (ticketdata.stationcode = "ROGYRK01") or if (ticketdata.stationcode = "ROGSIM01")
-	; 	sketch.form := "RA"
-	; Else
-	; 	sketch.form := "BA"
-	t.form := t.ForceAuxilliary()
-	;mb(t.form)
-	waitSTLoad()
-	writeDigArea()
-	;s.digarea := s.getDigArea()
-	;mb(obj2string(s.digarea))
-	;mb(s["north"])
-	;s.putDigArea()
-	if (digboundary)
-	{
-		if(digboundary = "1")
-		{
-			setDWToDWSketch()
-			setDWtext()
-		}
-		if(digboundary = "2")
-		{
-			setBLtoBLSketch(landbase,intdir)
-			setBLtext(landbase,intdir,xstreet,vstreet)
-			setOffsetLabel(landbase)
-		}
-		if(digboundary = "3")
-		{
-			setRCSketch(landbase)
-			setBLtext(landbase,intdir,xstreet,vstreet)
-		}
-		if(digboundary="4")
-		{
-			setPLToPLSketch(landbase)
-			setPLtext(landbase)
-			setOffsetLabel(landbase)
-		}
-		if(digboundary="5")
-		{
-			setPL4Sketch(landbase)
-			setPL4text(landbase)
-		}
-		if(digboundary="6")
-		{
-			setStreetToStreetSketch(landbase)
-			setStreettoStreetText(landbase)
-		}
-		if(digboundary="7")
-		{
-			setCornerSketch(landbase)
-			setCornerText(landbase)
-		}
-	}
-	Else
-	{
-		landbase := getlandbase()
-		Switch landbase
-		{
-			Case "N": 	SWFUNC("b - north.skt", "B - north no sw.skt")
-			Case "NE": 	SWFUNC("B - NE CORNER.SKT","B - NE corner no sw.skt")
-			Case "E": 	SWFUNC("B - EAST.SKT","B - east no sw.skt")
-			Case "SE": 	SWFUNC("B - SE CORNER.SKT","B - SE corner no sw.skt")
-			Case "S": 	SWFUNC("B - SOUTH.SKT","B - South no sw.skt")
-			Case "SW":	SWFUNC("B - SW CORNER.SKT","B - SW corner no sw.skt")
-			Case "W":	SWFUNC("B - WEST.SKT","B - WEST NO SW.SKT")
-			Case "NW": 	SWFUNC("B - NW CORNER.SKT","B - NW corner no sw.skt")
-			Case "TN":	loadImage("b - t intersection n.skt")
-			Case "TS":	loadImage("b - t intersection s.skt")
-			Case "TW":	loadImage("b - t intersection w.skt")
-			Case "TE": 	loadImage("b - T intersection e.skt")
-			Case "H": 	loadImage("B - horizontal st.skt")
-			Case "V": 	loadImage("B - vertical st.skt")
-			Case "HSS": loadImage("B - horizontal st centre to centre.skt")
-			Case "VSS": loadImage("B - vertical centre to centre.skt")
-			Case "INT": loadImage("B - intersection.skt")
-			Case "Custom": openimagedialog()
-			Default:	MsgBox % "No valid option selected. Please load form manually!"
-		}
-		if landbase in N,S,E,W
-		{
-			setTemplateText(landbase . "street.skt", street)
-		}
-		if landbase in NE,NW,SE,SW,TN,TS,TW,TE
-		{
-			inter := isInterText()
-			setCornerText(landbase)
-		}
-	}
-}
-
-setOffsetLabel(landbase)
-{
-	meas1 := setMeasurement()
-	meas2 := setMeasurement()
-	label := InputBox("Enter label for cable")
-	StringUpper, label, label
-	list:=["meas1.skt","meas2.skt","cablelabel.skt"]
-	setTemplateText(landbase "meas1.skt",meas1)
-	wait()
-	setTemplateText(landbase "meas2.skt",meas2)
-	wait()
-	setTemplateText(landbase "cablelabel.skt", label)
-}
-
-;AUTOMATED FORM FILLER
-;THIS NEEDS TO BE REFACTORED BIG TIME
-sketchAutoFill()
-{
-	global
-	; loads form and starts
-	timestart := A_TickCount
-	setForm()
-	if FileExist("C:\Users\Cr\Documents\" ticketnumber ".txt")
-	{
-		;	autodrawsketch()
-	}
-	; wait for SketchTool to be loaded via rotation arrow
-	waitSTLoad()
-	;changeGridSizeTo16()
-	;MouseClick,l,% A_ScreenWidth/2, % A_ScreenHeight/2
-	Winget,stpid,PID,A
-	if (form = "BP")
-	{
-		;QUICK FILL FOR SINGLE VS PROJECT
-		btickettype := Inputbox("Single or Project?")
-		if btickettype in s,S,p,P
-		{
-			if (btickettype = "s")
-			{
-				totalpages := 2
-
-				units := Inputbox("Enter units")
-				primary_template := FileSelectFile(,"C:\Users\Cr\Documents\","Choose bell primary form to open")
-				focusSketchtool()
-				loadImage("bell primary.skt")
-				wait()
-				loadImage(primary_template)
-				wait()
-				setTemplateText("bellprimarydate.skt",getCurrentDate())
-				wait()
-				setTemplateText("units.skt",units)
-				wait()
-				setTemplateText("RPtotalpages.skt",totalpages)
-				wait()
-				if !currentpage
-					currentpage := 1
-				Controlclick("OK","ahk_exe sketchtoolapplication.exe")
-				focusTeldig()
-				newPagePrompt()
-				pagetimeend := ((A_TickCount - timestart) / 1000)
-				FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
-				return
-			}
-			else if (btickettype = "p")
-			{
-				bellPrimStart()
-				return
-			}
-
-			else
-			{
-				bellPrimStart()
-				return
-			}
-		}
-	}
-
-	;getexisting := InputBox("Open existing sketch? Y/N")
-	MsgBox,4,Open Existing?,Open Existing Sketch?
+	MsgBox,36,Clear?,Ticket Clear?
 	focusSketchTool()
-
-	;if (getexisting = "y")
 	ifMsgBox, Yes
 	{
-		autofillExistingSketch()
-		newPagePrompt()
-		pagetimeend := ((A_TickCount - timestart) / 1000)
-		FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
-		return ;autofill existing module
-	}
-
-	;else if (getexisting = "n") ;this is where it gets tricky...
-	ifMsgBox, No
-	{
-		writeDigArea()
-
-		; checks for alternate or regular dig areas and writes
-		;next section is essentially prebaked vs custom dig area/sketch
-		if !(digboundary = "")
-		{
-			if(digboundary = "1")
-			{
-				setDWToDWSketch()
-				if !(rclear)
-				{
-					setDWtext()
-				}
-			}
-			if(digboundary = "2")
-			{
-				setBLtoBLSketch(landbase,intdir)
-				if !(rclear)
-				{
-					setBLtext(landbase,intdir,xstreet,vstreet)
-					if (!intdir)
-						setOffsetLabel(landbase)
-				}
-			}
-			if(digboundary = "3")
-			{
-				setRCSketch(landbase)
-				setBLtext(landbase,intdir,xstreet,vstreet)
-			}
-			if(digboundary="4")
-			{
-				rclear := rogclear()
-				if (rclear)
-					return
-				setPLToPLSketch(landbase)
-				setPLtext(landbase)
-				;setOffsetLabel(landbase)
-			}
-			if(digboundary="5")
-			{
-				setPL4Sketch(landbase)
-				setPL4text(landbase)
-			}
-			if(digboundary="6")
-			{
-				rclear := rogclear()
-				if (rclear)
-					return
-				setStreetToStreetSketch(landbase)
-				setStreettoStreetText(landbase)
-			}
-			if(digboundary="7")
-			{
-				setCornerSketch(landbase)
-				setCornerText(landbase)
-			}
-			if(digboundary="8")
-			{
-				rclear := rogclear()
-				if (rclear)
-					return
-				setPLtoPLSketch(landbase)
-				setPLtext(landbase)
-			}
-		}
-		else
-		{
-			if (stationCode = "ROGYRK01") or if (stationCode = "ROGSIM01")
-			{
-				rclear := rogClear()
-				if(rclear)
-				{
-					loadImage("rogclear.skt")
-					ST_SAVEEXIT()
-					newPagePrompt()
-					pagetimeend := ((A_TickCount - timestart) / 1000)
-					FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
-					return
-				}
-			}
-			landbase := getlandbase()
-			Switch landbase
-			{
-				Case "N": 	SWFUNC("b - north.skt", "B - north no sw.skt")
-				Case "NE": 	SWFUNC("B - NE CORNER.SKT","B - NE corner no sw.skt")
-				Case "E": 	SWFUNC("B - EAST.SKT","B - east no sw.skt")
-				Case "SE": 	SWFUNC("B - SE CORNER.SKT","B - SE corner no sw.skt")
-				Case "S": 	SWFUNC("B - SOUTH.SKT","B - South no sw.skt")
-				Case "SW":	SWFUNC("B - SW CORNER.SKT","B - SW corner no sw.skt")
-				Case "W":	SWFUNC("B - WEST.SKT","B - WEST NO SW.SKT")
-				Case "NW": 	SWFUNC("B - NW CORNER.SKT","B - NW corner no sw.skt")
-				Case "TN":	loadImage("b - t intersection n.skt")
-				Case "TS":	loadImage("b - t intersection s.skt")
-				Case "TW":	loadImage("b - t intersection w.skt")
-				Case "TE": 	loadImage("b - T intersection e.skt")
-				Case "H": 	loadImage("B - horizontal st.skt")
-				Case "V": 	loadImage("B - vertical st.skt")
-				Case "HSS": loadImage("B - horizontal st centre to centre.skt")
-				Case "VSS": loadImage("B - vertical centre to centre.skt")
-				Case "INT": loadImage("B - intersection.skt")
-				Case "Custom": openimagedialog()
-				Default:	MsgBox % "No valid option selected. Please load form manually!"
-			}
-			if landbase in N,S,E,W,H,V
-			{
-				setTemplateText(landbase . "street.skt", street)
-			}
-			if landbase in NE,NW,SE,SW,TN,TS,TW,TE
-			{
-				inter := isInterText()
-				setCornerText(landbase)
-			}
-		}
-		WinWaitClose, ahk_exe SketchToolApplication.exe
-		newPagePrompt()
-		pagetimeend := ((A_TickCount - timestart) / 1000)
-		FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
-		return
-	}
+		rclear:=1
+	return rclear
+}
 }
 
-;DIG AREA
-;this function needs cleanup
-writeDigArea() {
-	global
-	digboundary := getDigBoundaries() ; asks for INT representing dig boundaries
-	if (digboundary = "") ;no entry
-	{
-		getRegDA() ; asks line by line for dig box - returns north south east west
-		wait()
-		if (form = "RA") ;this might not need to be here TODO: check if can do ternary below since all that needs to change is boundary.skt etc
-		{
-			writeRAdigarea()
-			clickselection()
-			return
-		}
-		;setTemplateText -
-		focusSketchTool()
-		digarray := {(north):"Nboundary.skt",(south):"sboundary.skt",(west):"wboundary.skt"
-		,(east):"eboundary.skt"}
-		for k,v in digarray
-		{
-			setTemplateText(v,k)
-		}
-		digarray :=
-	}
-	else ;if using different boundaries
-	{
-		switch digboundary
-		{
-			;case 1 - DW to DW, case 2 - utilizing BL
-		case "1":
-			setDWToDWDA()
-		case "2":
-			setBLToBLDA()
-		case "3":
-			setRCDA()
-		case "4":
-			setPLDigArea()
-		case "5":
-			setPL4DigArea()
-		case "6":
-			setStreetToStreetDigArea()
-		case "7":
-			setCornerDigArea()
-		case "8":
-			setSGasDigArea()
-			;default case below just in case, recursion
-		default:
-			digboundary := ""
-			writeDigArea()
-		}
-	}
-}
-
-
-
-
-;MOBILE SPECIFIC BUTTON HANDLERS/HOTKEYS
-
-#ifwinactive ahk_exe mobile.exe
-
-RShift::
-MBUTTON::
-Menu, Mobile, Show
-return
-
-
-F8::
-	projectSketch()
-return
-
-F9::
-::SKAF::
-	sketchAutoFill()
-return
-
-+f9::
-	AFFromClearTemplate()
-return
-
-^n::
-::newsketch::
-	setForm()
-return
-
-;MOBILE HOTSTRINGS
-
-:::wtf::
-	writeTemplateFile()
-return
-
-
-#IfWinActive
-
-
-
-;MOBILE FUNCTIONS
-
-AFFromClearTemplate()
+aptClear()
 {
-	global
-	;used to fill out clear forms from text file format %ticketnumber%.txt
-	;outputs - dig area, rogclear/ftth/foonlyclear
-	;inputs - ticket data, pltopl or manual entry, address 1, address 2 if applicable, nbound, sbound, ebound, wbound
-	;read text file
-	setForm()
-	waitSTLoad()
-	;if !FileExist(A_MyDocuments "\" ticketnumber ".txt")
-	;{
-	;	Msgbox, % "Please complete text file"
-	;}
-
-	;else
-	;{
-
-	readClearTemplate()
-	addtotimesheet()
-	finishemail()
-	SetTimer,checkfornewticketb, 200
+	MsgBox,36,Clear?,Ticket Clear?
+	focusSketchTool()
+	ifMsgBox, Yes
+	{
+		aptClear := 1
+	return aptClear
+}
 }
 
-
-checkforNewTicket()
+rogersWarning()
 {
-	Controlget, ticketNumbernew, line, 1, edit1, ahk_exe mobile.exe
-	if(ticketnumber != ticketNumbernew)
-	{
-		autoinsertSketches()
-		ticketNumbernew := ""
-	}
-}
-
-checkforNewTicketB()
-{
-	Controlget, ticketNumbernew, line, 1, edit1, ahk_exe mobile.exe
-	if(ticketnumber != ticketNumbernew)
-	{
-		AFFromClearTemplate()
-		ticketNumbernew := ""
-	}
-}
-
-
-locationDataCheck()
-{
-	global
-	while locationDataObtained = ""
-	{
-		clickLocationTab()
-		getTicketData(number,street,intersection,intersection2,stationCode,diginfo,ticketNumber,town,ticketdata)
-		worktype := getWorkType()
-		;locationDataObtained := 1
-		return locationDataObtained := 1
-	}
-}
-
-newproj()
-{
-	Run, projectfile.ahk
-}
-
-openSketchEditor()
-{
-	Send, !ls
-}
-
-readClearTemplate()
-{
-	global
-	FileRead, templatefile, C:\Users\Cr\Documents\%ticketnumber%.txt
-	linelist := StrSplit(templatefile, "`r`n")
-	msgbox % linelist.22
-	if linelist[1] = "y"
-		autofillExistingSketch()
-	else if linelist.Length() == 3 ;ie pl4 template
-	{
-		num1 := linelist[2]
-		num2 := linelist[3]
-		setPL4DigArea(num1,num2)
-		loadImage("rogclear.skt")
-		ST_SAVEEXIT()
-	}
-	else if linelist.Length() == 5 ; manual clear template
-	{
-		IF (FORM = "RA")
-		{
-			setTemplateText("RANboundary.skt",linelist[2])
-			setTemplateText("RAsboundary.skt",linelist[3])
-			setTemplateText("RAWBoundary.skt",linelist[4])
-			setTemplateText("RAEBoundary.skt",linelist[5])
-		}
-		else
-		{
-			setTemplateText("Nboundary.skt",linelist[2])
-			setTemplateText("sboundary.skt",linelist[3])
-			setTemplateText("WBoundary.skt",linelist[4])
-			setTemplateText("EBoundary.skt",linelist[5])
-		}
-		clearreason := Inputbox("Clear reason","Regular (r)`nFTTH (f)`nClear For Fibre Only(c)")
-		switch clearreason
-		{
-			case "r": loadImage("rogclear.skt")
-			case "f": loadImage("ftth.skt")
-			case "c": loadImage("exclusion agreement r.skt")
-		}
-		ST_SAVEEXIT()
-	}
-	else
-	{
-		MsgBox, % "Template formatting error!"S
-		return
-	}
-}
-
-
-resetFormVar()
-{
-	global form
-	global locationDataObtained
-	global totalpages
-	global currentpage
-	form := "", locationDataObtained := "", totalpages := "",currentpage := "", num := ""
-	MsgBox % "Form data has been reset!"
-}
-
-setForm()
-{
-	;ticketdata := getticketdata(), stationCode := ticketdata.5
-	global
-	focusTeldig()
-	locationDataCheck()
-	Loop
-	{
-		if (stationcode == "CCS")
-		{
-			Loop
-			{
-				InputBox, stationcode, Station Code, Enter Station Code
-				StringUpper, stationcode,stationcode
-				switch stationcode
-				{
-					Case "BCGN01": Break
-					Case "ROGYRK01": Break
-					Case "APTUM01": Break
-					Default: continue
-				}
-			}
-			continue
-		}
-		if (stationCode == "BCGN01" and form = "") or if (stationCode == "BCGN02" and form = "") or if (stationCode == "BAGN02" and form = "")
-		{
-			TrayTip,Form, Opening Bell Primary Form,5
-			openForm("|<>*117$65.zj8DD44D64w8EEEF88XA90EUUUWEG2IG0V1114UY4gY13m3m9z899D24447W2EG+E4888844UYIU8EEEE88X8N0EyyyUEEsEHw", "BP")
-			;openBellPrimary()
-			break
-		}
-		else if (stationCode == "BCGN01") or if (stationCode == "BCGN02") or if (stationCode == "BAGN02")
-		{
-			openForm("|<>*122$71.l13lVD0MEYTEG28n2E0kV8YUY4UZ4U1F2+91891/904W4AG2Tm2GHk948EYMUY4WY0F8Fl81189581yEWWE228m6E24n8YU44C44yA4wlxw","BA")
-			;openBellAux()
-			break
-		}
-		else if (stationCode == "ROGYRK01" and form = "") or if (stationCode == "ROGSIM01" and form = "") or if (stationCode == "ROGPEL01" and form = "")
-		{
-			openForm("|<>*122$51.D33l1sTw+0MF880EWU2W91024I0YF880EWU4Xl1s22Y0WF880EIUDm91022W12F880EADM/lxw214","RP")
-			TrayTip,Form,Opening Rogers Primary form,5
-			;openCATVPrimary()
-			break
-		}
-		else if (stationCode == "ROGYRK01") or if (stationCode == "ROGSIM01")
-		{
-			openForm("|<>*119$71.6xz7Y41wSD60N0EE88216FA4W0V0EE444WQC4120UU8894ccD241z0SEHlF8E48220UUYWI8U8E441118Yc90EE88216F8kPsUSEE41kVF000000000000000000T00000E","RA")
-			TrayTip,Form,Opening Rogers Auxilliary Form,5
-
-			;openCATVAux()
-			break
-		}
-		else if (stationCode == "APTUM01" and form = "")
-		{
-			openForm("|<>*135$46.D3kSS7Vt0FW90U8s22E4411U890EE460UYNt0EM22EY411U892EE450FW90U8nks7blsQU","AP")
-			;openAptumPrimary()
-			break
-		}
-		else if(stationCode == "APTUM01")
-		{
-			openForm("|<>*134$68.jTlt10T7XlUG0UUEE42AWMAU8E441118b3824110EEG9FHkV0Tk7Y4wIIU8E4411194d824110EEG9+G0UUEE42AWFay87Y410Q8IF00000000000000007k00002","AA")
-			break
-		}
-		else
-		{
-			form := ""
-			continue
-		}
-	}
-}
-
-
-;MOBILE MODULES
-
-getticketpicture:
-	run,getticketpicture.ahk
-return
-
-writeTemplateFile()
-;generates a template file that can be used with above solution
-{
-	global north, south, west, east
-	clickLocationTab()
-	getTicketData(number, street, intersection, intersection2, stationCode, diginfo, ticketNumber, town, ticketdata)
-	Loop
-	{
-		Inputbox, useexisting, Use existing, Y or N
-		if useexisting in y,Y,n,N
-			break
-	}
-	if (useexisting = "y")
-	{
-		;FileSelectFile, filename,, A_MyDocuments
-		FileAppend, %useexisting%, A_MyDocuments\%ticketNumber%.txt
-		MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
-		return
-	}
-	Inputbox, type, Template, Select template type:`n1.PL4`n2.Manual
-	if (type = "1")
-	{
-		InputBox,house1, House 1, Enter house 1
-		InputBox,house2, House 2, Enter house 2
-		FileAppend, %useexisting%`n%house1%`n%house2%,%A_MyDocuments%\%ticketNumber%.txt
-		msgbox, %useexisting%`n%house1%`n%house2%
-		MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
-		return
-		;units
-		;
-
-	}
-	else
-	{
-		getRegDA()
-		FileAppend, %useexisting%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
-		FileAppend, %north%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
-		FileAppend, %south%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
-		FileAppend, %west%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
-		FileAppend, %east%, C:\Users\Cr\Documents\%ticketNumber%.txt
-		MsgBox, %south%`n
-		MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
-		return
-	}
-}
-
-;GUI BUTTON Labels
-
-DAButtonOK:
-Gui,Da: Submit
-Gui, Da: Destroy
-return
-
-
-DWButtonOK:
-	Gui, DW: Submit
-	Gui, DW: Destroy
+	global rclear, waitstate
+	GUIHWND := WinExist()
+	GuiControl, 2:, fibreonly, 0
+	GuiControl, 2:, ftth, 0
+	GuiControl, 2:, highriskfibre,0
+	GuiControl, 2:, inaccuraterecords,0
+	GuiControl, 2:, railway, 0
+	Gui, 2: Show, x411 y174 h383 w483, Please select all that apply
+	WinWaitClose, ahk_id %GUIHWND%
 	return
-
-
-;CLASS DEFINITIONS
-
-class TMobileAutomation {
-}
-
-class SketchToolAutomation {
-}
-
-class Ticket 
-{
-	
-	__New(number := "", street := "", intersection := "", intersection2 := "", stationCode := "", digInfo := "", ticketNumber := "", town := "", workType:= "")
-	{
-		this.number := number
-		this.street := street
-		this.intersection := intersection
-		this.intersection2 := intersection2
-		this.stationCode := stationCode
-		this.ticketNumber := ticketNumber
-		this.town := town
-		this.workType := workType
-	}
-	
-	GetData()
-	{
-		ControlGet, number, Line,1, edit2, ahk_exe Mobile.exe
-		ControlGet, street, line,1, Edit6, ahk_exe Mobile.exe
-		ControlGet, intersection, line,1,edit10, ahk_exe mobile.exe
-		ControlGet, intersection2, line,1,edit12, ahk_exe mobile.exe
-		ControlGet, stationCode, line,1, edit9, ahk_exe mobile.exe
-		ControlGetText, digInfo, edit22, ahk_exe mobile.exe
-		controlget, ticketNumber, line, 1, edit1, ahk_exe mobile.exe			
-		controlget, town, line, 1, edit13, ahk_exe mobile.exe
-		this.number := number
-		this.street := street
-		this.intersection := intersection
-		this.intersection2 := intersection2
-		this.stationCode := stationCode
-		this.ticketNumber := ticketNumber
-		this.town := town
-		this.workType := workType
-		return this
-	}
-
-	ForceAuxilliary()
-	;returns string representing auxilliary for particular utility
-	{
-		if (this.stationCode = "ROGYRK01"){
-			return "RA"
-		}
-		else if (this.stationCode = "ROGSIM01"){
-			return "RA"
-		}
-		else{
-			return "BA"
-		}
-
-	}
-}
-
-class Sketch 
-{
-
-	__New(landbase:=""){
-	}
-
-	;returns an integer representing digboundary
-	GetDigType(){
-		return this.digtype := GetDigBoundaries()
-	}
-
-	;returns a digarea object(north,south,east,west)
-	getDigArea(){
-		return this.digarea := getRegDA()
-	}
-
-	;writes dig area to sketch
-	putDigArea(){
-		setTemplateText("NBoundary.skt",this.digarea.north)
-		setTemplateText("SBoundary.skt",this.digarea.south)
-		setTemplateText("WBoundary.skt",this.digarea.west)
-		setTemplateText("EBoundary.skt",this.digarea.east)
-		}
-
-}
-
-
-class Point 
-{
-
-	__New(x,y)
-	{
-		this.x := x
-		this.y := y
-	}
-}
-
-
-
-
-setSGasDigArea()
-{
-	;dig area for short gas
-	
-	global
-	landbase := getLandbase()
-	num := getBLNum()
-	if (num[2])
-	{
-		num := getBLNum()
-	}
-	fixStreetName()
-	switch landbase
-	{
-		case "w":
-		north := "5M N/NBL " . num[1] . " " . street
-		south := "5M S/SBL " . num[1] . " " . street
-		west := "5M W/WBL " . num[1] . " " . street
-		east := "CENTRE LINE " . street
-		
-		case "e":
-		north := "5M N/NBL " . num[1] . " " . street
-		south := "5M S/SBL " . num[1] . " " . street
-		east := "5M E/EBL " . num[1] . " " . street
-		west := "CENTRE LINE " . street
-		
-		case "n":
-		north := "5M N/NBL " . num[1] . " " . street
-		east := "5M E/EBL " . num[1] . " " . street
-		west := "5M W/WBL " . num[1] . " " . street
-		south := "CENTRE LINE " . street
-		
-		case "s":
-		east := "5M E/EBL " . num[1] . " " . street
-		south := "5M S/SBL " . num[1] . " " . street
-		west := "5M W/WBL " . num[1] . " " . street
-		north := "CENTRE LINE " . street
-	}
-		
-		if (form = "RA")
-	{
-		setTemplateText("RANBoundary.skt", north)
-		setTemplateText("RASBoundary.skt", south)
-		setTemplateText("RAWBoundary.skt", west)
-		setTemplateText("RAEBoundary.skt", east)
-	}
-	else
-	{
-		setTemplateText("NBoundary.skt", north) ; ie HERE, this writes the dig area
-		setTemplateText("SBoundary.skt", south)
-		setTemplateText("WBoundary.skt", west)
-		setTemplateText("EBoundary.skt", east)
-	}
 }
 
 setBLToBLDA()
@@ -1556,103 +526,96 @@ setBLToBLDA()
 	}
 }
 
-setRCDA()
-{
+setBLtoBLSketch(landbase,intdir){
 	global
-	landbase := getlandbase() ;NSEW etc (String)
-	num := getBLNum() ;is an array
-	fixstreetName()
-	rclimit := InputBox("Crossing limit? (CL / PL ?)")
-	Switch landbase
+	if (stationcode="ROGYRK01") or if (stationcode = "ROGSIM01")
 	{
-	Case "n":
-		north := "NBL " num.1 " " street
-		south := "S" rclimit " " street
-		west := "WBL " num.1 " " street
-		east := "EBL " num.2 " " street
-	Case "s":
-		north := "N" rclimit " " street
-		south := "SBL " num.1 " " street
-		west := "WBL " num.1 " " street
-		east := "EBL " num.2 " " street
-	Case "w":
-		north := "NBL " num.1 " " street
-		south := "SBL " num.2 " " street
-		west := "WBL " num.1 " " street
-		east := "E" rclimit " " street
-	Case "e":
-		north := "NBL " num.1 " " street
-		south := "SBL " num.2 " " street
-		west := "W" rclimit " " street
-		east := "EBL " num.1 " " street
-	Case "nw":
-		isInterText()
-		north := "SBL " num.1 " " vstreet
-		south := "S" rclimit " " hstreet
-		west := "EBL " num.1 " " vstreet
-		east := "WCL " vstreet
-	Case "h":
-		north := "NPL " . street
-		south := "SPL " . street
-		west := "WBL " num.1 " " street
-		east := "EBL " num.2 " " street
-	Case "v":
-		north := "NBL " num.1 " " street
-		south := "SBL " num.2 " " street
-		west := "WPL " street
-		east := "EPL " street
+		rclear := rogclear()
+		if(rclear)
+		{
+			clearreason := Inputbox("Clear reason","Regular (r)`nFTTH (f)`nClear For Fibre Only(c)")
+			switch clearreason
+			{
+				case "r": loadImage("rogclear.skt")
+				case "f": loadImage("ftth.skt")
+				case "c": loadImage("exclusion agreement r.skt")
+			}
+			return
+		}
 	}
-
-	IF (FORM = "RA")
+	if (intdir)
 	{
-		setTemplateText("RANboundary.skt",north)
-		setTemplateText("RAsboundary.skt",south)
-		setTemplateText("RAWBoundary.skt",west)
-		setTemplateText("RAEBoundary.skt",east)
+		;if !FileExist("C:\Users\Cr\Documents\" landbase "CLTOBL" intdir ".skt")
+		;{
+		;Msgbox, Unable to load sketch (template not created)
+		;return
+		;}
+		loadImage(landbase "CLTOBL" intdir ".skt")
 	}
 	else
 	{
-		setTemplateText("Nboundary.skt",north)
-		setTemplateText("sboundary.skt",south)
-		setTemplateText("WBoundary.skt",west)
-		setTemplateText("EBoundary.skt",east)
+		switch choice
+		{
+			Case "i", "i": loadImage(landbase "BLTOBLI.SKT")
+			Case "o", "o": loadImage(landbase "BLTOBLO.SKT")
+			Case "nw", "nw": loadImage(landbase "BLTOBLNW.SKT")
+			Case "se", "se": loadImage(landbase "BLTOBLSE.SKT")
+			Case "single", "SINGLE": loadImage(landbase "BLTOBLSINGLE.SKT")
+			Default: return
+		}
+
 	}
 }
 
-setPLDigArea()
+setCornerDigArea()
 {
 	global
-	landbase:=getLandbase()
-	num:=getBLNum()
+	Loop
+	{
+		landbase := getLandbase()
+	}
+	Until (landbase = "NE" || landbase = "NW" || landbase = "SE" || landbase = "SW")
 	fixstreetName()
+	inter := isInterText()
+
+	Loop
+	{
+		Inputbox, bounds,,Boundaries (PL/BL)
+	}
+	until (bounds = "PL" || bounds = "BL")
+	if (bounds = "BL")
+	{
+		Inputbox, haddress,House address, Enter house address
+	}
+
 	switch landbase
 	{
-	case "n":
-		north:="NPL " num.1 " " street
-		south:="NCL " street
-		west:="WPL " num.1 " " street
-		east:="EPL " num.1 " " street
+	case "NW":
+		north := (bounds = "BL") ? "NBL " . haddress : "NPL " . inter.x
+		south := (bounds = "BL") ? "CENTRE LINE " . inter.x : "CENTRE LINE " . inter.x
+		west := (bounds = "BL") ? "WBL " . haddress : "WPL " . inter.y
+		east := "CENTRE LINE " . inter.y
 
-	case "s":
-		north:="SPL " num.1 " " street
-		south:="SCL " street
-		west:="WPL " num.1 " " street
-		east:="EPL " num.1 " " street
+	case "NE":
+		north := (bounds = "BL") ? "NBL " . haddress : "NPL " . inter.x
+		south := (bounds = "BL") ? "CENTRE LINE " . inter.x : "CENTRE LINE " . inter.x
+		west := "CENTRE LINE " . inter.y
+		east := (bounds = "BL") ? "EBL " . haddress : "EPL " . inter.y
 
-	case "w":
-		north:="NPL " num.1 " " street
-		south:="SPL " num.1 " " street
-		west:="WPL " num.1 " " street
-		east:="WCL " street
+	case "SW":
+		north := (bounds = "BL") ? "CENTRE LINE " . inter.x : "CENTRE LINE " . inter.x
+		south := (bounds = "BL") ? "SBL " . haddress : "SPL " . inter.x
+		west := (bounds = "BL") ? "WBL " . haddress : "WPL " . inter.y
+		east := "CENTRE LINE" . inter.y
 
-	case "e":
-		north:="NPL " num.1 " " street
-		south:="SPL " num.1 " " street
-		west:="ECL " street
-		east:="EPL " num.1 " " street
+	case "SE":
+		north := (bounds = "BL") ? "CENTRE LINE " . inter.x :"CENTRE LINE " . inter.x
+		south := (bounds = "BL") ? "SBL " . haddress : "SPL " . inter.x
+		west := "CENTRE LINE " . inter.y
+		east := (bounds = "BL") ? "EBL " . haddress : "EPL" . inter.y
 	}
 
-	IF (FORM = "RA")
+	if (form = "RA")
 	{
 		setTemplateText("RANboundary.skt",north)
 		setTemplateText("RAsboundary.skt",south)
@@ -1661,19 +624,246 @@ setPLDigArea()
 	}
 	else
 	{
-		setTemplateText("Nboundary.skt",north)
-		setTemplateText("sboundary.skt",south)
-		setTemplateText("WBoundary.skt",west)
-		setTemplateText("EBoundary.skt",east)
+		setTemplateText("Nboundary.skt", north)
+		setTemplateText("SBoundary.skt", south)
+		setTemplateText("Wboundary.skt", west)
+		setTemplateText("EBoundary.skt", east)
 	}
 }
 
-PL4ButtonOK:
+setDWToDWDA()
+;needs cleanup, can be condensed
+{
+	global
+	Gui, DW:Add, Edit, x242 y50 w150 h30 vlandbase,
+	Gui, DW:Add, Edit, x242 y130 w150 h30 vDWnum1,
+	Gui, DW:Add, Edit, x242 y210 w150 h30 vDWnum2,
+	Gui, DW:Add, Edit, x242 y290 w150 h30 vstreet, %street%
+	Gui, DW:Add, Text, x112 y50 w100 h30 , Landbase
+	Gui, DW:Add, Text, x112 y130 w100 h30 , DW 1
+	Gui, DW:Add, Text, x112 y210 w100 h30 , DW 2
+	Gui, DW:Add, Text, x112 y290 w100 h30 , Street
+	Gui, DW:Add, Button, x220 y360 w90 h30 +Center, OK
+	Gui, DW:Show, w534 h433, DW to DW Generator
+	WinWaitClose, DW to DW Generator
 
-	Gui, PL4: Submit
-	Gui, PL4: Destroy
-return
+	num1 := DWnum1
+	num2 := DWnum2
+	num := [num1,num2]
+	fixstreetName()
+	if(landbase = "nw" || landbase = "ne" || landbase = "se" || landbase = "sw")
+	{
+		xstreet := "", vstreet := ""
+		intdir := InputBox("Horizontal (H), Vertical (V)") ;, Both(B)?")
+		loop
+		{
+			if(intdir="h")
+				Break
+			else if(intdir="v")
+				Break
+			;else if(intdir="b")
+			;Break
+			else Continue
+			}
+		InputBox, xstreet,,Horizontal Street? `n1 = %street%`n2 = %intersection%`n3 = %intersection2%
+		if(xstreet = "1")
+			xstreet := street
+		else if(xstreet = "2")
+			xstreet := intersection
+		else if(xstreet = "3")
+			xstreet := intersection2
+		InputBox, vstreet,,Vertical Street? `n1 = %street%`n2 = %intersection%`n3 = %intersection2%
+		if(vstreet = "1")
+			vstreet := street
+		else if(vstreet = "2")
+			vstreet := intersection
+		else if(vstreet = "3")
+			vstreet := intersection2
+		;xstreet := InputBox("Which is the horizontal street?`n1=" street"`n2=" intersection"`n3=" intersection2)
+		;ystreet := InputBox("Which is the vertical street?`n1=" street"`n2=" intersection"`n3=" intersection2)
+	}
 
+	signs := INPUTBOX("Signs? ")
+	if (signs = "y"){
+		signs := true
+	}
+	if signs {
+		signdist := InputBox("Distance from curb? ")
+	}
+
+	switch landbase
+	{
+	Case "n":
+		if signs {
+			north := signdist . " N/NCL " . street
+		}
+		else {
+			north := "NPL " street
+		}
+		south := "NCL " street
+		west := "ERE DW " num.1 " " street
+		east := "ERE DW " num.2 " " street
+
+	Case "nrc":
+		if signs {
+			north := signdist . " N/NCL " . street
+		}
+		else {
+			north := "NPL " street
+		}
+		south := "SCL " street
+		west := "ERE DW " num.1 " " street
+		east := "ERE DW " num.2 " " street
+
+	Case "nw":
+		if (intdir = "h")
+		{
+			north :="NPL " xstreet
+			south :="NCL " xstreet
+			west :="ERE DW " num.1 " " xstreet
+			east :="WCL " vstreet
+		}
+		else
+		{
+			north :="NRE DW " num.1 " " vstreet
+			south :="NCL " xstreet
+			west :="WPL " vstreet
+			east :="WCL " vstreet
+		}
+
+	Case "ne":
+		if (intdir = "h")
+		{
+			north :="NPL " xstreet
+			south :="NCL " xstreet
+			west :="ERE DW " num.1 " " xstreet
+			east :="ECL " vstreet
+		}
+		else
+		{
+			north :="NRE DW " num.1 " " vstreet
+			south :="NCL " xstreet
+			west :="EPL " vstreet
+			east :="ECL " vstreet
+		}
+
+	Case "s":
+		north := "SCL " street
+		if signs {
+			south := signdist . " S/SCL " . street
+		}
+		else {
+			south := "SPL " street
+		}
+		west := "ERE of DW" . num1 . " " . street
+		east := "ERE of DW " . num.2 . " " . street
+
+	Case "src":
+		north := "NCL " street
+		if signs {
+			south := signdist . " S/SCL " . street
+		}
+		else {
+			south := "SPL " street
+		}
+		west := "ERE of DW" . num1 . " " . street
+		east := "ERE of DW " . num.2 . " " . street
+
+	Case "se":
+		if (intdir = "h")
+		{
+			north :="SCL " xstreet
+			south :="SPL " xstreet
+			west :="ERE DW " num.1 " " xstreet
+			east :="ECL " vstreet
+		}
+		else
+		{
+			south :="NRE DW " num.1 " " vstreet
+			north :="SCL " xstreet
+			west :="EPL " vstreet
+			east :="ECL " vstreet
+		}
+
+	Case "SW":
+		if (intdir = "h")
+		{
+			south :="SPL " xstreet
+			north :="SCL " xstreet
+			west :="ERE DW " num.1 " " xstreet
+			east :="WCL " vstreet
+		}
+		else
+		{
+			north :="NRE DW " num.1 " " vstreet
+			south :="SCL " xstreet
+			west :="WPL " vstreet
+			east :="WCL " vstreet
+		}
+
+	Case "w":
+		north := "WCL " street
+		if signs
+		{
+			south := signdist . " W/WCL " . street
+		}
+		Else
+			south := "WPL " street
+		west := "NRE of DW " . num.1 . " " . street
+		east := "NRE of DW " . num.2 . " " . street
+
+	Case "e":
+		north := "ECL " street
+		if signs
+		{
+			south := signdist . " E/ECL " . street
+		}
+		else
+			south := "EPL " street
+		west := "NRE of DW " . num.1 . " " . street
+		east := "NRE of DW " . num.2 . " " . street
+	}
+
+	if (form = "RA")
+	{
+		setTemplateText("RANBoundary.skt", north)
+		setTemplateText("RASBoundary.skt", south)
+		setTemplateText("RAWBoundary.skt", west)
+		setTemplateText("RAEBoundary.skt", east)
+	}
+	else
+	{
+		setTemplateText("NBoundary.skt", north) ; ie HERE, this writes the dig area
+		setTemplateText("SBoundary.skt", south)
+		setTemplateText("WBoundary.skt", west)
+		setTemplateText("EBoundary.skt", east)
+	}
+}
+
+setDWToDWSketch()
+{
+	global
+	if (stationcode="ROGYRK01") or if (stationcode = "ROGSIM01")
+	{
+		rclear := rogclear()
+		if(rclear)
+		{
+			clearreason := Inputbox("Clear reason","Regular (r)`nFTTH (f)`nClear For Fibre Only(c)")
+			switch clearreason
+			{
+				case "r": loadImage("rogclear.skt")
+				case "f": loadImage("ftth.skt")
+				case "c": loadImage("exclusion agreement r.skt")
+			}
+			return
+		}
+	}
+	if(intdir)
+		loadimage(landbase "dwtodw" intdir ".skt")
+	Else
+		loadImage(landbase "dwtodw.skt")
+	wait()
+}
 
 setPL4DigArea(num1:="", num2:="")
 {
@@ -1757,7 +947,6 @@ setPL4DigArea(num1:="", num2:="")
 		setTemplateText("WBoundary.skt",west)
 		setTemplateText("EBoundary.skt",east)
 	}
-
 }
 
 setStreetToStreetDigArea()
@@ -1946,55 +1135,54 @@ setStreetToStreetDigArea()
 	}
 }
 
-setCornerDigArea()
+setRCDA()
 {
 	global
-	Loop
-	{
-		landbase := getLandbase()
-	}
-	Until (landbase = "NE" || landbase = "NW" || landbase = "SE" || landbase = "SW")
+	landbase := getlandbase() ;NSEW etc (String)
+	num := getBLNum() ;is an array
 	fixstreetName()
-	inter := isInterText()
-
-	Loop
+	rclimit := InputBox("Crossing limit? (CL / PL ?)")
+	Switch landbase
 	{
-		Inputbox, bounds,,Boundaries (PL/BL)
+	Case "n":
+		north := "NBL " num.1 " " street
+		south := "S" rclimit " " street
+		west := "WBL " num.1 " " street
+		east := "EBL " num.2 " " street
+	Case "s":
+		north := "N" rclimit " " street
+		south := "SBL " num.1 " " street
+		west := "WBL " num.1 " " street
+		east := "EBL " num.2 " " street
+	Case "w":
+		north := "NBL " num.1 " " street
+		south := "SBL " num.2 " " street
+		west := "WBL " num.1 " " street
+		east := "E" rclimit " " street
+	Case "e":
+		north := "NBL " num.1 " " street
+		south := "SBL " num.2 " " street
+		west := "W" rclimit " " street
+		east := "EBL " num.1 " " street
+	Case "nw":
+		isInterText()
+		north := "SBL " num.1 " " vstreet
+		south := "S" rclimit " " hstreet
+		west := "EBL " num.1 " " vstreet
+		east := "WCL " vstreet
+	Case "h":
+		north := "NPL " . street
+		south := "SPL " . street
+		west := "WBL " num.1 " " street
+		east := "EBL " num.2 " " street
+	Case "v":
+		north := "NBL " num.1 " " street
+		south := "SBL " num.2 " " street
+		west := "WPL " street
+		east := "EPL " street
 	}
-	until (bounds = "PL" || bounds = "BL")
-	if (bounds = "BL")
-	{
-		Inputbox, haddress,House address, Enter house address
-	}
 
-	switch landbase
-	{
-	case "NW":
-		north := (bounds = "BL") ? "NBL " . haddress : "NPL " . inter.x
-		south := (bounds = "BL") ? "CENTRE LINE " . inter.x : "CENTRE LINE " . inter.x
-		west := (bounds = "BL") ? "WBL " . haddress : "WPL " . inter.y
-		east := "CENTRE LINE " . inter.y
-
-	case "NE":
-		north := (bounds = "BL") ? "NBL " . haddress : "NPL " . inter.x
-		south := (bounds = "BL") ? "CENTRE LINE " . inter.x : "CENTRE LINE " . inter.x
-		west := "CENTRE LINE " . inter.y
-		east := (bounds = "BL") ? "EBL " . haddress : "EPL " . inter.y
-
-	case "SW":
-		north := (bounds = "BL") ? "CENTRE LINE " . inter.x : "CENTRE LINE " . inter.x
-		south := (bounds = "BL") ? "SBL " . haddress : "SPL " . inter.x
-		west := (bounds = "BL") ? "WBL " . haddress : "WPL " . inter.y
-		east := "CENTRE LINE" . inter.y
-
-	case "SE":
-		north := (bounds = "BL") ? "CENTRE LINE " . inter.x :"CENTRE LINE " . inter.x
-		south := (bounds = "BL") ? "SBL " . haddress : "SPL " . inter.x
-		west := "CENTRE LINE " . inter.y
-		east := (bounds = "BL") ? "EBL " . haddress : "EPL" . inter.y
-	}
-
-	if (form = "RA")
+	IF (FORM = "RA")
 	{
 		setTemplateText("RANboundary.skt",north)
 		setTemplateText("RAsboundary.skt",south)
@@ -2003,185 +1191,59 @@ setCornerDigArea()
 	}
 	else
 	{
-		setTemplateText("Nboundary.skt", north)
-		setTemplateText("SBoundary.skt", south)
-		setTemplateText("Wboundary.skt", west)
-		setTemplateText("EBoundary.skt", east)
-	}
-	;cornerboundx := Inputbox("X dimension boundaries?`n1 = CL to PL`n2 = centre line to PL`n3 = CL to x distance")
-	;cornerboundy := Inputbox("Y dimension boundaries?`n1 = CL to PL`n2 = centre line to PL`n3 = CL to y distance")
-	;if (cornerboundx = "1")
-	;xdistance := Inputbox("Enter end distance in metres")
-	;if (cornerboundy = "1")
-	;ydistance := Inputbox("Enter end distance in metres")
-
-}
-
-bellPrimStart()
-{
-	WinGet,stpid,PID,A
-	global bellclear
-	MsgBox,36,Load Previous?,Load previous sketch?
-	focusSketchTool()
-	ifMsgBox,Yes
-	{
-		autofillExistingSketch()
-		newPagePrompt()
-		pagetimeend := ((A_TickCount - timestart) / 1000)
-		FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
-	return
-}
-bellclear := InputBox("Ticket Clear? Y / N")
-if (bellclear = "y")
-{
-	ST_SAVEEXIT()
-	newPagePrompt()
-	pagetimeend := ((A_TickCount - timestart) / 1000)
-	FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
-}
-else if (bellclear = "n")
-{
-	bell_stickers()
-	;waitCloseDialogBox()
-	;ST_SAVEEXIT()
-	WinWaitClose, ahk_exe SketchToolApplication.exe
-	newPagePrompt()
-	pagetimeend := ((A_TickCount - timestart) / 1000)
-	FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
-}
-else
-	bellPrimStart()
-}
-
-rogClear()
-{
-	MsgBox,36,Clear?,Ticket Clear?
-	focusSketchTool()
-	ifMsgBox, Yes
-	{
-		rclear:=1
-	return rclear
-}
-}
-
-rogersWarning()
-{
-	global rclear, waitstate
-	GUIHWND := WinExist()
-	GuiControl, 2:, fibreonly, 0
-	GuiControl, 2:, ftth, 0
-	GuiControl, 2:, highriskfibre,0
-	GuiControl, 2:, inaccuraterecords,0
-	GuiControl, 2:, railway, 0
-	Gui, 2: Show, x411 y174 h383 w483, Please select all that apply
-	WinWaitClose, ahk_id %GUIHWND%
-	return
-}
-;#IfWinActive
-2ButtonCancel:
-	Gui, 2: Cancel
-return
-
-2ButtonOK:
-	Gui, 2:Submit
-	rogwarn := {"fibreonly":fibreonly, "ftth":ftth, "highriskfibre":highriskfibre
-	,"inaccuraterecords":inaccuraterecords, "railway": railway}
-	for k, v in rogwarn
-	{
-		if (v = 1)
-			loadImage(k ".skt")
-	}
-	Critical, Off
-return
-
-isErrorNoSketchTemplate(path)
-{
-
-	if !FileExist("C:\Users\Cr\Documents\" path)
-	{
-		Msgbox, Unable to load sketch (template not created)
-		return
+		setTemplateText("Nboundary.skt",north)
+		setTemplateText("sboundary.skt",south)
+		setTemplateText("WBoundary.skt",west)
+		setTemplateText("EBoundary.skt",east)
 	}
 }
-newPagePrompt()
+
+setPLDigArea()
 {
 	global
-	;MsgBox, 4132, New Page?, Start a new page?
-	if (currentpage < totalpages)
+	landbase:=getLandbase()
+	num:=getBLNum()
+	fixstreetName()
+	switch landbase
 	{
-		sketchAutoFill()
+	case "n":
+		north:="NPL " num.1 " " street
+		south:="NCL " street
+		west:="WPL " num.1 " " street
+		east:="EPL " num.1 " " street
+
+	case "s":
+		north:="SPL " num.1 " " street
+		south:="SCL " street
+		west:="WPL " num.1 " " street
+		east:="EPL " num.1 " " street
+
+	case "w":
+		north:="NPL " num.1 " " street
+		south:="SPL " num.1 " " street
+		west:="WPL " num.1 " " street
+		east:="WCL " street
+
+	case "e":
+		north:="NPL " num.1 " " street
+		south:="SPL " num.1 " " street
+		west:="ECL " street
+		east:="EPL " num.1 " " street
+	}
+
+	IF (FORM = "RA")
+	{
+		setTemplateText("RANboundary.skt",north)
+		setTemplateText("RAsboundary.skt",south)
+		setTemplateText("RAWBoundary.skt",west)
+		setTemplateText("RAEBoundary.skt",east)
 	}
 	else
 	{
-		MsgBox % "Continue to Timesheet / Email"
-		return
-	}
-return
-}
-
-setDWToDWSketch()
-{
-	global
-	if (stationcode="ROGYRK01") or if (stationcode = "ROGSIM01")
-	{
-		rclear := rogclear()
-		if(rclear)
-		{
-			clearreason := Inputbox("Clear reason","Regular (r)`nFTTH (f)`nClear For Fibre Only(c)")
-			switch clearreason
-			{
-				case "r": loadImage("rogclear.skt")
-				case "f": loadImage("ftth.skt")
-				case "c": loadImage("exclusion agreement r.skt")
-			}
-			return
-		}
-	}
-	if(intdir)
-		loadimage(landbase "dwtodw" intdir ".skt")
-	Else
-		loadImage(landbase "dwtodw.skt")
-	wait()
-}
-
-setBLtoBLSketch(landbase,intdir){
-	global
-	if (stationcode="ROGYRK01") or if (stationcode = "ROGSIM01")
-	{
-		rclear := rogclear()
-		if(rclear)
-		{
-			clearreason := Inputbox("Clear reason","Regular (r)`nFTTH (f)`nClear For Fibre Only(c)")
-			switch clearreason
-			{
-				case "r": loadImage("rogclear.skt")
-				case "f": loadImage("ftth.skt")
-				case "c": loadImage("exclusion agreement r.skt")
-			}
-			return
-		}
-	}
-	if (intdir)
-	{
-		;if !FileExist("C:\Users\Cr\Documents\" landbase "CLTOBL" intdir ".skt")
-		;{
-		;Msgbox, Unable to load sketch (template not created)
-		;return
-		;}
-		loadImage(landbase "CLTOBL" intdir ".skt")
-	}
-	else
-	{
-		switch choice
-		{
-			Case "i", "i": loadImage(landbase "BLTOBLI.SKT")
-			Case "o", "o": loadImage(landbase "BLTOBLO.SKT")
-			Case "nw", "nw": loadImage(landbase "BLTOBLNW.SKT")
-			Case "se", "se": loadImage(landbase "BLTOBLSE.SKT")
-			Case "single", "SINGLE": loadImage(landbase "BLTOBLSINGLE.SKT")
-			Default: return
-		}
-
+		setTemplateText("Nboundary.skt",north)
+		setTemplateText("sboundary.skt",south)
+		setTemplateText("WBoundary.skt",west)
+		setTemplateText("EBoundary.skt",east)
 	}
 }
 
@@ -2255,14 +1317,14 @@ setPLToPLSketch(landbase)
 		if ErrorLevel
 			return
 		(rclearreason = "c") ? loadImage("rogclear.skt") : loadImage("rogftth.skt")
-		return rclear
-	}
-	;~ if !FileExist("C:\Users\Cr\Documents\" landbase "pltopl.skt")
-	;~ {
-	;~ Msgbox, Unable to load sketch (template not created)
-	;~ return
-	;~ }
-	loadImage(landbase "pltopl.skt")
+	return rclear
+}
+;~ if !FileExist("C:\Users\Cr\Documents\" landbase "pltopl.skt")
+;~ {
+;~ Msgbox, Unable to load sketch (template not created)
+;~ return
+;~ }
+loadImage(landbase "pltopl.skt")
 }
 
 setCornerSketch(landbase)
@@ -2280,6 +1342,1065 @@ setRCSketch(landbase){
 	}
 	else
 		loadImage(landbase "RC.skt")
+}
+
+setSGasDigArea()
+{
+	;dig area for short gas
+
+	global
+	landbase := getLandbase()
+	num := getBLNum()
+	if (num[2])
+	{
+		num := getBLNum()
+	}
+	fixStreetName()
+	switch landbase
+	{
+	case "w":
+		north := "5M N/NBL " . num[1] . " " . street
+		south := "5M S/SBL " . num[1] . " " . street
+		west := "5M W/WBL " . num[1] . " " . street
+		east := "CENTRE LINE " . street
+
+	case "e":
+		north := "5M N/NBL " . num[1] . " " . street
+		south := "5M S/SBL " . num[1] . " " . street
+		east := "5M E/EBL " . num[1] . " " . street
+		west := "CENTRE LINE " . street
+
+	case "n":
+		north := "5M N/NBL " . num[1] . " " . street
+		east := "5M E/EBL " . num[1] . " " . street
+		west := "5M W/WBL " . num[1] . " " . street
+		south := "CENTRE LINE " . street
+
+	case "s":
+		east := "5M E/EBL " . num[1] . " " . street
+		south := "5M S/SBL " . num[1] . " " . street
+		west := "5M W/WBL " . num[1] . " " . street
+		north := "CENTRE LINE " . street
+	}
+
+	if (form = "RA")
+	{
+		setTemplateText("RANBoundary.skt", north)
+		setTemplateText("RASBoundary.skt", south)
+		setTemplateText("RAWBoundary.skt", west)
+		setTemplateText("RAEBoundary.skt", east)
+	}
+	else
+	{
+		setTemplateText("NBoundary.skt", north) ; ie HERE, this writes the dig area
+		setTemplateText("SBoundary.skt", south)
+		setTemplateText("WBoundary.skt", west)
+		setTemplateText("EBoundary.skt", east)
+	}
+}
+
+setLGasDigArea()
+{
+	;dig area for long gas
+
+	global
+	landbase := getLandbase()
+	num := getBLNum()
+	if (num[2])
+	{
+		num := getBLNum()
+	}
+	fixStreetName()
+	switch landbase
+	{
+	case "w":
+		north := "5M N/NBL " . num[1] . " " . street
+		south := "5M S/SBL " . num[1] . " " . street
+		west := "5M W/WBL " . num[1] . " " . street
+		east := "10M E OF ECL " . street
+
+	case "e":
+		north := "5M N/NBL " . num[1] . " " . street
+		south := "5M S/SBL " . num[1] . " " . street
+		east := "5M E/EBL " . num[1] . " " . street
+		west := "10M W OF WCL " . street
+
+	case "n":
+		north := "5M N/NBL " . num[1] . " " . street
+		east := "5M E/EBL " . num[1] . " " . street
+		west := "5M W/WBL " . num[1] . " " . street
+		south := "10M S OF SCL " . street
+
+	case "s":
+		east := "5M E/EBL " . num[1] . " " . street
+		south := "5M S/SBL " . num[1] . " " . street
+		west := "5M W/WBL " . num[1] . " " . street
+		north := "10M N OF NCL " . street
+	}
+
+	if (form = "RA")
+	{
+		setTemplateText("RANBoundary.skt", north)
+		setTemplateText("RASBoundary.skt", south)
+		setTemplateText("RAWBoundary.skt", west)
+		setTemplateText("RAEBoundary.skt", east)
+	}
+	else
+	{
+		setTemplateText("NBoundary.skt", north) ; ie HERE, this writes the dig area
+		setTemplateText("SBoundary.skt", south)
+		setTemplateText("WBoundary.skt", west)
+		setTemplateText("EBoundary.skt", east)
+	}
+}
+
+setLGasSketch(){
+	global
+	hnum := num[1]
+	numpts := {"s": new Point(560,1056), "n": new Point(564,589)}
+	loadImageNG(landbase . "lgas.skt")
+	for k,v in numpts
+	{
+		if (k = landbase)
+		{
+			drawText("nbltext1.skt", hnum,v.x,v.y)
+		}
+	}
+}
+
+waitSTLoad()
+{
+	Text:="|<>*135$14.TwIka49n64kVax8tn08MA3w8"
+	while !(ok:=FindText(347-150000, 53-150000, 347+150000, 53+150000, 0, 0, Text)) ; wait for image of rotation tool in ST
+		continue
+}
+
+writeRAdigarea()
+{
+	global
+	loadImageNG("RANBoundary.skt")
+	wait()
+	SendInput {f2}
+	SendInput, %north%{enter}
+	wait()
+	loadImageNG("RASBoundary.skt")
+	;Sleep 500
+	SendInput, {f2}
+	SendInput, %south%{enter}
+	;wait()
+	loadImageNG("RAWBoundary.skt")
+	;Sleep 500
+	SendInput, {f2}
+	SendInput, %west%{enter}
+	;wait()
+	loadImageNG("RAEBoundary.skt")
+	;Sleep 500
+	SendInput, {f2}
+	SendInput,%east%{enter}
+	;wait()
+	clickSelection()
+}
+
+;SKETCHTOOL MODULES
+
+autoinsertSketches()
+{
+	global
+	project := []
+
+	;COMMENT EITHER THE NEXT TWO LINES OR THE FOLLOWING 2 LINES AT A TIME - NOT BOTH
+
+	FileSelectFile, projfile,,%A_ScriptDir%, Select project,
+	units := Inputbox("Enter units")
+
+	;projfile:="C:\Users\Cr\Desktop\archived\autohotkey\STONEHAM 50 TO 28 R.TXT"
+	;units:="1m"
+	loop, Read, %projfile%
+	{
+		project.Push(A_LoopReadLine)
+	}
+	totalpages := project.Length()
+	Loop % project.Length()
+	{
+		setform()
+		waitSTLoad()
+		loadImage(project[A_Index])
+		Sleep 500
+		stproj_saveexit()
+		ControlClick("OK", "ahk_exe sketchtoolapplication.exe")
+		focusTeldig()
+	}
+	;Msgbox, Done!
+	proj:=""
+	addtotimesheet()
+	finishemail()
+	;SetTimer,checkforNewTicket, 200 ;use this for looping
+}
+
+projectSketch()
+{
+	;global
+	t := new Ticket()
+	s := new Sketch()
+	focusTeldig()
+	clickLocationTab()
+	t:= t.GetData()
+	;getTicketData(number,street,intersection,intersection2,stationCode,diginfo,ticketNumber,town,ticketdata)
+	;worktype := getWorkType()
+	openSketchEditor()
+	; if (ticketdata.stationcode = "ROGYRK01") or if (ticketdata.stationcode = "ROGSIM01")
+	; 	sketch.form := "RA"
+	; Else
+	; 	sketch.form := "BA"
+	t.form := t.ForceAuxilliary()
+	;mb(t.form)
+	waitSTLoad()
+	writeDigArea()
+	;s.digarea := s.getDigArea()
+	;mb(obj2string(s.digarea))
+	;mb(s["north"])
+	;s.putDigArea()
+	if (digboundary)
+	{
+		if(digboundary = "1")
+		{
+			setDWToDWSketch()
+			setDWtext()
+		}
+		if(digboundary = "2")
+		{
+			setBLtoBLSketch(landbase,intdir)
+			setBLtext(landbase,intdir,xstreet,vstreet)
+			setOffsetLabel(landbase)
+		}
+		if(digboundary = "3")
+		{
+			setRCSketch(landbase)
+			setBLtext(landbase,intdir,xstreet,vstreet)
+		}
+		if(digboundary="4")
+		{
+			setPLToPLSketch(landbase)
+			setPLtext(landbase)
+			setOffsetLabel(landbase)
+		}
+		if(digboundary="5")
+		{
+			setPL4Sketch(landbase)
+			setPL4text(landbase)
+		}
+		if(digboundary="6")
+		{
+			setStreetToStreetSketch(landbase)
+			setStreettoStreetText(landbase)
+		}
+		if(digboundary="7")
+		{
+			setCornerSketch(landbase)
+			setCornerText(landbase)
+		}
+	}
+	Else
+	{
+		landbase := getlandbase()
+		Switch landbase
+		{
+			Case "N": 	SWFUNC("b - north.skt", "B - north no sw.skt")
+			Case "NE": 	SWFUNC("B - NE CORNER.SKT","B - NE corner no sw.skt")
+			Case "E": 	SWFUNC("B - EAST.SKT","B - east no sw.skt")
+			Case "SE": 	SWFUNC("B - SE CORNER.SKT","B - SE corner no sw.skt")
+			Case "S": 	SWFUNC("B - SOUTH.SKT","B - South no sw.skt")
+			Case "SW":	SWFUNC("B - SW CORNER.SKT","B - SW corner no sw.skt")
+			Case "W":	SWFUNC("B - WEST.SKT","B - WEST NO SW.SKT")
+			Case "NW": 	SWFUNC("B - NW CORNER.SKT","B - NW corner no sw.skt")
+			Case "TN":	loadImage("b - t intersection n.skt")
+			Case "TS":	loadImage("b - t intersection s.skt")
+			Case "TW":	loadImage("b - t intersection w.skt")
+			Case "TE": 	loadImage("b - T intersection e.skt")
+			Case "H": 	loadImage("B - horizontal st.skt")
+			Case "V": 	loadImage("B - vertical st.skt")
+			Case "HSS": loadImage("B - horizontal st centre to centre.skt")
+			Case "VSS": loadImage("B - vertical centre to centre.skt")
+			Case "INT": loadImage("B - intersection.skt")
+			Case "Custom": openimagedialog()
+			Default:	MsgBox % "No valid option selected. Please load form manually!"
+		}
+		if landbase in N,S,E,W
+		{
+			setTemplateText(landbase . "street.skt", street)
+		}
+		if landbase in NE,NW,SE,SW,TN,TS,TW,TE
+		{
+			inter := isInterText()
+			setCornerText(landbase)
+		}
+	}
+}
+
+setOffsetLabel(landbase)
+{
+	meas1 := setMeasurement()
+	meas2 := setMeasurement()
+	label := InputBox("Enter label for cable")
+	StringUpper, label, label
+	list:=["meas1.skt","meas2.skt","cablelabel.skt"]
+	setTemplateText(landbase "meas1.skt",meas1)
+	wait()
+	setTemplateText(landbase "meas2.skt",meas2)
+	wait()
+	setTemplateText(landbase "cablelabel.skt", label)
+}
+
+getDigBoundaries()
+{
+	InputBox, digboundary,Boundaries?, 1 = Driveway to Driveway`n2 = BL to BL`n3 = Road Crossing `(FTTH`)`n4 = PL to PL`n5 = All PL`n6 = Street to Street`n7 = Corner`n8 = Short Gas`n9 = Long Gas,,,300
+	return digboundary
+}
+
+;AUTOMATED FORM FILLER
+;THIS NEEDS TO BE REFACTORED BIG TIME
+sketchAutoFill()
+{
+	global
+	; loads form and starts
+	timestart := A_TickCount
+	setForm()
+	if FileExist("C:\Users\Cr\Documents\" ticketnumber ".txt")
+	{
+		;	autodrawsketch()
+	}
+	; wait for SketchTool to be loaded via rotation arrow
+	waitSTLoad()
+	;changeGridSizeTo16()
+	;MouseClick,l,% A_ScreenWidth/2, % A_ScreenHeight/2
+	Winget,stpid,PID,A
+	if (form = "BP")
+	{
+		;QUICK FILL FOR SINGLE VS PROJECT
+		btickettype := Inputbox("Single or Project?")
+		if btickettype in s,S,p,P
+		{
+			if (btickettype = "s")
+			{
+				totalpages := 2
+
+				units := Inputbox("Enter units")
+				primary_template := FileSelectFile(,"C:\Users\Cr\Documents\","Choose bell primary form to open")
+				focusSketchtool()
+				loadImage("bell primary.skt")
+				wait()
+				loadImage(primary_template)
+				wait()
+				setTemplateText("bellprimarydate.skt",getCurrentDate())
+				wait()
+				setTemplateText("units.skt",units)
+				wait()
+				setTemplateText("RPtotalpages.skt",totalpages)
+				wait()
+				if !currentpage
+					currentpage := 1
+				Controlclick("OK","ahk_exe sketchtoolapplication.exe")
+				focusTeldig()
+				newPagePrompt()
+				pagetimeend := ((A_TickCount - timestart) / 1000)
+				FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
+				return
+			}
+			else if (btickettype = "p")
+			{
+				bellPrimStart()
+				return
+			}
+
+			else
+			{
+				bellPrimStart()
+				return
+			}
+		}
+	}
+
+	;getexisting := InputBox("Open existing sketch? Y/N")
+	MsgBox,4,Open Existing?,Open Existing Sketch?
+	focusSketchTool()
+
+	;if (getexisting = "y")
+	ifMsgBox, Yes
+	{
+		autofillExistingSketch()
+		newPagePrompt()
+		pagetimeend := ((A_TickCount - timestart) / 1000)
+		FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
+	return ;autofill existing module
+}
+
+;else if (getexisting = "n") ;this is where it gets tricky...
+ifMsgBox, No
+{
+	writeDigArea()
+
+	; checks for alternate or regular dig areas and writes
+	;next section is essentially prebaked vs custom dig area/sketch
+	if !(digboundary = "")
+	{
+		if(digboundary = "1")
+		{
+			setDWToDWSketch()
+			if !(rclear)
+			{
+				setDWtext()
+			}
+		}
+		if(digboundary = "2")
+		{
+			setBLtoBLSketch(landbase,intdir)
+			if !(rclear)
+			{
+				setBLtext(landbase,intdir,xstreet,vstreet)
+				if (!intdir)
+					setOffsetLabel(landbase)
+			}
+		}
+		if(digboundary = "3")
+		{
+			setRCSketch(landbase)
+			setBLtext(landbase,intdir,xstreet,vstreet)
+		}
+		if(digboundary="4")
+		{
+			rclear := rogclear()
+			if (rclear)
+				return
+			setPLToPLSketch(landbase)
+			setPLtext(landbase)
+			;setOffsetLabel(landbase)
+		}
+		if(digboundary="5")
+		{
+			setPL4Sketch(landbase)
+			setPL4text(landbase)
+		}
+		if(digboundary="6")
+		{
+			rclear := rogclear()
+			if (rclear)
+				return
+			setStreetToStreetSketch(landbase)
+			setStreettoStreetText(landbase)
+		}
+		if(digboundary="7")
+		{
+			setCornerSketch(landbase)
+			setCornerText(landbase)
+		}
+		if(digboundary="8")
+		{
+			rclear := rogclear()
+			if (rclear)
+				return
+			setPLtoPLSketch(landbase)
+			setPLtext(landbase)
+		}
+		if(digboundary="9")
+		{
+			rclear := rogclear()
+			if (rclear)
+				return
+			setLGasSketch()
+		}
+	}
+	else
+	{
+		if (stationCode = "ROGYRK01") or if (stationCode = "ROGSIM01")
+		{
+			rclear := rogClear()
+			if(rclear)
+			{
+				loadImage("rogclear.skt")
+				ST_SAVEEXIT()
+				newPagePrompt()
+				pagetimeend := ((A_TickCount - timestart) / 1000)
+				FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
+				return
+			}
+		}
+		if (stationCode = "APTUM01")
+		{
+			aptclear := aptClear()
+			if (aptclear) 
+			{
+				loadImage("aptumclear.skt")
+				ST_SAVEEXIT()
+				newPagePrompt()
+				return
+			}
+		}
+		landbase := getlandbase()
+		Switch landbase
+		{
+			Case "N": 	SWFUNC("b - north.skt", "B - north no sw.skt")
+			Case "NE": 	SWFUNC("B - NE CORNER.SKT","B - NE corner no sw.skt")
+			Case "E": 	SWFUNC("B - EAST.SKT","B - east no sw.skt")
+			Case "SE": 	SWFUNC("B - SE CORNER.SKT","B - SE corner no sw.skt")
+			Case "S": 	SWFUNC("B - SOUTH.SKT","B - South no sw.skt")
+			Case "SW":	SWFUNC("B - SW CORNER.SKT","B - SW corner no sw.skt")
+			Case "W":	SWFUNC("B - WEST.SKT","B - WEST NO SW.SKT")
+			Case "NW": 	SWFUNC("B - NW CORNER.SKT","B - NW corner no sw.skt")
+			Case "TN":	loadImage("b - t intersection n.skt")
+			Case "TS":	loadImage("b - t intersection s.skt")
+			Case "TW":	loadImage("b - t intersection w.skt")
+			Case "TE": 	loadImage("b - T intersection e.skt")
+			Case "H": 	loadImage("B - horizontal st.skt")
+			Case "V": 	loadImage("B - vertical st.skt")
+			Case "HSS": loadImage("B - horizontal st centre to centre.skt")
+			Case "VSS": loadImage("B - vertical centre to centre.skt")
+			Case "INT": loadImage("B - intersection.skt")
+			Case "Custom": openimagedialog()
+			Default:	MsgBox % "No valid option selected. Please load form manually!"
+		}
+		if landbase in N,S,E,W,H,V
+		{
+			setTemplateText(landbase . "street.skt", street)
+		}
+		if landbase in NE,NW,SE,SW,TN,TS,TW,TE
+		{
+			inter := isInterText()
+			setCornerText(landbase)
+		}
+	}
+	WinWaitClose, ahk_exe SketchToolApplication.exe
+	newPagePrompt()
+	pagetimeend := ((A_TickCount - timestart) / 1000)
+	FileAppend, %ticketnumber% p.%currentpage% - %pagetimeend%`n, timelog.txt
+	return
+}
+}
+
+setCustomDigArea(digarray)
+{
+	setTemplateText("Nboundary.skt",digarray[1])
+	setTemplateText("Sboundary.skt",digarray[2])
+	setTemplateText("Wboundary.skt",digarray[3])
+	setTemplateText("Eboundary.skt",digarray[4])
+}
+
+;DIG AREA
+;this function needs cleanup
+writeDigArea() {
+	global
+	digboundary := getDigBoundaries() ; asks for INT representing dig boundaries
+	if (digboundary = "") ;no entry
+	{
+		getRegDA() ; asks line by line for dig box - returns north south east west
+		wait()
+		if (form = "RA") ;this might not need to be here TODO: check if can do ternary below since all that needs to change is boundary.skt etc
+		{
+			writeRAdigarea()
+			clickselection()
+			return
+		}
+		;setTemplateText -
+		focusSketchTool()
+		if (form = "AP")
+		{
+			digarray := {(north):"Nboundaryapt.skt",(south):"sboundaryapt.skt",(west):"wboundaryapt.skt"
+		,(east):"eboundaryapt.skt"}
+		}
+		else
+		{
+			digarray := {(north):"Nboundary.skt",(south):"sboundary.skt",(west):"wboundary.skt"
+			,(east):"eboundary.skt"}
+		}
+		for k,v in digarray
+		{
+			setTemplateText(v,k)
+		}
+		digarray :=
+	}
+	else ;if using different boundaries
+	{
+		switch digboundary
+		{
+			;case 1 - DW to DW, case 2 - utilizing BL
+		case "1":
+			setDWToDWDA()
+		case "2":
+			setBLToBLDA()
+		case "3":
+			setRCDA()
+		case "4":
+			setPLDigArea()
+		case "5":
+			setPL4DigArea()
+		case "6":
+			setStreetToStreetDigArea()
+		case "7":
+			setCornerDigArea()
+		case "8":
+			setSGasDigArea()
+		case "9":
+			setLGasDigArea()
+			;default case below just in case, recursion
+		default:
+			digboundary := ""
+			writeDigArea()
+		}
+	}
+}
+
+;MOBILE SPECIFIC BUTTON HANDLERS/HOTKEYS
+
+#ifwinactive ahk_exe mobile.exe
+
+	f2::
+		ticketDatatoJSON()
+	return
+
+	RShift::
+	MBUTTON::
+		Menu, Mobile, Show
+	return
+
+	F8::
+		projectSketch()
+	return
+
+	F9::
+	::SKAF::
+		sketchAutoFill()
+	return
+
+	+f9::
+		AFFromClearTemplate()
+	return
+
+	^n::
+	::newsketch::
+		setForm()
+	return
+
+	;MOBILE HOTSTRINGS
+
+	:::wtf::
+		writeTemplateFile()
+	return
+
+#IfWinActive
+
+;MOBILE FUNCTIONS
+
+ticketDatatoJSON(){
+	ControlGet, data, list,,SysListview321,ahk_exe mobile.exe
+	tl := []
+	j := new JSON()
+	street:="",town:=""
+	for i,row in StrSplit(data,"`n")
+	{
+		fields := strsplit(row, "`t")
+
+		obj :=	{ id:i
+			,name:fields[2]
+			,street:fields[6]
+			,civic:fields[5]
+			,intersection:fields[14]
+		,intersection2:fields[17]}
+		tl.Push(obj)
+		obj:="",fields:=""
+	}
+	jval := j.Dump(tl,,2)
+	;ScrollBox(jval,"b1","Tickets as JSON")
+	FileAppend, %jval%, jsondata.txt
+}
+
+getPoleNumber(diginfo){
+	if !(diginfo)
+	{
+		MB("No dig info obtained")
+	return ""
+}
+substr := StrSplit(diginfo," ", OmitChars)
+for i,v in substr
+{
+	if (RegExMatch(v,"P[0-9]+"))
+	return v
+}
+}
+
+AFFromClearTemplate()
+{
+	global
+	;used to fill out clear forms from text file format %ticketnumber%.txt
+	;outputs - dig area, rogclear/ftth/foonlyclear
+	;inputs - ticket data, pltopl or manual entry, address 1, address 2 if applicable, nbound, sbound, ebound, wbound
+	;read text file
+	setForm()
+	waitSTLoad()
+	;if !FileExist(A_MyDocuments "\" ticketnumber ".txt")
+	;{
+	;	Msgbox, % "Please complete text file"
+	;}
+
+	;else
+	;{
+
+	readClearTemplate()
+	addtotimesheet()
+	finishemail()
+	SetTimer,checkfornewticketb, 200
+}
+
+checkforNewTicket()
+{
+	Controlget, ticketNumbernew, line, 1, edit1, ahk_exe mobile.exe
+	if(ticketnumber != ticketNumbernew)
+	{
+		autoinsertSketches()
+		ticketNumbernew := ""
+	}
+}
+
+checkforNewTicketB()
+{
+	Controlget, ticketNumbernew, line, 1, edit1, ahk_exe mobile.exe
+	if(ticketnumber != ticketNumbernew)
+	{
+		AFFromClearTemplate()
+		ticketNumbernew := ""
+	}
+}
+
+locationDataCheck()
+{
+	global
+	while locationDataObtained = ""
+	{
+		clickLocationTab()
+		getTicketData(number,street,intersection,intersection2,stationCode,diginfo,ticketNumber,town,ticketdata)
+		worktype := getWorkType()
+		;locationDataObtained := 1
+	return locationDataObtained := 1
+}
+}
+
+newproj()
+{
+	Run, % "C:\Users\Cr\archived\autohotkey\projectfile.ahk"
+}
+
+openSketchEditor()
+{
+	Send, !ls
+}
+
+readClearTemplate()
+{
+	global
+	FileRead, templatefile, C:\Users\Cr\Documents\%ticketnumber%.txt
+	linelist := StrSplit(templatefile, "`r`n")
+	msgbox % linelist.22
+	if linelist[1] = "y"
+		autofillExistingSketch()
+	else if linelist.Length() == 3 ;ie pl4 template
+	{
+		num1 := linelist[2]
+		num2 := linelist[3]
+		setPL4DigArea(num1,num2)
+		loadImage("rogclear.skt")
+		ST_SAVEEXIT()
+	}
+	else if linelist.Length() == 5 ; manual clear template
+	{
+		IF (FORM = "RA")
+		{
+			setTemplateText("RANboundary.skt",linelist[2])
+			setTemplateText("RAsboundary.skt",linelist[3])
+			setTemplateText("RAWBoundary.skt",linelist[4])
+			setTemplateText("RAEBoundary.skt",linelist[5])
+		}
+		else
+		{
+			setTemplateText("Nboundary.skt",linelist[2])
+			setTemplateText("sboundary.skt",linelist[3])
+			setTemplateText("WBoundary.skt",linelist[4])
+			setTemplateText("EBoundary.skt",linelist[5])
+		}
+		clearreason := Inputbox("Clear reason","Regular (r)`nFTTH (f)`nClear For Fibre Only(c)")
+		switch clearreason
+		{
+			case "r": loadImage("rogclear.skt")
+			case "f": loadImage("ftth.skt")
+			case "c": loadImage("exclusion agreement r.skt")
+		}
+		ST_SAVEEXIT()
+	}
+	else
+	{
+		MsgBox, % "Template formatting error!"S
+	return
+}
+}
+
+resetFormVar()
+{
+	global form
+	global locationDataObtained
+	global totalpages
+	global currentpage
+	form := "", locationDataObtained := "", totalpages := "",currentpage := "", num := ""
+	MsgBox % "Form data has been reset!"
+}
+
+setForm()
+{
+	;ticketdata := getticketdata(), stationCode := ticketdata.5
+	global
+	focusTeldig()
+	locationDataCheck()
+	Loop
+	{
+		if (stationcode == "CCS")
+		{
+			Loop
+			{
+				InputBox, stationcode, Station Code, Enter Station Code
+				StringUpper, stationcode,stationcode
+				switch stationcode
+				{
+					Case "BCGN01": Break
+					Case "ROGYRK01": Break
+					Case "APTUM01": Break
+					Default: continue
+				}
+			}
+			continue
+		}
+		if (stationCode == "BCGN01" and form = "") or if (stationCode == "BCGN02" and form = "") or if (stationCode == "BAGN02" and form = "")
+		{
+			TrayTip,Form, Opening Bell Primary Form,5
+			openForm("|<>*117$65.zj8DD44D64w8EEEF88XA90EUUUWEG2IG0V1114UY4gY13m3m9z899D24447W2EG+E4888844UYIU8EEEE88X8N0EyyyUEEsEHw", "BP")
+			;openBellPrimary()
+			break
+		}
+		else if (stationCode == "BCGN01") or if (stationCode == "BCGN02") or if (stationCode == "BAGN02")
+		{
+			openForm("|<>*122$71.l13lVD0MEYTEG28n2E0kV8YUY4UZ4U1F2+91891/904W4AG2Tm2GHk948EYMUY4WY0F8Fl81189581yEWWE228m6E24n8YU44C44yA4wlxw","BA")
+			;openBellAux()
+			break
+		}
+		else if (stationCode == "ROGYRK01" and form = "") or if (stationCode == "ROGSIM01" and form = "") or if (stationCode == "ROGPEL01" and form = "")
+		{
+			openForm("|<>*122$51.D33l1sTw+0MF880EWU2W91024I0YF880EWU4Xl1s22Y0WF880EIUDm91022W12F880EADM/lxw214","RP")
+			TrayTip,Form,Opening Rogers Primary form,5
+			;openCATVPrimary()
+			break
+		}
+		else if (stationCode == "ROGYRK01") or if (stationCode == "ROGSIM01")
+		{
+			openForm("|<>*119$71.6xz7Y41wSD60N0EE88216FA4W0V0EE444WQC4120UU8894ccD241z0SEHlF8E48220UUYWI8U8E441118Yc90EE88216F8kPsUSEE41kVF000000000000000000T00000E","RA")
+			TrayTip,Form,Opening Rogers Auxilliary Form,5
+
+			;openCATVAux()
+			break
+		}
+		else if (stationCode == "APTUM01" and form = "")
+		{
+			openForm("|<>*135$46.D3kSS7Vt0FW90U8s22E4411U890EE460UYNt0EM22EY411U892EE450FW90U8nks7blsQU","AP")
+			;openAptumPrimary()
+			break
+		}
+		else if(stationCode == "APTUM01")
+		{
+			openForm("|<>*134$68.jTlt10T7XlUG0UUEE42AWMAU8E441118b3824110EEG9FHkV0Tk7Y4wIIU8E4411194d824110EEG9+G0UUEE42AWFay87Y410Q8IF00000000000000007k00002","AA")
+			break
+		}
+		else
+		{
+			form := ""
+			continue
+		}
+	}
+}
+
+;MOBILE MODULES
+
+getticketpicture:
+	run,getticketpicture.ahk
+return
+
+writeTemplateFile()
+;generates a template file that can be used with above solution
+{
+	global north, south, west, east
+	clickLocationTab()
+	getTicketData(number, street, intersection, intersection2, stationCode, diginfo, ticketNumber, town, ticketdata)
+	Loop
+	{
+		Inputbox, useexisting, Use existing, Y or N
+		if useexisting in y,Y,n,N
+			break
+	}
+	if (useexisting = "y")
+	{
+		;FileSelectFile, filename,, A_MyDocuments
+		FileAppend, %useexisting%, A_MyDocuments\%ticketNumber%.txt
+		MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
+		return
+	}
+	Inputbox, type, Template, Select template type:`n1.PL4`n2.Manual
+	if (type = "1")
+	{
+		InputBox,house1, House 1, Enter house 1
+		InputBox,house2, House 2, Enter house 2
+		FileAppend, %useexisting%`n%house1%`n%house2%,%A_MyDocuments%\%ticketNumber%.txt
+		msgbox, %useexisting%`n%house1%`n%house2%
+		MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
+		return
+		;units
+		;
+
+	}
+	else
+	{
+		getRegDA()
+		FileAppend, %useexisting%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
+		FileAppend, %north%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
+		FileAppend, %south%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
+		FileAppend, %west%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
+		FileAppend, %east%, C:\Users\Cr\Documents\%ticketNumber%.txt
+		MsgBox, %south%`n
+		MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
+		return
+	}
+}
+
+;GUI BUTTON Labels
+
+DAButtonOK:
+	Gui,Da: Submit
+	Gui, Da: Destroy
+return
+
+DWButtonOK:
+	Gui, DW: Submit
+	Gui, DW: Destroy
+return
+
+PL4ButtonOK:
+
+	Gui, PL4: Submit
+	Gui, PL4: Destroy
+return
+
+2ButtonCancel:
+	Gui, 2: Cancel
+return
+
+2ButtonOK:
+	Gui, 2:Submit
+	rogwarn := {"fibreonly":fibreonly, "ftth":ftth, "highriskfibre":highriskfibre
+	,"inaccuraterecords":inaccuraterecords, "railway": railway}
+	for k, v in rogwarn
+	{
+		if (v = 1)
+			loadImage(k ".skt")
+	}
+	Critical, Off
+return
+
+;CLASS DEFINITIONS
+
+class TMobileAutomation {
+}
+
+class SketchToolAutomation {
+}
+
+class Ticket 
+{
+
+	__New(number := "", street := "", intersection := "", intersection2 := "", stationCode := "", digInfo := "", ticketNumber := "", town := "", workType:= "")
+	{
+		this.number := number
+		this.street := street
+		this.intersection := intersection
+		this.intersection2 := intersection2
+		this.stationCode := stationCode
+		this.ticketNumber := ticketNumber
+		this.town := town
+		this.workType := workType
+	}
+
+	GetData()
+	{
+		ControlGet, number, Line,1, edit2, ahk_exe Mobile.exe
+		ControlGet, street, line,1, Edit6, ahk_exe Mobile.exe
+		ControlGet, intersection, line,1,edit10, ahk_exe mobile.exe
+		ControlGet, intersection2, line,1,edit12, ahk_exe mobile.exe
+		ControlGet, stationCode, line,1, edit9, ahk_exe mobile.exe
+		ControlGetText, digInfo, edit22, ahk_exe mobile.exe
+		controlget, ticketNumber, line, 1, edit1, ahk_exe mobile.exe			
+		controlget, town, line, 1, edit13, ahk_exe mobile.exe
+		this.number := number
+		this.street := street
+		this.intersection := intersection
+		this.intersection2 := intersection2
+		this.stationCode := stationCode
+		this.ticketNumber := ticketNumber
+		this.town := town
+		this.workType := workType
+		return this
+	}
+
+	ForceAuxilliary()
+	;returns string representing auxilliary for particular utility
+	{
+		if (this.stationCode = "ROGYRK01"){
+			return "RA"
+		}
+		else if (this.stationCode = "ROGSIM01"){
+			return "RA"
+		}
+		else{
+			return "BA"
+		}
+
+	}
+}
+
+class Sketch 
+{
+
+	__New(landbase:=""){
+	}
+
+	;returns an integer representing digboundary
+	GetDigType(){
+		return this.digtype := GetDigBoundaries()
+	}
+
+	;returns a digarea object(north,south,east,west)
+	getDigArea(){
+		return this.digarea := getRegDA()
+	}
+
+	;writes dig area to sketch
+	putDigArea(){
+		setTemplateText("NBoundary.skt",this.digarea.north)
+		setTemplateText("SBoundary.skt",this.digarea.south)
+		setTemplateText("WBoundary.skt",this.digarea.west)
+		setTemplateText("EBoundary.skt",this.digarea.east)
+	}
+
+}
+
+class Point 
+{
+
+	__New(x,y)
+	{
+		this.x := x
+		this.y := y
+	}
 }
 
 beginHook(Options, EndKey,Matchlist){
@@ -2382,7 +2503,6 @@ openExistingPrompt()
 		}
 	}
 #IfWinActive
-
 
 transformerAutoFill()
 {
@@ -2760,6 +2880,7 @@ poleAutoFill() ; AUTOCOMPLETE FOR POLES
 {
 	global
 	setForm()
+	polenum := getPoleNumber(diginfo)
 	if (form = "bp")
 	{
 		bellPrimaryPoleAutofill()
@@ -2776,7 +2897,7 @@ poleAutoFill() ; AUTOCOMPLETE FOR POLES
 
 		IfMsgBox, No
 		{
-			setPoleDigArea()
+			setPoleDigArea(polenum)
 			if (stationcode = "ROGYRK01") or if (stationcode = "ROGSIM01")
 			{
 				rclear := rogClear()
@@ -2953,6 +3074,7 @@ loadImageNG(x) ; loads template without ungrouping
 	Sleep 50
 	waitCloseDialogBox()
 }
+
 saveFile() ; opens save dialog
 {
 	SendInput !f{enter}
@@ -3039,7 +3161,7 @@ getTicketData(ByRef number, ByRef street, byref intersection, ByRef intersection
 	;ticketdata := [number, street, intersection, intersection2, stationcode, diginfo, ticketnumber, town]
 	ticketdata := {number : number, street : street, intersection : intersection, intersection2 : intersection2, stationCode : stationCode, digInfo: digInfo, ticketNumber : ticketNumber, town : town}
 	sleep 1000
-	return ticketdata
+return ticketdata
 }
 
 writePageNumber() ; page number prompt will replace with auto numbering
@@ -3064,6 +3186,26 @@ writePageNumber() ; page number prompt will replace with auto numbering
 	loadImageNG("totalpages.skt")
 	SendInput, {f2}%totalpages%
 	Sleep 1000
+}
+
+writeCurrentPage(currentpage)
+{
+	if currentpage is not integer
+	{
+		Throw "Page number must be integer"
+		return
+	}
+	setTemplateText("currentpage.skt",currentpage)
+}
+
+writeTotalPages(totalpages)
+{
+	if totalpages is not integer
+	{
+		Throw "Page number must be integer"
+		return
+	}
+	setTemplateText("totalpages.skt",totalpages)
 }
 
 getRPPages()
@@ -3157,9 +3299,8 @@ getPoint(inst1) {
 	Tooltip,
 	;arccoord := [x1, y1]
 	arccoord := new Point(x1,y1)
-	return arccoord
+return arccoord
 }
-
 
 #IFWINACTIVE Tel ahk_exe SketchToolApplication.exe
 c::
@@ -3575,15 +3716,13 @@ Return
 ; PASTES HIGH RISK FIBRE LETTER
 #H::
 	add_high_risk_fibre_letter()
-	return
-	
-	
+return
+
 add_high_risk_fibre_letter(){
 	loadImageNG("highriskletter.skt")
 	ControlClick, OK,ahk_exe SketchToolApplication.exe
 	WinActivate, ahk_exe mobile.exe
 }
-		
 
 ; ADDS HIGH RISK FIBRE STICKER
 ::hiriskfibre::
@@ -3603,6 +3742,10 @@ isInt(var){
 	addtotimesheet()
 return
 
+getUtility(string) {
+
+}
+
 addtotimesheet()
 {
 	GLOBAL
@@ -3612,6 +3755,93 @@ addtotimesheet()
 	clickLocationTab()
 	getTicketData(number,street,intersection,intersection2,stationCode,diginfo,ticketNumber,town,ticketdata)
 	today := A_DD . " " . A_MM . " " . A_yyyy
+
+/*
+
+	InputBox, units, Units, Enter units string (format: <num><M/C><util(R/B/A)> separated by Space)
+	if (RegExMatch(units, " ")) {
+		mb("multiple entries: " StrSplit(units," ").Length())
+	}
+	if (RegExMatch(units,"r")) {
+		mb("rogers")
+	}
+	
+
+	if !(instr(units," ")) {
+		utilArray := units
+	}
+
+	else {
+	utilArray = StrSplit(units, A_Space)
+	}
+
+	if (utilArray = ""){
+		return
+	}
+
+	for i,j in utilArray {
+		; check for improper string length
+		if (StrLen(j) < 3) || (Strlen(j > 4)) {
+			mb("Incorrect format!")
+		}
+
+		;rogers - if last character is r
+		if (InStr(j,"r",,3)) {
+			if (InStr(j,"m",,2)) {
+				rogersmarked := SubStr(j,1,-1)
+				stringupper,rogersmarked,rogersmarked
+			}
+			else if (Instr(j,"c",,2)) {
+				rogersclear := SubStr(j,1,-1)
+				stringupper,rogersclear,rogersclear
+			}
+			else {
+				Mb("Incorrect format!")
+			}
+		}
+
+		;aptum
+		;if last character is b
+		else if (InStr(j,"b",,3)) {
+
+			;check for m or c - reject otherwise
+			if (InStr(j,"m",,2)) {
+				bellmarked := SubStr(j,1,-1)
+				Stringupper,bellclear,bellclear
+			}
+			else if (Instr(j,"c",,2)) {
+				bellClear := SubStr(j,1,-1)
+				Stringupper,bellclear,bellclear
+			}
+			else {
+				Mb("Incorrect format!")
+			}
+		}
+
+		;aptum
+		;if last character is a
+		else if (InStr(j,"a",,3)) {
+			if (InStr(j,"m",,2)) {
+				aptummarked := SubStr(j,1,-1)
+				Stringupper,aptummarked,aptummarked
+			}
+			else if (Instr(j,"c",,2)) {
+				aptumclear := SubStr(j,1,-1)
+				Stringupper,aptumclear,aptumclear
+			}
+			else {
+				Mb("Incorrect format!")
+			}
+		}
+
+		;all other cases
+		else {
+			MB("Incorrect format")
+		}
+	}
+	MB(rogersmarked "`n" rogersClear "`n" bellmarked "`n" bellclear "`n" aptummarked "`n" aptumclear)
+	*/
+
 	Loop{
 		InputBox, ROGERSMARKED, Enter Rogers Marked (1 -20 or blank)
 		if ROGERSMARKED is not digit
@@ -3623,7 +3853,7 @@ addtotimesheet()
 
 	Loop{
 		InputBox, ROGERSCLEAR, Enter rogers Clear (1 - 20 or blank)
-		if rc is not digit
+		if rogersclear is not digit
 			continue
 	}
 	until ROGERSCLEAR <= 20
@@ -3641,7 +3871,23 @@ addtotimesheet()
 			continue
 	}
 	until BELLCLEAR <= 20
+	
+	/*
+	Loop{
+		InputBox, APTUMMARKED, Enter APTUM MARKED (int)
+		if APTUMMARKED is not digit
+			continue
+	}
+	until APTUMMARKED <= 20
 
+	Loop{
+			InputBox, APTUMCLEAR, Enter APTUM CLEAR (int)
+			if APTUMCLEAR is not digit
+				continue
+		}
+		until APTUMCLEAR <= 20
+		*/
+	
 	if (rogersMarked)
 		rogersMarked .= "M"
 	if (rogersClear)
@@ -3650,10 +3896,16 @@ addtotimesheet()
 		bellMarked .= "M"
 	if (bellClear)
 		bellClear .= "C"
-
+	/*
+	if (aptumMarked)
+		aptumMarked .= "M"
+	if (aptumClear)
+		aptumClear .= "C"
+*/
 	InputBox, comments, Enter comments
 	StringUpper, comments,comments
 	FileAppend,% ticketnumber "," number " " street "," rogersMarked "," rogersClear "," bellMarked "," bellClear "," comments "`n", C:\Users\Cr\timesheet%today%.txt
+	;FileAppend,% ticketnumber "," number " " street "," rogersMarked "," rogersClear "," bellMarked "," bellClear "," aptummarked "," aptumclear "," comments "`n", C:\Users\Cr\timesheet%today%.txt
 	if (ErrorLevel)
 		MsgBox % "There was an error writing to timesheet`nError: " A_LastError
 	SplashTextOff
@@ -3712,7 +3964,6 @@ ralt::
 ::txbx::
 	textboxplus()
 return
-
 
 textboxplus() {
 	MouseGetPos, xpos, ypos
@@ -3944,7 +4195,7 @@ stproj_saveexit()
 	Case "BP" :
 		;units := Inputbox("Enter units")
 		loadImage("bell primary.skt")
-=> No duplicate line
+		=> No duplicate line
 		setTemplateText("units.skt",units)
 		setTemplateText("bellprimarydate.skt",today)
 		setTemplateText("totalpages.skt",totalpages)
@@ -4039,15 +4290,28 @@ ST_SAVEEXIT()
 		rogersunits := getRogersUnits()
 		totalpages := getRPPages()
 		loadImage("catv primary.skt")
-	(InStr(rogersunits,"M")) ? loadImageNG("rogerspaint.skt") :
+		(InStr(rogersunits,"M")) ? loadImageNG("rogerspaint.skt") :
 		setTemplateText("units.skt",rogersunits)
 		setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
 		setTemplateText("RPtotalpages.skt",totalpages)
 		Sleep 100
 	Case "RA" :
 		loadImage("rogersaux.skt")
-		Case "AP" : loadImage("cogeco primary.skt")
-		Case "AA" : loadImage("aptumaux.skt")
+	Case "AP" : 
+		rogersunits := getRogersUnits()
+		totalpages := getRPPages()
+		loadImage("cogeco primary.skt")
+		if (InStr(rogersunits,"M"))
+		{
+			loadImageNG("rogerspaint.skt")
+		}
+		setTemplateText("units.skt",rogersunits)
+		setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
+		setTemplateText("RPtotalpages.skt",totalpages)
+		Sleep 100
+	Case "AA" :
+		loadImage("aptumaux.skt")
+		
 	}
 	; end
 	Sleep 300
@@ -4057,8 +4321,8 @@ ST_SAVEEXIT()
 	;gosub, rogersPrimaryFinalize
 	else if (form = "BA")
 		gosub, bellAuxilliaryFinalize
-	else if (form = "AP")
-		gosub, aptumPrimaryFinalize
+	;else if (form = "AP")
+	;gosub, aptumPrimaryFinalize
 	Sleep 150
 	;Msgbox, 4132, Page Number, Insert page numbers?
 	;ifMsgBox, Yes
@@ -4479,10 +4743,9 @@ setTreeDigArea() {
 return treetype
 }
 
-setPoleDigArea() {
-	global form
-	global polenum
-	InputBox, polenum, Pole Number, Write pole number
+setPoleDigArea(polenum) {
+	global
+	polenum := InputBox("Pole number","Enter pole number",,,,,,,,polenum)
 	InputBox, radius, Radius, Enter radius in m
 	if (form = "RA")
 	{
@@ -4521,9 +4784,9 @@ setPedDigArea()
 	}
 	Inputbox,pednum, Ped Address, Write ped number
 	arrpednum := 	{"NBoundary.skt": "5M N OF PED " pednum
-					, "SBoundary.skt": "5M S OF PED " pednum
-					, "WBoundary.skt": "5M W OF PED " pednum
-					, "Eboundary.skt": "5M E OF PED " pednum}
+		, "SBoundary.skt": "5M S OF PED " pednum
+		, "WBoundary.skt": "5M W OF PED " pednum
+	, "Eboundary.skt": "5M E OF PED " pednum}
 	For k,v in arrpednum
 	{
 		setTemplateText(k,v)
@@ -4639,7 +4902,7 @@ isInterSketch()
 			Break
 		else Continue
 		}
-	return intdir
+return intdir
 }
 
 isInterText()
@@ -4661,7 +4924,7 @@ isInterText()
 	else if(vstreet = "3")
 		vstreet := intersection2
 	inter.x := xstreet, inter.y := vstreet
-	return inter
+return inter
 }
 
 ;		date ctrl d
@@ -4839,7 +5102,6 @@ drawMediumBuilding(){
 ::2dsmhse:: ; insert small house
 	loadImage("sbuilding.skt")
 return
-
 
 ; insert set of horizontal arrows with measurement
 h_arrow()
@@ -5177,7 +5439,6 @@ showHotStrings() {
 
 #ifwinactive ahk_exe mobile.exe
 
-
 NewPage:
 	focusTeldig()
 	setForm()
@@ -5321,14 +5582,10 @@ fixstreetName()
 return
 #IfWinActive
 
-
-
 #v::
 :::vpn::
 	vpnToggle()
 return
-
-
 
 +!b::
 	bellsearch()
@@ -5678,6 +5935,7 @@ rogersLookup2()
 	}
 }
 
+
 ;google maps lookup Alt Shift G
 !+g::
 googleLookup()
@@ -5692,8 +5950,7 @@ googleLookup() {
 	Iobj := ""
 }
 
-getIxn()
-{
+getIxn() {
 	Inputbox, choice, Address or Intersection?, A / I
 	if ErrorLevel
 		return
@@ -6635,7 +6892,6 @@ centreDrawing()
 	return
 	#IfWinActive
 
-
 	#IfWinActive
 	#IfWinActive ahk_exe SketchToolApplication.exe
 	#IfWinActive ahk_class #32770
@@ -7166,12 +7422,15 @@ drawText(filename, String,x,y,w := "",h := "",rotation := "")
 {
   winactivate, ahk_exe sketchtoolapplication.exe
   loadImageNG(filename)
+	sleep 200
+	ACCESSPROPERTIES()
   ;text position
   send, {Tab 9}
   send, %x%,%y%{enter}
+	sleep 250
   ;text String
   send, {tab 5}
-  send, %String%enter
+  send, %String%{enter}
 }
 
 ::rectsize::
@@ -7217,7 +7476,7 @@ MsgBox % "You have " . belllist.length() . " Bell tickets and " . roglist.length
 
 sketchSearch()
 {
-	run, C:\Users\Cr\Desktop\drawingsearch.ahk
+	run, C:\Users\Cr\archived\autohotkey\sketchsearch.ahk
 }
 
 :::note::
@@ -7404,4 +7663,5 @@ getCoords(){
 		;mb(obj2String(nc))
 	
 ;saveSKTasJPEG() {
+
 
