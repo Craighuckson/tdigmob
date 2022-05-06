@@ -85,5 +85,10 @@
     "sync.autoUpload": true,
     "sync.quietSync": true,
     "editor.quickSuggestions": true,           //won't auto show quick suggestions
-    "editor.suggestOnTriggerCharacters": false, //won't trigger on spacebar)
+		"editor.suggestOnTriggerCharacters": false,
+		"python.testing.pytestArgs": [
+			"testassets"
+		],
+		"python.testing.unittestEnabled": false,
+		"python.testing.pytestEnabled": true, //won't trigger on spacebar)
 }

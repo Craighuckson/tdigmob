@@ -2307,6 +2307,13 @@ return
 	Critical, Off
 return
 
+
+;Clear input procedure
+makeTemplateFromPy()
+{
+	Run, rogers_clear_input.py
+}
+
 ;CLASS DEFINITIONS
 
 class TMobileAutomation {
@@ -3207,6 +3214,8 @@ writeTotalPages(totalpages)
 	}
 	setTemplateText("totalpages.skt",totalpages)
 }
+
+writeClearWarning(
 
 getRPPages()
 {

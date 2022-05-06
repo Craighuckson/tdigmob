@@ -22,8 +22,6 @@ def get_ticket_data():
     m.activate()
     result = ahk.run_script(script)
     results = [x for x in result.splitlines()]
-    print(results[5])
-    print(results[6])
     ticket = {
         "number": results[0],
         "street": results[1],
@@ -35,6 +33,3 @@ def get_ticket_data():
         "town": results[8],
     }
     return ticket
-
-
-print(get_ticket_data())

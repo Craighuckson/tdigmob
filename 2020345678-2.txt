@@ -1,0 +1,8 @@
+2
+2
+n bound2
+s bound2
+w bound2
+e bound2
+regular
+3C

@@ -2,36 +2,38 @@
 
 getVPNPass()
 {
-	VPNPASS := "7K2aVGxs"
+	VPNPASS := "J%sK42E4"
 	return VPNPaSS
 }
 
-isvpn() {
-	DetectHiddenWindows, ON
-	WinShow, Cisco AnyConnect Secure Mobility Client ahk_class #32770
-	WinActivate, Cisco AnyConnect Secure Mobility Client ahk_class #32770, , ahk_class VPNUI
-	Text:="|<>*181$35.000Tzy000zzY003zz87zbzwEzzDzlbzyST7TwQwSDz01wMzw03w3zk07sDx007szy00Dtzc00DzzE00DzyU00Dzx000Dze0023sI006U0c00Bo1E00Pc2U00rE5001iUDzzzzy00000600000B"
-	if (ok:=FindText(534-150000, 350-150000, 534+150000, 350+150000, 0, 0, Text))
-	{
+
+isVPN()
+{
+	RunWait, C:\Users\Cr\rogemailhelper\rogemailgen\isvpn.py,,Hide
+	FileRead, status, C:\Users\Cr\vpnstatus.txt
+	if (status = "True")
 		return true
-	}
 	else
 		return false
 }
 
+
 vpnToggle()
 {
-	DetectHiddenWindows, ON
-	WinShow, Cisco AnyConnect Secure Mobility Client ahk_class #32770
-	WinActivate, Cisco AnyConnect Secure Mobility Client ahk_class #32770 ahk_exe vpnui.exe ; shows client
-	;imagesearch,,,0,0,1366,768,vpnon.png ; search for checkmark
-	Text:="|<>*181$35.000Tzy000zzY003zz87zbzwEzzDzlbzyST7TwQwSDz01wMzw03w3zk07sDx007szy00Dtzc00DzzE00DzyU00Dzx000Dze0023sI006U0c00Bo1E00Pc2U00rE5001iUDzzzzy00000600000B"
-	(ok:=FindText(534-150000, 350-150000, 534+150000, 350+150000, 0, 0, Text)) ? vpnOff() : vpnOn() ; if image found go to turn off fxn, otherwise go to vpnon
-	DetectHiddenWindows, Off
+	isvpn := isvpn()
+	if (isvpn = 0) {
+		vpnOn()
+	}
+	else if (isvpn = 1) {
+		vpnOff()
+	}
 }
 
 vpnOn() ; Logs into VPN automatically
 {
+	DetectHiddenWindows, ON
+	WinShow, Cisco AnyConnect Secure Mobility Client ahk_class #32770
+	WinActivate, Cisco AnyConnect Secure Mobility Client ahk_class #32770 ahk_exe vpnui.exe
 	vpnpass := getVPNPass()
 	SetControlDelay,-1
 	;ControlClick, Connect, ahk_exe vpnui.exe,,,,na
@@ -52,6 +54,7 @@ vpnOn() ; Logs into VPN automatically
 }
 
 vpnOff() {
+	Winshow, Cisco AnyConnect Secure Mobility Client ahk_class #32770
 	WinActivate, Cisco AnyConnect Secure Mobility Client ahk_class #32770
 	ControlClick("Button1","Cisco AnyConnect Secure Mobility Client") ; disconnect
 	WinClose, ahk_exe vpnui.exe

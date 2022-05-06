@@ -1,0 +1,33 @@
+
+START - automation started - Wed Apr 13 2022 11:55:48 GMT-0400 (Eastern Daylight Time)
+
+LIVE MODE - type done to quit
+ [RPA][STARTED]
+[RPA][0] - listening for inputs
+[RPA][1] - exist_result = exist('location.png').toString()
+[RPA][1] - listening for inputs
+[RPA][2] - dump exist_result to rpa_python.txt
+[RPA][2] - listening for inputs
+[RPA][3] - click location.png
+[RPA][3] - listening for inputs
+[RPA][4] - dclick (148,136)
+[RPA][4] - listening for inputs
+[RPA][5] - keyboard [ctrl]c
+[RPA][5] - listening for inputs
+[RPA][6] - dump clipboard() to rpa_python.txt
+[RPA][6] - listening for inputs
+[RPA][7] - exist_result = exist('drawings.png').toString()
+[RPA][7] - listening for inputs
+[RPA][8] - dump exist_result to rpa_python.txt
+[RPA][8] - listening for inputs
+[RPA][9] - click drawings.png
+[RPA][9] - listening for inputs
+[RPA][10] - exist_result = exist('newarrow.png').toString()
+[RPA][10] - listening for inputs
+[RPA][11] - dump exist_result to rpa_python.txt
+[RPA][11] - listening for inputs
+[RPA][12] - exist_result = exist('cabletv.png').toString()
+[RPA][12] - listening for inputs
+[RPA][13] - dump exist_result to rpa_python.txt
+[RPA][13] - listening for inputs
+[RPA][14] - exist_result = exist('rotation.png').toString()
