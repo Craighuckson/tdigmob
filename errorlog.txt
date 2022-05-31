@@ -503,3 +503,85 @@
 20220505132810 - Cannot access ChildPath Item #2 -> 7
 20220505132940 - Cannot access ChildPath Item #2 -> 7
 20220505221727 - Cannot access ChildPath Item #2 -> 7
+20220506090059 - Cannot access ChildPath Item #4 -> 1
+20220506103341 - Cannot access ChildPath Item #4 -> 1
+20220506103349 - Invalid IAccessible Object
+20220506103349 - Cannot access ChildPath Item #9 -> 4
+20220506132359 - Invalid IAccessible Object
+20220506132359 - Cannot access ChildPath Item #9 -> 4
+20220506132400 - Invalid IAccessible Object
+20220506132400 - Cannot access ChildPath Item #9 -> 4
+20220508225125 - "DoDefaultAction" Cmd Not Implemented
+20220509093502 - Cannot access ChildPath Item #2 -> 1
+20220511152604 - Cannot access ChildPath Item #2 -> 7
+20220512111200 - Cannot access ChildPath Item #2 -> 7
+20220512111221 - Cannot access ChildPath Item #2 -> 7
+20220512111225 - Cannot access ChildPath Item #2 -> 7
+20220512112009 - Cannot access ChildPath Item #2 -> 7
+20220512112417 - Cannot access ChildPath Item #2 -> 7
+20220512113130 - Cannot access ChildPath Item #2 -> 7
+20220512113745 - Cannot access ChildPath Item #2 -> 7
+20220513084245 - Cannot access ChildPath Item #2 -> 7
+20220513092609 - Cannot access ChildPath Item #2 -> 7
+20220513094920 - Cannot access ChildPath Item #2 -> 1
+20220513095814 - Cannot access ChildPath Item #2 -> 7
+20220513100425 - Cannot access ChildPath Item #2 -> 7
+20220513100857 - Cannot access ChildPath Item #2 -> 7
+20220513102858 - Cannot access ChildPath Item #2 -> 7
+20220513103744 - Cannot access ChildPath Item #2 -> 7
+20220513104331 - Cannot access ChildPath Item #2 -> 7
+20220513104641 - Cannot access ChildPath Item #2 -> 7
+20220513105659 - Cannot access ChildPath Item #2 -> 7
+20220513110126 - Cannot access ChildPath Item #2 -> 7
+20220513140141 - "DoDefaultAction" Cmd Not Implemented
+20220513140154 - "DoDefaultAction" Cmd Not Implemented
+20220515214746 - Cannot access ChildPath Item #2 -> 7
+20220515215125 - Cannot access ChildPath Item #2 -> 7
+20220515215854 - Cannot access ChildPath Item #2 -> 7
+20220515221009 - Cannot access ChildPath Item #2 -> 7
+20220515222356 - Cannot access ChildPath Item #2 -> 7
+20220516082751 - Cannot access ChildPath Item #2 -> 7
+20220516083812 - Cannot access ChildPath Item #2 -> 7
+20220516102117 - Cannot access ChildPath Item #2 -> 7
+20220516102438 - Cannot access ChildPath Item #2 -> 7
+20220516103118 - Cannot access ChildPath Item #2 -> 7
+20220516104103 - Cannot access ChildPath Item #2 -> 7
+20220516104839 - Cannot access ChildPath Item #2 -> 7
+20220516105450 - Cannot access ChildPath Item #2 -> 7
+20220516110457 - Cannot access ChildPath Item #2 -> 7
+20220516110916 - Cannot access ChildPath Item #2 -> 7
+20220516111516 - Cannot access ChildPath Item #2 -> 7
+20220516114608 - Cannot access ChildPath Item #2 -> 7
+20220516170940 - "DoDefaultAction" Cmd Not Implemented
+20220517111116 - Cannot access ChildPath Item #4 -> 1
+20220517171856 - Cannot access ChildPath Item #2 -> 7
+20220518152259 - Cannot access ChildPath Item #2 -> 7
+20220518152307 - Cannot access ChildPath Item #2 -> 7
+20220518153153 - Cannot access ChildPath Item #2 -> 7
+20220518153627 - Cannot access ChildPath Item #2 -> 7
+20220518155652 - Cannot access ChildPath Item #2 -> 7
+20220518160217 - Cannot access ChildPath Item #2 -> 7
+20220518160617 - Cannot access ChildPath Item #2 -> 7
+20220518170734 - "DoDefaultAction" Cmd Not Implemented
+20220518171630 - Cannot access ChildPath Item #2 -> 7
+20220518172024 - Cannot access ChildPath Item #2 -> 7
+20220519134506 - Invalid IAccessible Object
+20220519134506 - Cannot access ChildPath Item #9 -> 4
+20220519134508 - Invalid IAccessible Object
+20220519134508 - Cannot access ChildPath Item #9 -> 4
+20220519171859 - "DoDefaultAction" Cmd Not Implemented
+20220519171911 - "DoDefaultAction" Cmd Not Implemented
+20220520145811 - Cannot access ChildPath Item #2 -> 7
+20220524121802 - Cannot access ChildPath Item #2 -> 7
+20220524122200 - Cannot access ChildPath Item #2 -> 7
+20220524123203 - Cannot access ChildPath Item #2 -> 7
+20220525162344 - Cannot access ChildPath Item #2 -> 7
+20220525163140 - Cannot access ChildPath Item #2 -> 7
+20220526151100 - Cannot access ChildPath Item #2 -> 7
+20220530112233 - Invalid IAccessible Object
+20220530112233 - Cannot access ChildPath Item #9 -> 4
+20220530121649 - Cannot access ChildPath Item #2 -> 7
+20220530122412 - Cannot access ChildPath Item #2 -> 7
+20220530122425 - Cannot access ChildPath Item #2 -> 7
+20220530122756 - Cannot access ChildPath Item #2 -> 7
+20220530141446 - "DoDefaultAction" Cmd Not Implemented

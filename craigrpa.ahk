@@ -62,6 +62,7 @@ class Mobile
 		SelectTab(2)
 	}
  
+	SelectCableTV()
 	{
 		this.SelectNewForm()
 		MouseClick("L",915,498)
@@ -185,9 +186,9 @@ class Ticket
 		controlget, town, line, 1, edit13, ahk_exe mobile.exe
 		ControlGet, remarks, line, 1, Edit23, % MOBILEWIN
 		this.number := number
-		this.street := FixStreetName(street)
-		this.intersection := FixStreetName(intersection)
-		this.intersection2 := FixStreetName(intersection2)
+		this.street := CraigRpa.FixStreetName(street)
+		this.intersection := CraigRPA.FixStreetName(intersection)
+		this.intersection2 := CraigRPA.FixStreetName(intersection2)
 		this.stationCode := stationCode
 		this.ticketNumber := ticketNumber
 		this.digInfo := digInfo
