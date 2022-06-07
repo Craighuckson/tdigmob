@@ -585,3 +585,10 @@
 20220530122425 - Cannot access ChildPath Item #2 -> 7
 20220530122756 - Cannot access ChildPath Item #2 -> 7
 20220530141446 - "DoDefaultAction" Cmd Not Implemented
+20220602095227 - Invalid IAccessible Object
+20220602095227 - Cannot access ChildPath Item #9 -> 4
+20220602113409 - Could not access an IAccessible Object
+20220602113410 - Could not access an IAccessible Object
+20220602113410 - Could not access an IAccessible Object
+20220602113410 - Could not access an IAccessible Object
+20220606140617 - "DoDefaultAction" Cmd Not Implemented
