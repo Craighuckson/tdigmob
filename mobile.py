@@ -1,5 +1,6 @@
 #functions for Teldig mobile
 import pyautogui as p
+from pywinauto.application import Application
 from ahk import AHK
 ahk = AHK()
 import time
@@ -25,7 +26,7 @@ def select_auxilliary():
 
 def select_cogeco():
 	p.click(920,409)
-    
+
 def click_ok():
     p.click(1079,695)
 
@@ -45,7 +46,8 @@ if __name__ == '__main__':
 
 	# test harness
 	p.alert('Press ok to start')
-	mobwin = p.getWindowsWithTitle('TelDig Mobile')[0]
+	# mobwin = p.getWindowsWithTitle('TelDig Mobile')[0]
+	app = Application(backend='uia').connect(title_re='TelDig').top_window()
 	# stwin = ahk.win_get(title='TelDig Sketchtool')
 	mobwin.activate()
 	# select_pending()
@@ -58,14 +60,5 @@ if __name__ == '__main__':
 	p.hotkey('alt','i')
 	p.press('down', presses= 8)
 	p.press('enter')
-	while True:
-		try:
-			opdlg = p.getWindowsWithTitle('Open')[0]
-			if opdlg.isActive == True:
-				break
-		except IndexError:
-			continue
+	p.sleep(3)
 	p.write('Cool it worked')
-
-
-

@@ -150,9 +150,7 @@ Menu, ST, Add, HotString list, showHotStrings
 writeDigArea()
 return
 
-F10::
-autoinsertSketches()
-return
+
 
 MButton::
 Menu, ST, Show
@@ -1508,32 +1506,33 @@ autoinsertSketches()
 
 	;COMMENT EITHER THE NEXT TWO LINES OR THE FOLLOWING 2 LINES AT A TIME - NOT BOTH
 
-	FileSelectFile, projfile,,%A_ScriptDir%, Select project,
-	units := Inputbox("Enter units")
+	;FileSelectFile, projfile,,%A_ScriptDir%, Select project,
+	;units := Inputbox("Enter units")
 
-	;projfile:="C:\Users\Cr\Desktop\archived\autohotkey\STONEHAM 50 TO 28 R.TXT"
-	;units:="1m"
-	loop, Read, %projfile%
-	{
-		project.Push(A_LoopReadLine)
-	}
-	totalpages := project.Length()
-	Loop % project.Length()
-	{
-
-		()
+	 projfile:="C:\Users\Cr\Documents\cua rogers.skt"
+	 units := "1C"
+	;~ loop, Read, %projfile%
+	;~ {
+		;~ project.Push(A_LoopReadLine)
+	;~ }
+	;~ totalpages := project.Length()
+	;~ Loop % project.Length()
+	;~ {
+		LOCATIONDATACHECK()
+		setform()
 		waitSTLoad()
-		loadImage(project[A_Index])
+		loadImage(PROJFILE)
 		Sleep 500
 		stproj_saveexit()
 		ControlClick("OK", "ahk_exe sketchtoolapplication.exe")
 		focusTeldig()
-	}
+	;~ }
 	;Msgbox, Done!
 	proj:=""
+	rogersunits := ["","1C"]
 	addtotimesheet()
 	finishemail()
-	;SetTimer,checkforNewTicket, 200 ;use this for looping
+	SetTimer,checkforNewTicket, 200 ;use this for looping
 }
 
 projectSketch()
@@ -2083,10 +2082,8 @@ QA.Start()
 QA.Finalize()
 return
 
-^n::
-	::newsketch::
-
-()
+F10::
+autoinsertSketches()
 return
 
 	;MOBILE HOTSTRINGS
@@ -2336,6 +2333,7 @@ setForm()
 	;ticketdata := getticketdata(), stationCode := ticketdata.5
 	global
 	focusTeldig()
+	clickdrawingtab()
 	;move this to main routine
 	;locationDataCheck()
 	Loop
@@ -2497,7 +2495,7 @@ return
 
 PL4ButtonOK:
 
-Gui, PL4: Submit
+Gui, PL4:
 Gui, PL4: Destroy
 return
 
@@ -2516,6 +2514,8 @@ for k, v in rogwarn
 }
 Critical, Off
 return
+
+;gui glabels
 
 ;mapinfo proviewer button handlers
 
@@ -2771,8 +2771,11 @@ class CraigRPA {
 		t := new Ticket()
 		t.GetDataFromOneCallInfo()
 		cleardata := t.GetClearData()
+		MsgBox % obj2string(cleardata)
 		ticketnumber := t.ticketnumber
 		currentpage := cleardata[1]
+		;delete file if previous runthrough still present
+		FileDelete(A_MyDocuments . "\" . ticketnumber . "-" . currentpage . ".txt")
 		for k,v in cleardata {
 			FileAppend(v . "`n",A_MyDocuments . "\" . ticketnumber . "-" . currentpage . ".txt")
 		}
@@ -3033,7 +3036,7 @@ class Ticket
 
 	GetClearData()
 	{
-		static currentpage,totalpages,units,digareatype,clearreason,north,south,west,east,savefile
+		static currentpage,totalpages,units,digareatype,clearreason,editnorth,editsouth,editwest,editeast,savefile
 		Gui, clform:Add, Text, x22 y20 w70 h20 , Current Page:
 		Gui, clform:Add, Text, x22 y50 w70 h20 , Total Pages:
 		Gui, clform:Add, Text, x22 y80 w70 h20 , Units:
@@ -3042,8 +3045,8 @@ class Ticket
 		Gui, clform:Add, Edit, x102 y80 w80 h20 vunits, 1C
 		Gui, clform:Add, Text, x22 y110 w80 h20 , Dig Area Type:
 		Gui, clform:Add, Radio, x102 y110 w90 h20 Group vdigareatype, Manual
-		Gui, clform:Add, Radio, x202 y110 w110 h20 , Private Property
-		Gui, clform:Add, Radio, x322 y110 w100 h20 , PL To PL
+		Gui, clform:Add, Radio,gwatchdaradio x202 y110 w110 h20 , Private Property
+		Gui, clform:Add, Radio,x322 y110 w100 h20 , PL To PL
 		Gui, clform:Add, Text, x22 y140 w80 h20, Clear Reason:
 		Gui, clform:Add, Radio, x102 y140 w110 h20 Group vclearreason, Regular
 		Gui, clform:Add, Radio, x202 y140 w110 h20,FTTH
@@ -3053,10 +3056,10 @@ class Ticket
 		Gui, clform:Add, Text, x22 y210 w70 h30 , South:
 		Gui, clform:Add, Text, x22 y250 w70 h30 , West:
 		Gui, clform:Add, Text, x22 y290 w70 h30 , East:
-		Gui, clform:Add, Edit, x102 y170 w350 h20 vnorth,
-		Gui, clform:Add, Edit, x102 y210 w350 h20 vsouth,
-		Gui, clform:Add, Edit, x102 y250 w350 h20 vwest,
-		Gui, clform:Add, Edit, x102 y290 w350 h20 veast,
+		Gui, clform:Add, Edit, x102 y170 w350 h20 veditnorth,
+		Gui, clform:Add, Edit, x102 y210 w350 h20 veditsouth,
+		Gui, clform:Add, Edit, x102 y250 w350 h20 veditwest,
+		Gui, clform:Add, Edit, x102 y290 w350 h20 vediteast,
 		Gui, clform:Add, Text, x22 y330 w80 h20 , Save File Name
 		Gui, clform:Add, Edit, x102 y330 w350 h20 vsaveFile,
 		Gui, clform:Add, Button, x187 y360 w100 h30 , Submit
@@ -3067,12 +3070,28 @@ class Ticket
 		cleardata.Push(totalpages)
 		cleardata.Push(units)
 		cleardata.Push(clearreason)
-		cleardata.Push(north)
-		cleardata.Push(south)
-		cleardata.Push(west)
-		cleardata.Push(east)
+		cleardata.Push(editnorth)
+		cleardata.Push(editsouth)
+		cleardata.Push(editwest)
+		cleardata.Push(editeast)
 		cleardata.Push(saveFile)
 		return cleardata
+
+		watchDARadio:
+			north := "NPL " . this.number . " " . this.street
+			south := "SPL " this.number " " this.street
+			west := "WPL " this.number " " this.street
+			east := "EPL " this.number " " this.street
+			GuiControl, clform:Text, Edit4,%north%
+			GuiControl, clform:Text, Edit5,%south%
+			GuiControl, clform:Text, Edit6,%west%
+			GuiControl, clform:Text, Edit7,%east%
+			editnorth := north
+			editsouth := south
+			editwest := west
+			editeast := east
+			return
+
 	}
 
 
@@ -3537,15 +3556,89 @@ sptreeAutofill()
 	}
 }
 
+checkforTreeTemplateFile(ticketnumber)
+{
+	if (FileExist(A_MyDocuments . "\" . ticketnumber ".txt")){
+		return True
+	}
+	else
+		return False
+}
+
+treeSketchFromTemplate(treefile)
+{
+	/*
+	ticketnumber
+	north
+	south
+	east
+	west
+	treetype
+	street
+	landbase
+	number
+	cabloc
+	meas1
+	meas2
+	label
+	label2
+	filename
+	*/
+	global
+	north := FileReadLine(treefile,2)
+	south := FileReadLine(treefile,3)
+	west := FileReadLine(treefile,4)
+	east := FileReadLine(treefile,5)
+	treetype := FileReadLine(treefile,6)
+	street := FileReadLine(treefile,7)
+	landbase := FileReadLine(treefile,8)
+	number := FileReadline(treefile,9)
+	cabloc := FileReadLine(treefile,10)
+	meas1 := FileReadLine(treefile,11)
+	meas2 := FileReadLine(treefile,12)
+	label := FileReadLine(treefile,13)
+	label2 := FileReadLine(treefile,14)
+	filename := FileReadLine(treefile,15)
+
+	clickdrawingtab()
+	setForm()
+	waitSTLoad()
+
+	if (cabloc = 3)
+	{
+		labels := [meas1,meas2,label,label2]
+	}
+	else
+	{
+		labels := [meas1,label]
+	}
+
+	tda := {"north":north, "south":south, "west":west, "east":east}
+
+	rogersunits := "1M"
+	setTreeDigArea(tda)
+	loadImageNG(treeSketchBuilder(landbase, cabloc))
+	setTreeLabels(labels,street,cabloc,landbase,treetype,number)
+	setTemplateText("units.skt",rogersunits)
+	setTemplateText("totalpages.skt",1)
+	setTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
+	SketchTool.SaveImage(filename)
+	sleep 500
+	SketchTool.SubmitAndExit()
+	focusTeldig()
+	addtotimesheet()
+}
 
 treeAutoFill()
 {
-
 	global
-
 	locationDataCheck()
-	setform()
-	waitSTLoad()
+	if (checkforTreeTemplateFile(ticketnumber))
+	{
+		treeSketchFromTemplate(A_MyDocuments "\" ticketnumber ".txt")
+		return
+	}
+	Control,Disable,,Button39,ahk_exe mobile.exe
 	if (form = "BP")
 	{
 		bellPrimaryPoleAutofill()
@@ -3556,15 +3649,21 @@ treeAutoFill()
 		openExistingPrompt()
 		IfMsgBox, Yes
 		{
+			clickdrawingtab()
+			setForm()
+			waitSTload()
 			autofillExistingSketch()
 		}
 		IfMsgBox, No
 		{
+			clickdrawingtab()
 			treeDigArea := getTreeDigArea()
 			treetype := treeDigArea["treetype"]
 			rclear := rogClear()
 			if (rclear)
 			{
+				setform()
+				waitSTload()
 				setTreeDigArea(treeDigArea)
 				writeRogersClearReason()
 				rclear := ""
@@ -3576,6 +3675,23 @@ treeAutoFill()
 			InputBox, number,Number, Enter house number?
 			InputBox, cabloc, Location, Where is cable relative to tree?`n1 = closer to road`n2 = closer to property`n3 = both sides of tree,,,,,,,,2
 			labels := getTreeLabels(cabloc)
+			;write a template file (ticketnumber)trees.txt
+			treefile := JoinPath(A_MyDocuments,ticketnumber . ".txt")
+			MsgBox % treefile
+			FileAppend(ticketnumber "`n" treeDigArea["north"] "`n" treeDigArea["south"] "`n" treeDigArea["west"] "`n" treeDigArea["east"] "`n" treetype "`n" street "`n" landbase "`n" number "`n" cabloc "`n",treefile)
+			if (cabloc =3)
+			{
+				FileAppend(labels[1] "`n" labels[2] "`n" labels[3] "`n" labels[4] "`n" number " " street " TREES R.SKT",treefile)
+			}
+			else
+				FileAppend(labels[1] "`n" "x`n" labels[2] "`n" "x`n" number " " street " TREES R.SKT",treefile)
+			finishnow := InputBox("Complete ticket now?")
+			if (finishnow = "n" || finishnow = "N")
+			{
+				MsgBox("Ticket info saved to file")
+			}
+			setform()
+			waitSTLoad()
 			setTreeDigArea(treeDigArea)
 			loadimageNG(treeSketchBuilder(landbase,cabloc))
 			setTreeLabels(labels,street, cabloc, landbase, treetype,number)
@@ -6290,6 +6406,20 @@ finishnoemail()
 WinActivate ahk_exe mobile.exe
 return
 
+#ifwinactive ahk_exe streets.exe
+;streets and trips hotkeys
+f2::
+Rename()
+return
+
+Rename()
+{
+	MouseClick, R
+	Send, n
+}
+
+
+
 #IFWINACTIVE AHK_EXE MOBILE.EXE
 !^L::
 ::AATSAT::
@@ -7782,13 +7912,24 @@ clickSelection()
 return
 
 2:: ;draw pole
-MouseGetPos, polex, poley
-MouseClick, L, 71, 612
-wait()
-Click,%polex%,%poley%
-polex:="",poley:=""
-clickSelection()
+drawPole()
 return
+
+drawPole()
+{
+	SetTitleMatchMode, 2
+	CoordMode, Mouse, Window
+	tt = TelDig SketchTool
+	WinWait, %tt%
+	IfWinNotActive, %tt%,, WinActivate, %tt%
+	Sleep, 1404
+	MouseGetPos, polex, poley
+	MouseClick, L, 64, 636
+	Sleep, 764
+	MouseClick, L,%polex%,%poley%
+	clickSelection()
+	Sleep, 1000
+}
 
 ;DRAW TRANSFORMER
 3::
@@ -7798,6 +7939,8 @@ wait()
 Click,%txx%,%txy%
 txx:="",txy:=""
 clickSelection()
+
+
 Return
 
 ^E::
@@ -8276,9 +8419,9 @@ editTimesheet()
 {
 	global today
 	if (fileexist("C:\Users\Cr\timesheet" today ".txt"))
-		Run,  C:\Users\Cr\timesheet%today%.txt
+		Run,gvim "C:\Users\Cr\timesheet%today%.txt"
 	else
-		Run,  C:\Users\Cr\Desktop\archived\autohotkey\timesheet%today%.txt
+		Run, gvim  "C:\Users\Cr\Desktop\archived\autohotkey\timesheet%today%.txt"
 }
 
 ::propfib::
