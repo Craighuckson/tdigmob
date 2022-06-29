@@ -73,7 +73,7 @@
     "terminal.integrated.fontFamily": "consolas",
     "typescript.disableAutomaticTypeAcquisition": true,
     "editor.detectIndentation": false,
-    "editor.renderWhitespace": false,
+    "editor.renderWhitespace": "none",
     "window.zoomLevel": 0,
       // Configure glob patterns of file paths to exclude from file watching. Patterns must match on absolute paths (i.e. prefix with ** or the full path to match properly). Changing this setting requires a restart. When you experience Code consuming lots of CPU time on startup, you can exclude large folders to reduce the initial load.
     "files.watcherExclude": {
@@ -84,7 +84,11 @@
     },
     "sync.autoUpload": true,
     "sync.quietSync": true,
-    "editor.quickSuggestions": true,           //won't auto show quick suggestions
+    "editor.quickSuggestions": {
+      "comments": "on",
+      "strings": "on",
+      "other": "on"
+    },           //won't auto show quick suggestions
 		"editor.suggestOnTriggerCharacters": false,
 		"python.testing.pytestArgs": [
 			"testassets"

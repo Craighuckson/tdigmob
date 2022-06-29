@@ -14,34 +14,37 @@ ListLines, On
 #include <findtext>
 #include <DebugWindow>
 ;#include <V1TOV1FUNC>
-#include json.ahk
+;#include json.ahk
 #include <Acc>
-#include scrollbox.ahk
+#include *i scrollbox.ahk
 #include <cpuload>
+#include <UIA_Interface>
 #include <AHKEZ>
 #Include <AHKEZ_Debug>
-#Include Canvas.ahk
+;#Include Canvas.ahk
 #Include <printstack>
 ;#Include multiviewer.ahk
-#Include vpn.ahk
-#Include aptumlookup.ahk
+#Include C:\Users\Cr\teldig\vpn.ahk
+#Include C:\Users\Cr\teldig\aptumlookup.ahk
 BlockInput, SendAndMouse
 SetControlDelay, 50
-Menu, Tray, Icon, %A_ScriptDir%\tico.png
+Menu, Tray, Icon, C:\Users\Cr\teldig\tico.png
 
 
-;Runs on startup to preload variables
-iniread, form, C:\Users\Cr\teldig\teldig.ini, variables, form, ""
-iniread, stationcode, C:\Users\Cr\teldig\teldig.ini, variables, stationcode, ""
-iniread, bellmarked, C:\Users\Cr\teldig\teldig.ini, variables, bellmarked, ""
-iniread, bellclear, C:\Users\Cr\teldig\teldig.ini, variables, bellclear, ""
-iniread, rogersclear, C:\Users\Cr\teldig\teldig.ini, variables, rogersclear, ""
-iniread, rogersmarked, C:\Users\Cr\teldig\teldig.ini, variables, rogersmarked, ""
-iniread, locationdataobtained, C:\Users\Cr\teldig\teldig.ini, variables, locationdataobtained, 0
-iniread, street, C:\Users\Cr\teldig\teldig.ini, variables, street, ""
-iniread, intersection, C:\Users\Cr\teldig\teldig.ini, variables, intersection, ""
-iniread, currentpage, C:\Users\Cr\teldig\teldig.ini, variables, currentpage, ""
-iniread, totalpages, C:\Users\Cr\teldig\teldig.ini, variables, totalpages, "
+;Iniread section to preload variables between resets
+
+	iniread, form, C:\Users\Cr\teldig\teldig.ini, variables, form, ""
+	iniread, stationcode, C:\Users\Cr\teldig\teldig.ini, variables, stationcode, ""
+	iniread, bellmarked, C:\Users\Cr\teldig\teldig.ini, variables, bellmarked, ""
+	iniread, bellclear, C:\Users\Cr\teldig\teldig.ini, variables, bellclear, ""
+	iniread, rogersclear, C:\Users\Cr\teldig\teldig.ini, variables, rogersclear, ""
+	iniread, rogersmarked, C:\Users\Cr\teldig\teldig.ini, variables, rogersmarked, ""
+	iniread, locationdataobtained, C:\Users\Cr\teldig\teldig.ini, variables, locationdataobtained, 0
+	iniread, street, C:\Users\Cr\teldig\teldig.ini, variables, street, ""
+	iniread, intersection, C:\Users\Cr\teldig\teldig.ini, variables, intersection, ""
+	iniread, currentpage, C:\Users\Cr\teldig\teldig.ini, variables, currentpage, ""
+	iniread, totalpages, C:\Users\Cr\teldig\teldig.ini, variables, totalpages, "
+
 
 ;CONSTANTS
 
@@ -57,90 +60,91 @@ sketch_bounds := {ulx:192, uly:512,lrx:948,lry:1152,width:756,height:640}
 YorkMaps := "https://maps.york.ca/Html5ViewerPublic/Index.html?viewer=GeneralInteractiveMap.YorkMaps"
 
 ;setup of GUI for Bell primary sheet
-Gui, Add, CheckBox, x172 y80 w100 h30 vbellhydro, Bell Hydro
-Gui, Add, CheckBox, x172 y110 w100 h30 vbridgealert, Bridge Alert
-Gui, Add, CheckBox, x172 y140 w150 h30 vcableconduit, Cables May or May Not Be in Conduit
-Gui, Add, CheckBox, x172 y170 w100 h30 vhanddig, Hand Dig Only
-Gui, Add, CheckBox, x172 y200 w100 h30 vprioritycable, Priority Cable Present
-Gui, Add, CheckBox, x172 y230 w100 h30 vemptyconduit, Unable to Locate Empty Ducts
-Gui, Add, CheckBox, x172 y260 w100 h30 vunlocateable, Unlocatable Future Use
-Gui, Add, Button, x82 y310 w100 h30 , OK
-Gui, Add, Button, x272 y310 w100 h30 , Cancel
-Gui, Add, CheckBox, x72 y20 w100 h30 VCABLE, Cable
-Gui, Add, CheckBox, x272 y20 w100 h30 VCONDUIT, Conduit
+	Gui, Add, CheckBox, x172 y80 w100 h30 vbellhydro, Bell Hydro
+	Gui, Add, CheckBox, x172 y110 w100 h30 vbridgealert, Bridge Alert
+	Gui, Add, CheckBox, x172 y140 w150 h30 vcableconduit, Cables May or May Not Be in Conduit
+	Gui, Add, CheckBox, x172 y170 w100 h30 vhanddig, Hand Dig Only
+	Gui, Add, CheckBox, x172 y200 w100 h30 vprioritycable, Priority Cable Present
+	Gui, Add, CheckBox, x172 y230 w100 h30 vemptyconduit, Unable to Locate Empty Ducts
+	Gui, Add, CheckBox, x172 y260 w100 h30 vunlocateable, Unlocatable Future Use
+	Gui, Add, Button, x82 y310 w100 h30 , OK
+	Gui, Add, Button, x272 y310 w100 h30 , Cancel
+	Gui, Add, CheckBox, x72 y20 w100 h30 VCABLE, Cable
+	Gui, Add, CheckBox, x272 y20 w100 h30 VCONDUIT, Conduit
 
 ;setup of GUI for Rogers warnings rog gui
-Gui,2: Add, CheckBox, x172 y80 w100 h30 vfibreonly, Fibre Only
-Gui,2: Add, CheckBox, x172 y110 w100 h30 vftth, FTTH
-Gui,2: Add, CheckBox, x172 y140 w150 h30 vhighriskfibre, High Risk Fibre
-Gui,2: Add, CheckBox, x172 y170 w100 h30 vinaccuraterecords, Inaccurate Records
-Gui,2: Add, CheckBox, x172 y200 w100 h30 vrailway, Railway
-Gui,2: Add, Button, x82 y310 w100 h30 , OK
-Gui,2: Add, Button, x272 y310 w100 h30 , Cancel
+	Gui,2: Add, CheckBox, x172 y80 w100 h30 vfibreonly, Fibre Only
+	Gui,2: Add, CheckBox, x172 y110 w100 h30 vftth, FTTH
+	Gui,2: Add, CheckBox, x172 y140 w150 h30 vhighriskfibre, High Risk Fibre
+	Gui,2: Add, CheckBox, x172 y170 w100 h30 vinaccuraterecords, Inaccurate Records
+	Gui,2: Add, CheckBox, x172 y200 w100 h30 vrailway, Railway
+	Gui,2: Add, Button, x82 y310 w100 h30 , OK
+	Gui,2: Add, Button, x272 y310 w100 h30 , Cancel
 
 ; SETUP OF MENU FOR SKETCH TOOL
-Menu, Mobile, Add, &New Page, newpage
-Menu, Mobile, Add, &Records Lookup, recordsLookup
-Menu, mobile, Add, &Sketch Autofill, sketchAutoFill
-Menu, mobile, Add, Radius Autofill, selectRadiusProjectType
-Menu, Mobile, Add, Add List to Streets and Trips,writedirectionlist
-Menu, Mobile, Add, Add New Timesheet &Entry, newtimesheetentry
-Menu, Mobile, Add, Add To &Timesheet, addtotimesheet
-Menu, Mobile, Add, Autofill CUA,autofillCUA
-Menu, Mobile, Add, Create new Project, newproj
-;Menu, Mobile, Add, Get Rogers Primary Sheet, getRogPrimForm
-Menu, Mobile, Add, Finish &Without Email, finishwithoutemail
-Menu, Mobile, Add, Finish and &Email, finishandemail
-Menu, mobile, Add, Get Ticket Picture, getticketpicture
-Menu, Mobile, Add, Load from Project, autoinsertSketches
-Menu, mobile, Add, Mark &job number as 2(clear), markJobNumberas2Clear
-Menu, mobile, Add, Open Sketch E&ditor, openSketchEditor
-Menu, Mobile, Add, &Write Template File, writeTemplateFile
-Menu, Mobile, Add, Load Clear Python Template, loadClearPyTemplate
-Menu, Mobile,Add,Rogers Clear Form, rogersClearForm
-Menu("Mobile","Add","Load From Template","AFFromClearTemplate")
-Menu, Mobile, Add, Regular Sync, mobilesyncr
-Menu, mobile, Add, Reset Form&Var, resetformVar
-Menu,mobile, Add, View ticket count, utilCount
-Menu,mobile,Add, Search for Sketch, sketchSearch
-Menu,mobile,Add, Clear multiple, clearMulti
+	Menu, Mobile, Add, &New Page, newpage
+	Menu, Mobile, Add, &Records Lookup, recordsLookup
+	Menu, mobile, Add, &Sketch Autofill, sketchAutoFill
+	Menu, mobile, Add, Radius Autofill, selectRadiusProjectType
+	Menu, Mobile, Add, Add List to Streets and Trips,writedirectionlist
+	Menu, Mobile, Add, Add New Timesheet &Entry, newtimesheetentry
+	Menu, Mobile, Add, Add To &Timesheet, addtotimesheet
+	Menu, Mobile, Add, Autofill CUA,autofillCUA
+	Menu, Mobile, Add, Create new Project, newproj
+;Mobile menu definitions
+	Menu, Mobile, Add, Open EZDraw, openEZDraw
+	Menu, Mobile, Add, Finish and &Email, finishandemail
+	Menu, mobile, Add, Get Ticket Picture, getticketpicture
+	Menu, Mobile, Add, Load from Project, autoinsertSketches
+	Menu, mobile, Add, Mark &job number as 2(clear), markJobNumberas2Clear
+	Menu, mobile, Add, Open Sketch E&ditor, openSketchEditor
+	Menu, Mobile, Add, &Write Template File, writeTemplateFile
+	Menu, Mobile, Add, Load Clear Python Template, loadClearPyTemplate
+	Menu, Mobile,Add,Rogers Clear Form, rogersClearForm
+	Menu("Mobile","Add","Load From Template","AFFromClearTemplate")
+	Menu, Mobile, Add, Regular Sync, mobilesyncr
+	Menu, mobile, Add, Reset Form&Var, resetformVar
+	Menu,mobile, Add, View ticket count, utilCount
+	Menu,mobile,Add, Search for Sketch, sketchSearch
+	Menu,mobile,Add, Clear multiple, clearMulti
+	Menu, forms, Add, Bell Auxilliary, 2buttonbaux
+	Menu, forms, Add, Bell Primary, 2buttonbprim
+	Menu, forms, Add, Rogers Auxilliary, 2buttonraux
+	Menu, forms, Add, Rogers Primary, 2buttonrprim
+	Menu, drawingtools, Add, Horizontal Arrow Tool, HorizontalArrowTool
+	Menu, drawingtools, Add, Vertical Arrow Tool, VerticalArrowTool
+	Menu, drawingtools, Add, Building, 2buttonbuilding
+	Menu, drawingtools, Add, Horizontal Cable, drawHorizontalCable
+	Menu, drawingtools, Add, Vertical Cable, drawVerticalCable
+	Menu, drawingtools, Add, Insert Ez draw sketch rp, insertEZDrawRP
+	Menu, drawingtools, Add, Insert EZ Draw Sketch BA, insertEZDrawBA
+	Menu, drawingtools, Add, Dig Box, digbox
+	Menu, drawingtools, Add, Corner Tool, drawCorner
+	Menu, drawingtools, Add, Delete Sketch Contents,deleteoldbell
+	Menu, drawingtools, Add, Clear Rogers From Bell, clearRogersFromBell
+	Menu, drawingtools, Add, Rogers Aux Dig Area Shift,radigsh
+	Menu, warninglabels, Add, Rogers Clear, 2buttonrogersclear
+	Menu, warninglabels, Add, Rogers FTTH, 2buttonrogersftth
+	Menu, warninglabels, Add, Fibre Only, 2buttonfibreonly
+	Menu, warninglabels, Add, Bell Clear, 2buttonbellclear
+	Menu, warninglabels, Add, Inaccurate, 2buttoninaccurate
+	Menu, warninglabels, Add, See Auxilliary, 2buttonseeauxilliary
+	Menu, ST, Add, Form Data, :forms
+	Menu, ST, Add, Warning Labels, :warninglabels
+	Menu, ST, Add, Drawing Tools, :drawingtools
+	Menu, ST, Add, Bell Stickers, 2buttonbellstickers
+	Menu, ST, Add, Dig Area, 2buttondigarea
+	Menu, ST, Add, Load Sketch, 2buttoninsertsketch
+	Menu, ST, Add, Save Sketch, 2buttonsavesketch
+	Menu, ST, Add, Emergency, emergency
+	Menu, ST, Add, Save and Exit, 2buttonsaveandexit
+	Menu, ST, Add, HotString list, showHotStrings
 
-Menu, forms, Add, Bell Auxilliary, 2buttonbaux
-Menu, forms, Add, Bell Primary, 2buttonbprim
-Menu, forms, Add, Rogers Auxilliary, 2buttonraux
-Menu, forms, Add, Rogers Primary, 2buttonrprim
-Menu, drawingtools, Add, Horizontal Arrow Tool, HorizontalArrowTool
-Menu, drawingtools, Add, Vertical Arrow Tool, VerticalArrowTool
-Menu, drawingtools, Add, Building, 2buttonbuilding
-Menu, drawingtools, Add, Horizontal Cable, drawHorizontalCable
-Menu, drawingtools, Add, Vertical Cable, drawVerticalCable
-Menu, drawingtools, Add, Insert Ez draw sketch rp, insertEZDrawRP
-Menu, drawingtools, Add, Insert EZ Draw Sketch BA, insertEZDrawBA
-Menu, drawingtools, Add, Dig Box, digbox
-Menu, drawingtools, Add, Corner Tool, drawCorner
-Menu, drawingtools, Add, Delete Sketch Contents,deleteoldbell
-Menu, drawingtools, Add, Clear Rogers From Bell, clearRogersFromBell
-Menu, drawingtools, Add, Rogers Aux Dig Area Shift,radigsh
-Menu, warninglabels, Add, Rogers Clear, 2buttonrogersclear
-Menu, warninglabels, Add, Rogers FTTH, 2buttonrogersftth
-Menu, warninglabels, Add, Fibre Only, 2buttonfibreonly
-Menu, warninglabels, Add, Bell Clear, 2buttonbellclear
-Menu, warninglabels, Add, Inaccurate, 2buttoninaccurate
-Menu, warninglabels, Add, See Auxilliary, 2buttonseeauxilliary
-Menu, ST, Add, Form Data, :forms
-Menu, ST, Add, Warning Labels, :warninglabels
-Menu, ST, Add, Drawing Tools, :drawingtools
-Menu, ST, Add, Bell Stickers, 2buttonbellstickers
-Menu, ST, Add, Dig Area, 2buttondigarea
-Menu, ST, Add, Load Sketch, 2buttoninsertsketch
-Menu, ST, Add, Save Sketch, 2buttonsavesketch
-Menu, ST, Add, Emergency, emergency
-Menu, ST, Add, Save and Exit, 2buttonsaveandexit
-Menu, ST, Add, HotString list, showHotStrings
+
+
 
 ; mobile menu
 
-;Menu, Mobile, Add,
 
 ;SKETCHTOOL SPECIFIC HOTKEYS/BUTTON HANDLERS
 #IfWinActive ahk_exe SKETCHTOOLAPPLICATION.EXE
@@ -188,13 +192,11 @@ bellPrimaryPoleAutofill()
 	WinWaitClose, Please select all that apply
 }
 
-bellPrimStart()
+bellPrimaryAutofill()
 {
-	WinGet,stpid,PID,A
 	global bellclear
-	MsgBox,36,Load Previous?,Load previous sketch?
 	focusSketchTool()
-	ifMsgBox,Yes
+	if (useExisting() = "y")
 	{
 		autofillExistingSketch()
 		newPagePrompt()
@@ -213,7 +215,7 @@ bellPrimStart()
 		newPagePrompt()
 	}
 	else
-		bellPrimStart()
+		bellPrimaryAutofill()
 }
 
 newPagePrompt()
@@ -526,6 +528,8 @@ isTicketRogers(stationcode)
 {
 	if (stationcode="ROGYRK01") or if (stationcode = "ROGSIM01")
 		return true
+	else
+		return false
 }
 
 writeRogersClearReason()
@@ -1531,7 +1535,7 @@ autoinsertSketches()
 	proj:=""
 	rogersunits := ["","1C"]
 	addtotimesheet()
-	finishemail()
+	FinishNoEmail()
 	SetTimer,checkforNewTicket, 200 ;use this for looping
 }
 
@@ -1655,25 +1659,24 @@ getDigBoundaries()
 	return digboundary
 }
 
+isBellPrimary(form)
+{
+	if (form = "BP")
+		return True
+	Else
+		return False
+}
+
 ;AUTOMATED FORM FILLER
 ;THIS NEEDS TO BE REFACTORED BIG TIME
 sketchAutoFill()
 {
+	;TODO eliminate use of global variables
 	global
-	; loads form and starts
-	timestart := A_TickCount
 
-	setform()
-	if FileExist("C:\Users\Cr\Documents\" ticketnumber ".txt")
-	{
-		;	autodrawsketch()
-	}
-	; wait for SketchTool to be loaded via rotation arrow
+	setform() ;TODO change with new form initialize
 	waitSTLoad()
-	;changeGridSizeTo16()
-	;MouseClick,l,% A_ScreenWidth/2, % A_ScreenHeight/2
-	Winget,stpid,PID,A
-	if (form = "BP")
+	if (isBellPrimary(form))
 	{
 		;QUICK FILL FOR SINGLE VS PROJECT
 		btickettype := Inputbox("Single or Project?")
@@ -1705,24 +1708,21 @@ sketchAutoFill()
 			}
 			else if (btickettype = "p")
 			{
-				bellPrimStart()
+				bellPrimaryAutofill()
 				return
 			}
 
 			else
 			{
-				bellPrimStart()
+				bellPrimaryAutofill()
 				return
 			}
 		}
 	}
 
-	;getexisting := InputBox("Open existing sketch? Y/N")
-	MsgBox,4,Open Existing?,Open Existing Sketch?
 	focusSketchTool()
 
-	;if (getexisting = "y")
-	ifMsgBox, Yes
+	if (useExisting() = "y")
 	{
 		autofillExistingSketch()
 		newPagePrompt()
@@ -1730,7 +1730,7 @@ sketchAutoFill()
 	}
 
 ;else if (getexisting = "n") ;this is where it gets tricky...
-	ifMsgBox, No
+	else
 	{
 		writeDigArea()
 
@@ -1897,6 +1897,11 @@ writeDigArea() {
 			digarray := {(north):"Nboundaryapt.skt",(south):"sboundaryapt.skt",(west):"wboundaryapt.skt"
 		,(east):"eboundaryapt.skt"}
 		}
+    else if (form = "EP")
+		{
+			digarray := {(north):"Nboundaryenvi.skt",(south):"sboundaryenvi.skt",(west):"wboundaryenvi.skt"
+		,(east):"eboundaryenvi.skt"}
+		}
 		else
 		{
 			digarray := {(north):"Nboundary.skt",(south):"sboundary.skt",(west):"wboundary.skt"
@@ -2028,7 +2033,7 @@ switch ErrorLevel
 	Case "endkey:Numpadleft":
 		MsgBox, W
 	Case "endkey:Numpadright":
-		MsgBox, E
+		MsgBox,
 	Case "endkey:NumpadHome":
 		MsgBox, NW
 	Case "endkey:NumpadPgup":
@@ -2046,6 +2051,9 @@ return
 addressSearch()
 return
 
+^t::
+run,changeterritory.py
+return
 
 ; f2::
 ; ticketDatatoJSON()
@@ -2088,6 +2096,10 @@ return
 
 	;MOBILE HOTSTRINGS
 
+::cua::
+setJobNumberTo99()
+return
+
 	:::wtf::
 writeTemplateFile()
 return
@@ -2095,6 +2107,41 @@ return
 #IfWinActive
 
 ;MOBILE FUNCTIONS
+
+setJobNumberto99()
+{
+	SetTitleMatchMode, 2
+	CoordMode, Mouse, Window
+
+	tt = TelDig Mobile - [Ticket list] ahk_class Afx:400000:8:10003:0:3860a53
+	WinWait, %tt%
+	IfWinNotActive, %tt%,, WinActivate, %tt%
+
+	Sleep, 445
+
+	Send, {Blind}{Alt Down}f{Alt Up}n
+
+	Sleep, 148
+
+	tt = Set job number ahk_class #32770
+	WinWait, %tt%
+	IfWinNotActive, %tt%,, WinActivate, %tt%
+
+	Sleep, 335
+
+	Send, {Blind}99{Enter}
+
+	tt = TelDig Mobile - [Ticket list] ahk_class Afx:400000:8:10003:0:3860a53
+	WinWait, %tt%
+	IfWinNotActive, %tt%,, WinActivate, %tt%
+
+	Sleep, 1000
+}
+
+openEZDraw()
+{
+	Run, C:\Users\Cr\Locatedraw\Locate-draw\ezdrawlnew.py
+}
 
 rogersClearForm()
 {
@@ -2187,6 +2234,7 @@ clearMulti(){
 		;load ticket
 		CraigRPA.ClearRogersFromTemplate()
 		sleep 500
+		Mobile.SelectPending()
 		Mobile.FinishWithEmail()
 		sleep 2000
 		SetTimer,checkforNextTicket,200
@@ -2254,7 +2302,7 @@ locationDataCheck()
 		clickLocationTab()
 		getTicketData()
 		worktype := getWorkType()
-		;locationDataObtained := 1
+		locationDataObtained := 1
 		return locationDataObtained := 1
 	}
 }
@@ -2335,7 +2383,7 @@ setForm()
 	focusTeldig()
 	clickdrawingtab()
 	;move this to main routine
-	;locationDataCheck()
+	locationDataCheck()
 	Loop
 	{
 		if (stationcode == "CCS")
@@ -2349,6 +2397,7 @@ setForm()
 					Case "BCGN01": Break
 					Case "ROGYRK01": Break
 					Case "APTUM01": Break
+          Case "ENVIN01": Break
 					Default: continue
 				}
 			}
@@ -2435,13 +2484,8 @@ writeTemplateFile()
 	units := Inputbox("Enter units")
 	;dig Area
 	;clear reason
-	Loop
-	{
-		Inputbox, useexisting, Use existing, Y or N
-		if useexisting in y,Y,n,N
-			break
-	}
-	if (useexisting = "y")
+
+	if (useExisting() = "y")
 	{
 		;FileSelectFile, filename,, A_MyDocuments
 		FileAppend, %useexisting%, A_MyDocuments\%ticketNumber%.txt
@@ -2639,7 +2683,7 @@ class CraigRPA {
 
 			;init
 			SplashImage,,,,Creating the form...
-			t.form := t.GetFormType()
+			t.form := t.GetFormType(t)
 			Mobile.SelectDrawingsTab()
 			sleep 250
 			Mobile.SelectDrawingForm(t.form)
@@ -2837,8 +2881,15 @@ class QA {
 	}
 }
 
+#IfWinActive, ahk_exe mobile.exe
+^f2::
+Mobile.FinishNoEmail()
+return
+
 class Mobile
 {
+
+
 	SelectNewForm()
 	{
 		clickNewForm()
@@ -2864,54 +2915,76 @@ class Mobile
 		sleep 500
 		switch form {
 			case "RP":
-			MouseClick("L",915,498)
+			;MouseClick("L",915,498)
+      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("CABLE TV").Click()
 
-			case "RA":
-			MouseClick("L",953,392)
+			case "RA", "AA", "EA":
+			;MouseClick("L",953,392)
+      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("SKETCH_FORM").Click()
 
 			case "AP":
-			MouseClick("L",920,409)
+			;MouseClick("L",920,409)
+      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("COGECO").Click()
+
+      case "EP":
+      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("ENVI NETWORKS").Click()
 
 			default:
-			MouseClick("L",915,498)
+			;MouseClick("L",915,498)
+      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("CABLE TV").Click()
 		}
 		sleep 500
 	}
 
 	SelectPending()
 	{
-		CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
-	}
+		;CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
+
+    ;UIA := UIA_Interface()
+    ;Winactivate, ahk_exe mobile.exe
+    ;mobEl := UIA.ElementFromHandle(WinExist("ahk_exe mobile.exe"))
+    ;mobEl.FindFirstByNameAndType("Request status:","ComboBox").SetValue("PENDING")
+    UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByNameAndType("Request status:","ComboBox").SetValue("PENDING")
+  }
 
 
 	ClickOK()
 	{
 		MouseClick("L",1079,695)
+    UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("OK").Click()
 	}
 
 	Cancel()
 	{
-		MouseClick("L",1244,702)
-		sleep 300
-		Send("Y")
+		; MouseClick("L",1244,702)
+		; sleep 300
+		; Send("Y")
+    UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("Cancel").Click()
 	}
 
 	FinishWithEmail()
 	{
 		this.ClickOK()
-		WinWaitActive("ahk_class #32770")
-		Send("y")
-		WinWaitActive("Paper output to contractor")
-		Send("{Enter}")
+    UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770")).FindFirstByName("Yes").Click()
+    WinWaitActive,Paper output to contractor
+    UIA_Interface().ElementFromHandle(WinExist("Paper output to contractor")).FindFirstByName("OK").Click()
+		;WinWaitActive("ahk_class #32770")
+		;Send("y")
+		;WinWaitActive("Paper output to contractor")
+		;Send("{Enter}")
 	}
 
 	FinishNoEmail()
 	{
 		this.ClickOK()
-		WinWaitActive("ahk_class #32770")
-		Send("n")
+    UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770")).FindFirstByName("No").Click()
+		; WinWaitActive("ahk_class #32770")
+		; Send("n")
+
 	}
 }
+
+
 
 class SketchTool {
 	WaitUntilSketchToolReady()
@@ -2930,36 +3003,58 @@ class SketchTool {
 		WinWaitClose("ahk_class #32770 ahk_exe sketchtoolapplication.exe")
 	}
 
+
+
 	OpenImageDialog()
 	{
-		SendInput("!i")
+
+    UIA := UIA_Interface()
+    WinActivate, ahk_exe sketchtool.exe
+    tdEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
+    tdEl.FindFirstByName("Insert image from file...").Click()
+    uia := "",tdEl := ""
+		/*SendInput("!i")
 		Sleep(50)
 		SendInput("{Down 8}")
 		Sleep(50)
 		SendInput("{Enter}")
+    */
 	}
 
 	OpenSaveDialog()
 	{
-		Send("!f{Enter}")
+		;Send("!f{Enter}")
+    UIA := UIA_Interface()
+    stEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
+    stEl.FindFirstByName("File").Click()
+    stEl.FindFirstByName("Export...").Click()
 	}
 
 	LoadImage(filename,ungroup := true)
 	{
 		this.OpenImageDialog()
 		this.WaitDialogBox()
-		Send(filename)
-		Send("{Enter}")
+		;Send(filename)
+		;Send("{Enter}")
+    UIA := UIA_Interface()
+    dlgEl := UIA.ElementFromHandle(WinExist("ahk_class #32770"))
+    fneditEl := dlgEl.FindByPath(3.1).SetValue(filename)
+    dlgEl.FindByPath(5).Click()
 		this.WaitCloseDialogBox()
 		if (ungroup = true)
 		{
-			send("!i{Down}{Enter}")
+			;send("!i{Down}{Enter}")
+      stEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
+      imageEl := stEl.FindFirstByNameAndType("Image","MenuItem").Click()
+      stEl.FindFirstByName("Ungroup").Click()
+
 		}
 	}
 
 	SubmitAndExit()
 	{
-		ControlClick("OK","ahk_exe sketchtoolapplication.exe")
+		;ControlClick("OK","ahk_exe sketchtoolapplication.exe")
+    UIA_Interface().ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe")).FindFirstByName("OK").Click()
 	}
 
 	SaveImage(filename := "")
@@ -2968,8 +3063,11 @@ class SketchTool {
 		this.WaitDialogBox()
 		if (filename != "")
 		{
-			send(filename)
-			Send("{Enter}")
+			;send(filename)
+			;Send("{Enter}")
+      dlgEl := UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770"))
+      dlgEl.FindFirstByNameAndType("File name:","Edit").SetValue(filename)
+      dlgEl.FindFirstByNameAndType("Save","Button").Click()
 			this.waitCloseDialogBox()
 		}
 		else
@@ -2995,6 +3093,8 @@ class Ticket
 		{
 			return true
 		}
+		Else
+			return false
 	}
 
 	GetClearStamp(clearreason)
@@ -3011,27 +3111,29 @@ class Ticket
 
 	GetDataFromOneCallInfo()
 	{
-		Mobile.SelectLocationTab()
-		ControlGet, number, Line,1, edit2, ahk_exe Mobile.exe
-		ControlGet, street, line,1, Edit6, ahk_exe Mobile.exe
-		ControlGet, intersection, line,1,edit10, ahk_exe mobile.exe
-		ControlGet, intersection2, line,1,edit12, ahk_exe mobile.exe
-		ControlGet, stationCode, line,1, edit9, ahk_exe mobile.exe
-		ControlGetText, digInfo, edit22, ahk_exe mobile.exe
-		controlget, ticketNumber, line, 1, edit1, ahk_exe mobile.exe
-		controlget, town, line, 1, edit13, ahk_exe mobile.exe
-		ControlGet, remarks, line, 1, Edit23, % MOBILEWIN
-		this.number := number
-		this.street := CraigRpa.FixStreetName(street)
-		this.intersection := CraigRPA.FixStreetName(intersection)
-		this.intersection2 := CraigRPA.FixStreetName(intersection2)
-		this.stationCode := stationCode
-		this.ticketNumber := ticketNumber
-		this.digInfo := digInfo
-		this.remarks := remarks
-		this.town := CraigRPA.FixTownName(town)
-		this.workType := this.GetWorkType()
-		return this
+		if (this.HasData() = false) {
+			Mobile.SelectLocationTab()
+			ControlGet, number, Line,1, edit2, ahk_exe Mobile.exe
+			ControlGet, street, line,1, Edit6, ahk_exe Mobile.exe
+			ControlGet, intersection, line,1,edit10, ahk_exe mobile.exe
+			ControlGet, intersection2, line,1,edit12, ahk_exe mobile.exe
+			ControlGet, stationCode, line,1, edit9, ahk_exe mobile.exe
+			ControlGetText, digInfo, edit22, ahk_exe mobile.exe
+			controlget, ticketNumber, line, 1, edit1, ahk_exe mobile.exe
+			controlget, town, line, 1, edit13, ahk_exe mobile.exe
+			ControlGet, remarks, line, 1, Edit23, % MOBILEWIN
+			this.number := number
+			this.street := CraigRpa.FixStreetName(street)
+			this.intersection := CraigRPA.FixStreetName(intersection)
+			this.intersection2 := CraigRPA.FixStreetName(intersection2)
+			this.stationCode := stationCode
+			this.ticketNumber := ticketNumber
+			this.digInfo := digInfo
+			this.remarks := remarks
+			this.town := CraigRPA.FixTownName(town)
+			this.workType := this.GetWorkType()
+			return this
+		}
 	}
 
 	GetClearData()
@@ -3046,7 +3148,6 @@ class Ticket
 		Gui, clform:Add, Text, x22 y110 w80 h20 , Dig Area Type:
 		Gui, clform:Add, Radio, x102 y110 w90 h20 Group vdigareatype, Manual
 		Gui, clform:Add, Radio,gwatchdaradio x202 y110 w110 h20 , Private Property
-		Gui, clform:Add, Radio,x322 y110 w100 h20 , PL To PL
 		Gui, clform:Add, Text, x22 y140 w80 h20, Clear Reason:
 		Gui, clform:Add, Radio, x102 y140 w110 h20 Group vclearreason, Regular
 		Gui, clform:Add, Radio, x202 y140 w110 h20,FTTH
@@ -3196,12 +3297,30 @@ class Sketch extends Sketchtool
 		return this.digarea := getRegDA()
 	}
 
+	GetForm(Ticket){
+		return Ticket.GetFormType()
+	}
+
+	;Base routine to start a new sketch form
+	Initialize(Ticket)
+	{
+		Ticket.GetDataFromOneCallInfo()
+		Mobile.SelectDrawingsTab()
+		Mobile.SelectNewForm()
+		Mobile.SelectDrawingForm(Ticket.GetFormType())
+		SketchTool.WaitUntilSketchToolReady()
+	}
+
 	;writes dig area to sketch
-	putDigArea(){
-		setTemplateText("NBoundary.skt",this.digarea.north)
-		setTemplateText("SBoundary.skt",this.digarea.south)
-		setTemplateText("WBoundary.skt",this.digarea.west)
-		setTemplateText("EBoundary.skt",this.digarea.east)
+	putDigArea(form){
+
+		/*
+		accepts a dig area object(north, south, west, east)
+		*/
+		setTemplateText(form = "RA" ? "RANBoundary.skt":"NBoundary.skt",this.digarea.north)
+		setTemplateText(form = "RA" ? "RASBoundary.skt":"SBoundary.skt",this.digarea.south)
+		setTemplateText(form = "RA" ? "RAWBoundary.skt":"WBoundary.skt",this.digarea.west)
+		setTemplateText(form = "RA" ? "RAEBoundary.skt":"EBoundary.skt",this.digarea.east)
 	}
 
 	WriteTemplateText(template, text)
@@ -3243,6 +3362,17 @@ isSidewalk(){
 	return SIDEWALK
 }
 
+isBellClear()
+{
+	Loop
+	{
+		Inputbox,bellClear,Is Bell Clear?
+		if bellClear in y,Y
+			return True
+		Else
+			return False
+	}
+}
 boreholeAutoFill()
 {
 	global
@@ -3250,13 +3380,12 @@ boreholeAutoFill()
 	locationDataCheck()
 	setForm()
 	waitSTLoad()
-	openExistingPrompt()
-	IfMsgBox, Yes
+	if (useExisting() = "y")
 	{
 		autofillExistingSketch()
 		WinWaitClose, ahk_exe SketchToolApplication.exe
 	}
-	IfMsgBox, No
+	Else
 	{
 		setBHDigArea()
 		rclear := rogClear()
@@ -3294,10 +3423,9 @@ pedAutoFill() {
 
 	locationDataCheck()
 	setForm()
-	openExistingPrompt()
-	IfMsgBox, Yes
+	if (useExisting() = "y")
 		autofillExistingSketch()
-	IfMsgBox, No
+	else
 	{
 		setPedDigArea()
 		InputBox, landbase, Landbase, Which Direction?
@@ -3309,9 +3437,14 @@ pedAutoFill() {
 		pedAutoFill()
 }
 
-openExistingPrompt()
+useExisting()
 {
-	MsgBox, 4132, Open Existing?, Open existing sketch?
+	Loop
+	{
+		Inputbox, openExisting, Open existing sketch?
+	}
+	Until openExisting in y,Y,n,N
+	return openExisting
 }
 
 ;radius dig area
@@ -3353,9 +3486,8 @@ transformerAutoFill()
 	}
 	else
 	{
-		openExistingPrompt()
 
-		IfMsgBox, Yes
+		if (useExisting() = "y")
 		{
 			autofillExistingSketch()
 			WinWaitClose("ahk_exe Sketchtoolapplication.exe")
@@ -3363,7 +3495,7 @@ transformerAutoFill()
 				transformerAutoFill()
 		}
 
-		IfMsgBox, No
+		else
 		{
 			txlocation := Inputbox("Where is the tranformer situated?`n`nb = backyard`nf = front of house")
 			landbase := InputBox("What side of the road is the address on?`n(N, E, S, W)")
@@ -3567,72 +3699,134 @@ checkforTreeTemplateFile(ticketnumber)
 
 treeSketchFromTemplate(treefile)
 {
-	/*
-	ticketnumber
-	north
-	south
-	east
-	west
-	treetype
-	street
-	landbase
-	number
-	cabloc
-	meas1
-	meas2
-	label
-	label2
-	filename
-	*/
 	global
-	north := FileReadLine(treefile,2)
-	south := FileReadLine(treefile,3)
-	west := FileReadLine(treefile,4)
-	east := FileReadLine(treefile,5)
-	treetype := FileReadLine(treefile,6)
-	street := FileReadLine(treefile,7)
-	landbase := FileReadLine(treefile,8)
-	number := FileReadline(treefile,9)
-	cabloc := FileReadLine(treefile,10)
-	meas1 := FileReadLine(treefile,11)
-	meas2 := FileReadLine(treefile,12)
-	label := FileReadLine(treefile,13)
-	label2 := FileReadLine(treefile,14)
-	filename := FileReadLine(treefile,15)
+	Loop {
 
-	clickdrawingtab()
-	setForm()
-	waitSTLoad()
+		north := FileReadLine(treefile,2)
+		south := FileReadLine(treefile,3)
+		west := FileReadLine(treefile,4)
+		east := FileReadLine(treefile,5)
+		treetype := FileReadLine(treefile,6)
+		street := FileReadLine(treefile,7)
+		landbase := FileReadLine(treefile,8)
+		number := FileReadline(treefile,9)
+		cabloc := FileReadLine(treefile,10)
+		meas1 := FileReadLine(treefile,11)
+		meas2 := FileReadLine(treefile,12)
+		label := FileReadLine(treefile,13)
+		label2 := FileReadLine(treefile,14)
+		filename := FileReadLine(treefile,15)
 
-	if (cabloc = 3)
-	{
-		labels := [meas1,meas2,label,label2]
+		clickdrawingtab()
+		setForm()
+		waitSTLoad()
+
+		if (cabloc = 3)
+		{
+			labels := [meas1,meas2,label,label2]
+		}
+		else
+		{
+			labels := [meas1,label]
+		}
+
+		tda := {"north":north, "south":south, "west":west, "east":east}
+
+		rogersunits := "1M"
+		setTreeDigArea(tda)
+		loadImageNG(treeSketchBuilder(landbase, cabloc))
+		setTreeLabels(labels,street,cabloc,landbase,treetype,number)
+		setTemplateText("units.skt",rogersunits)
+		setTemplateText("totalpages.skt",1)
+		loadImage("catv primary.skt")
+		setTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
+		SketchTool.SaveImage(filename)
+		sleep 500
+		SketchTool.SubmitAndExit()
+		focusTeldig()
+		addtotimesheet()
+		sleep 500
+		Mobile.SelectPending()
+		sleep 2000
+		finishemail()
+		ControlGet, ticketnumbernew, line,1,edit1,ahk_exe mobile.exe
+		if(ticketnumber != ticketnumbernew)
+		{
+			ticketnumbernew := ""
+			stationcode := ""
+			north := ""
+			south := ""
+			west := ""
+			east := ""
+			treetype := ""
+			street := ""
+			landbase := ""
+			number := ""
+			cabloc := ""
+			meas1 :=""
+			meas2 := ""
+			label := ""
+			label2 := ""
+			filename := ""
+			form := ""
+			treeAutoFill()
+		}
 	}
-	else
-	{
-		labels := [meas1,label]
-	}
-
-	tda := {"north":north, "south":south, "west":west, "east":east}
-
-	rogersunits := "1M"
-	setTreeDigArea(tda)
-	loadImageNG(treeSketchBuilder(landbase, cabloc))
-	setTreeLabels(labels,street,cabloc,landbase,treetype,number)
-	setTemplateText("units.skt",rogersunits)
-	setTemplateText("totalpages.skt",1)
-	setTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
-	SketchTool.SaveImage(filename)
-	sleep 500
-	SketchTool.SubmitAndExit()
-	focusTeldig()
-	addtotimesheet()
 }
+
+class TreeSketch extends Ticket
+{
+
+	__New()
+	{
+		return this
+	}
+
+	Init()
+	{
+
+	}
+
+	LocationDataCheck()
+	{
+		if (this.HasData() = false) {
+		return this.GetDataFromOneCallInfo()
+		}
+	}
+
+
+
+}
+
+
 
 treeAutoFill()
 {
 	global
 	locationDataCheck()
+	;steps currently in this method (high level)
+
+	;1.check for data presence
+	;2.check for template presence
+	;3.Disable Complete control (Mobile)
+	;4.Check for Bell Primary if so go there and then save/exit
+	;5.chck for existing sketch to import - if yes then open sketchtool and insert sketch
+	;6.get dig area
+	;7.get treetype
+	;8.check if clear - if yes start new clear tree sketch
+	;9.get street
+	;10.get landbase
+	;11.get number
+	;12 get cable location
+	;13 get labels
+	;14.Append most things to a file
+	;15.Check cabloc - assign labels depending on single cable or double cable
+	;16. Check to see if ticket should be completed now- NO: inform that ticket saved to file and return YES: setform and wait STLOAD
+
+	; FileDelete,treeticketdata.tt
+	; FileAppend(ticketnumber "`n" number "`n" street,"treeticketdata.txt")
+	; MsgBox % FileRead("treeticketdata.txt")
+	;RunWait,trees.py,%A_ScriptDir%
 	if (checkforTreeTemplateFile(ticketnumber))
 	{
 		treeSketchFromTemplate(A_MyDocuments "\" ticketnumber ".txt")
@@ -3646,15 +3840,14 @@ treeAutoFill()
 	}
 	else
 	{
-		openExistingPrompt()
-		IfMsgBox, Yes
+		if (useExisting() = "y")
 		{
 			clickdrawingtab()
 			setForm()
 			waitSTload()
 			autofillExistingSketch()
 		}
-		IfMsgBox, No
+		else
 		{
 			clickdrawingtab()
 			treeDigArea := getTreeDigArea()
@@ -3679,6 +3872,7 @@ treeAutoFill()
 			treefile := JoinPath(A_MyDocuments,ticketnumber . ".txt")
 			MsgBox % treefile
 			FileAppend(ticketnumber "`n" treeDigArea["north"] "`n" treeDigArea["south"] "`n" treeDigArea["west"] "`n" treeDigArea["east"] "`n" treetype "`n" street "`n" landbase "`n" number "`n" cabloc "`n",treefile)
+			;make sure the labels correspond to a single cable or double cable sketch
 			if (cabloc =3)
 			{
 				FileAppend(labels[1] "`n" labels[2] "`n" labels[3] "`n" labels[4] "`n" number " " street " TREES R.SKT",treefile)
@@ -3686,16 +3880,28 @@ treeAutoFill()
 			else
 				FileAppend(labels[1] "`n" "x`n" labels[2] "`n" "x`n" number " " street " TREES R.SKT",treefile)
 			finishnow := InputBox("Complete ticket now?")
+			;back out if want to finish later
 			if (finishnow = "n" || finishnow = "N")
 			{
 				MsgBox("Ticket info saved to file")
+				ticketnumber := "",landbase := "",number :="",cabloc := "",labels := "",treefile := "",treeDigArea := "",stationcode := "",intersection := "",intersection2 := ""
+				resetformVar()
+				return
 			}
 			setform()
 			waitSTLoad()
 			setTreeDigArea(treeDigArea)
 			loadimageNG(treeSketchBuilder(landbase,cabloc))
 			setTreeLabels(labels,street, cabloc, landbase, treetype,number)
-			WinWaitClose, AHK_EXE SKETCHTOOLAPPLICATION.EXE
+			rogersunits := "1M"
+			setTemplateText("units.skt",rogersunits)
+			setTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
+			setTemplateText("totalpages.skt",1)
+			SketchTool.SaveImage(A_MyDocuments "\" ticketnumber " TREE PLANTING R.skt")
+			sleep 500
+			SketchTool.SubmitAndExit()
+			focusTeldig()
+
 		}
 	}
 	if (currentpage < totalpages)
@@ -3716,12 +3922,11 @@ treeAutoFillFromTemplate()
 	}
 	else
 	{
-		openExistingPrompt()
-		IfMsgBox, Yes
+		if (useExisting() = "y")
 		{
 			autofillExistingSketch()
 		}
-		IfMsgBox, No
+		else
 		{
 			treeDigArea := getTreeDigArea()
 			treetype := treeDigArea["treetype"]
@@ -3882,14 +4087,13 @@ poleAutoFill() ; AUTOCOMPLETE FOR POLES
 	}
 	else
 	{
-		openExistingPrompt()
 
-		IfMsgBox, Yes
+		if (useExisting() = "y")
 		{
 			autofillExistingSketch()
 		}
 
-		IfMsgBox, No
+		else
 		{
 			setPoleDigArea(polenum)
 			if (stationcode = "ROGYRK01") or if (stationcode = "ROGSIM01")
@@ -4759,7 +4963,7 @@ addtotimesheet()
 	if (aptumunits || rogersunits)
 	{
 		addToTimesheetFromPrevious(aptumunits,rogersunits)
-		MsgBox, Entry added to timesheet
+		TrayTip("Entry added","Ticket added to timesheet",5)
 		return
 	}
 	SPLASHTEXTON ,,,ADDING TO LOGSHEET TEXT FILE
@@ -5671,10 +5875,10 @@ getTreeDigArea()
 	}
 	treeDigArea := {}
 	treenum := InputBox("Trees","Write tree number")
-	treeDigArea["north"] := "3M N OF " . treetype . " " . treenum
-	treeDigArea["south"] := "3M S OF " . treetype . " " . treenum
-	treeDigArea["west"] := "3M W OF " . treetype . " " . treenum
-	treeDigArea["east"] := "3M E OF " . treetype . " " . treenum
+	treeDigArea["north"] := "2M N OF " . treetype . " " . treenum
+	treeDigArea["south"] := "2M S OF " . treetype . " " . treenum
+	treeDigArea["west"] := "2M W OF " . treetype . " " . treenum
+	treeDigArea["east"] := "2M E OF " . treetype . " " . treenum
 	treeDigArea["treetype"] := treetype
 	return treeDigArea
 }
@@ -7166,6 +7370,7 @@ Sendevent %street%{ENTER}
 waitCaret()
 Sendevent %intersection%{enter}
 return
+
 CDS_LOOKUP:
 WinActivate ahk_exe MAPINFOR.EXE
 Sleep 1000
@@ -7188,7 +7393,7 @@ setCornerText(landbase)
 {
 	global
 	setTemplateText(landbase "cornerxstreet.skt", inter.x)
-	setTemplateText(landbase "cornervstreet.skt", inter.y)
+	setTemplateText(landbase "cornerystreet.skt", inter.y)
 		;setTemplateText(landbase "cornerhouse.skt", haddress)
 }
 
@@ -8628,3 +8833,7 @@ getCoords(){
 		RunWait,% "C:\Users\Cr\rogers_clear_script.py"
 		Suspend,Off
 	}
+
+;TESTS
+
+;run tests - need a hotkey??

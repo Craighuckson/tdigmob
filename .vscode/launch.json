@@ -14,7 +14,7 @@
         "type": "autohotkey",
         "request": "launch",
         "name": "AutoHotkey Debugger",
-        "program": "",
+        "program": "${file}",
         "stopOnEntry": true
       }
 

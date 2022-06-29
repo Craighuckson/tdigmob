@@ -1,0 +1,4 @@
+3M N OF STUMP 34 a st
+3M S OF STUMP 34 a st
+3M W OF STUMP 34 a st
+3M E OF STUMP 34 a st

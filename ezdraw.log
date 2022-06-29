@@ -1,0 +1,25 @@
+2022-06-17 10:54:43,875
+Traceback (most recent call last):
+  File "C:\Users\Cr\Locatedraw\Locate-draw\ezdrawlnew.py", line 2376, in <module>
+    graph.move_figure(item, x - start_point[0],y - start_point[1])
+TypeError: 'NoneType' object is not subscriptable
+2022-06-17 10:55:12,857
+Traceback (most recent call last):
+  File "C:\Users\Cr\Locatedraw\Locate-draw\ezdrawlnew.py", line 2376, in <module>
+    graph.move_figure(item, x - start_point[0],y - start_point[1])
+TypeError: 'NoneType' object is not subscriptable
+2022-06-17 10:56:00,113
+Traceback (most recent call last):
+  File "C:\Users\Cr\Locatedraw\Locate-draw\ezdrawlnew.py", line 542, in hlabel
+    sg.Graph.draw_text(graph, msg.upper(), (x, y), font=fontstr)
+AttributeError: 'NoneType' object has no attribute 'upper'
+2022-06-17 10:56:01,433
+Traceback (most recent call last):
+  File "C:\Users\Cr\Locatedraw\Locate-draw\ezdrawlnew.py", line 542, in hlabel
+    sg.Graph.draw_text(graph, msg.upper(), (x, y), font=fontstr)
+AttributeError: 'NoneType' object has no attribute 'upper'
+2022-06-17 10:57:33,395
+Traceback (most recent call last):
+  File "C:\Users\Cr\Locatedraw\Locate-draw\ezdrawlnew.py", line 2376, in <module>
+    graph.move_figure(item, x - start_point[0],y - start_point[1])
+TypeError: 'NoneType' object is not subscriptable

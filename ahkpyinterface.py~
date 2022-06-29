@@ -34,4 +34,4 @@ def get_ticket_data():
     return ticket
 
 t = get_ticket_data()
-print(t)
+print(f'{t["street"]} is a pretty good street, especially at #{t["number"]}')

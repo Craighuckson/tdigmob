@@ -1,0 +1,59 @@
+Sketch autofill procedure
+
+need to get station code with other data?
+setform
+	focus teldig window, click drawing tab, pick form based on station code
+wait for sketchtool to load
+
+Bell check - if form has "B" in it
+	ask if single or project
+	if single:
+		totalpages set to 2
+		Prompt for units
+		Prompt for bell primary form to open - stickers etc
+		focus st
+		load bell primary base
+		load primary template
+		write bell primary date
+		write units
+		write total pages
+		if currentpage var not initialized
+			set currentpage to 1
+		Click OK on SketchTool
+		focus mobile
+		FUNC prompt for new page
+			if current page less than totalpages
+					loop back to start of sketch autofill
+			else print continue to timesheet message
+		return from procedure
+
+	else if project:
+		bellprimarystart func
+		return from procedure
+
+prompt USE Existing
+	YEs: goto autofill existing sketch routine
+					if bell primary form:
+							prompt for units
+							prompt for totalpages
+							load primary base
+							write units
+							write date on bell primary
+							write total pages - bell minimum 2
+							if currentpages doesnt exist:
+								set it to 1
+							if totalpages doesnt exist:
+								set it to 1
+							Click sketchtool OK
+							focus mobile
+					otherwise:
+							wait for sketch to be closed (ie through completion)
+							FUNC prompt for new page
+
+	NO: big routine now
+
+	FUNC Write Dig Area
+			get dig boundaries - returns int representing dig area type
+
+			if digboundary blank (ie manual dig area):
+				func getregda - gets north,south,east,west dig areas (current function)
