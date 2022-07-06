@@ -96,7 +96,7 @@ YorkMaps := "https://maps.york.ca/Html5ViewerPublic/Index.html?viewer=GeneralInt
 	Menu, Mobile, Add, Finish and &Email, finishandemail
 	Menu, mobile, Add, Get Ticket Picture, getticketpicture
 	Menu, Mobile, Add, Load from Project, autoinsertSketches
-	Menu, mobile, Add, Mark &job number as 2(clear), markJobNumberas2Clear
+  Menu, Mobile, Add, Get All Tickets, getAllTickets
 	Menu, mobile, Add, Open Sketch E&ditor, openSketchEditor
 	Menu, Mobile, Add, &Write Template File, writeTemplateFile
 	Menu, Mobile, Add, Load Clear Python Template, loadClearPyTemplate
@@ -1867,6 +1867,7 @@ sketchAutoFill()
 	}
 }
 
+
 setCustomDigArea(digarray)
 {
 	setTemplateText("Nboundary.skt",digarray[1])
@@ -1877,7 +1878,8 @@ setCustomDigArea(digarray)
 
 ;DIG AREA
 ;this function needs cleanup
-writeDigArea() {
+writeDigArea()
+{
 	global
 	digboundary := getDigBoundaries() ; asks for INT representing dig boundaries
 	if (digboundary = "") ;no entry
@@ -2027,7 +2029,7 @@ Input,dir,,{numpadup}{numpaddown}{numpadleft}{numpadright}{numpadhome}{NumpadEnd
 switch ErrorLevel
 {
 	Case "endkey:numpadup":
-			MsgBox, N
+		MsgBox, N
 	Case "endkey:numPadDown":
 		MsgBox, S
 	Case "endkey:Numpadleft":
@@ -2460,6 +2462,42 @@ setForm()
 	}
 }
 
+getNumberofTickets()
+{
+  return ControlGet("List","Count","SysListView321","ahk_exe mobile.exe")
+}
+
+getListofTicketNumbers()
+{
+  tncolumn := ControlGet("List", "Col2","SysListView321","ahk_exe mobile.exe")
+  return StrSplit(tncolumn,"`n")
+}
+
+HasVal(haystack,needle) {
+  if !(IsObject(haystack)) || (haystack.Length() = 0)
+    return 0
+  for index,value in haystack
+  {
+    if (value = needle)
+      return index
+  }
+  return 0
+}
+
+lookForOldTickets()
+{
+  datapath := A_ScriptDir "\data"
+  oldticketlist := []
+ Loop,Files, %datapath%\*, D
+ {
+    if (HasVal(getListofTicketNumbers(),A_LoopFileName) = 0)
+      oldticketlist.Push(A_LoopFileName)
+ }
+  if oldticketlist.Length() > 0
+    return True
+  Else
+    return false
+}
 ;MOBILE MODULES
 
 getticketpicture:
@@ -2539,7 +2577,7 @@ return
 
 PL4ButtonOK:
 
-Gui, PL4:
+Gui, PL4: Submit
 Gui, PL4: Destroy
 return
 
@@ -2641,6 +2679,28 @@ class CraigRPA {
 
 	today:= A_DD . " " . A_MM . " " . A_YYYY
 
+	__ClearTemplateExists(Ticket)
+	{
+		if !(FileExist(A_MyDocuments . "\" . Ticket.ticketnumber . "*.*")) {
+			MsgBox("No template for this ticket")
+			Mobile.Cancel()
+			return false
+		}
+		return True
+	}
+
+	__FirstPageExists(Ticket)
+	{
+		ticketnumber := Ticket.ticketnumber
+		ticketpage1 := A_MyDocuments "\" ticketnumber "-1.txt"
+		if !(FileExist(ticketpage1)) {
+			MsgBox("Couldn't find page 1 for this ticket")
+			Mobile.Cancel()
+			return false
+		}
+		return True
+	}
+
 	ClearRogersFromTemplate(completeOnSite:=false,t:="") {
 
 		s := new Sketch
@@ -2650,23 +2710,16 @@ class CraigRPA {
 		}
 
 		;checks for existence of template
-		if !(FileExist(A_MyDocuments . "\" . t.ticketnumber . "*.*")) {
-			MsgBox("No template for this ticket")
-			Mobile.Cancel()
+		if (this.__ClearTemplateExists(t) == false)
 			return
-		}
 
 		;start by reading page 1
 		currentsketchpage := 1
 		ticketnumber := t.ticketnumber
 
 		;quits if page 1 for this ticket is not found
-		ticketpage1 := A_MyDocuments "\" ticketnumber "-1.txt"
-		if !(FileExist(ticketpage1)) {
-			MsgBox("Couldn't find page 1 for this ticket")
-			Mobile.Cancel()
+		if (this.__FirstPageExists(t) == false)
 			return
-		}
 
 		;loops through this routine until all pages in template are read
 		Loop {
@@ -2915,71 +2968,72 @@ class Mobile
 		sleep 500
 		switch form {
 			case "RP":
-			;MouseClick("L",915,498)
-      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("CABLE TV").Click()
+			MouseClick("L",915,498)
+			;UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("CABLE TV").Click()
 
 			case "RA", "AA", "EA":
-			;MouseClick("L",953,392)
-      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("SKETCH_FORM").Click()
+			MouseClick("L",953,392)
+			;UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("SKETCH_FORM").Click()
 
 			case "AP":
-			;MouseClick("L",920,409)
-      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("COGECO").Click()
+			MouseClick("L",920,409)
+			;UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("COGECO").Click()
 
-      case "EP":
-      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("ENVI NETWORKS").Click()
+			case "EP":
+			UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("ENVI NETWORKS").Click()
 
 			default:
-			;MouseClick("L",915,498)
-      UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("CABLE TV").Click()
+			MouseClick("L",915,498)
+			;UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("CABLE TV").Click()
 		}
 		sleep 500
 	}
 
 	SelectPending()
 	{
-		;CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
+		CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
 
     ;UIA := UIA_Interface()
     ;Winactivate, ahk_exe mobile.exe
     ;mobEl := UIA.ElementFromHandle(WinExist("ahk_exe mobile.exe"))
     ;mobEl.FindFirstByNameAndType("Request status:","ComboBox").SetValue("PENDING")
-    UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByNameAndType("Request status:","ComboBox").SetValue("PENDING")
+    ;UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByNameAndType("Request status:","ComboBox").SetValue("PENDING")
   }
 
 
 	ClickOK()
 	{
 		MouseClick("L",1079,695)
-    UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("OK").Click()
+		sleep 300
+		;UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("OK").Click()
 	}
 
 	Cancel()
 	{
-		; MouseClick("L",1244,702)
-		; sleep 300
-		; Send("Y")
-    UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("Cancel").Click()
+		MouseClick("L",1244,702)
+		 sleep 300
+		 Send("Y")
+		;UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("Cancel").Click()
 	}
 
 	FinishWithEmail()
 	{
 		this.ClickOK()
-    UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770")).FindFirstByName("Yes").Click()
-    WinWaitActive,Paper output to contractor
-    UIA_Interface().ElementFromHandle(WinExist("Paper output to contractor")).FindFirstByName("OK").Click()
-		;WinWaitActive("ahk_class #32770")
-		;Send("y")
-		;WinWaitActive("Paper output to contractor")
-		;Send("{Enter}")
+    ;UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770")).FindFirstByName("Yes").Click()
+    ;WinWaitActive,Paper output to contractor
+    ;UIA_Interface().ElementFromHandle(WinExist("Paper output to contractor")).FindFirstByName("OK").Click()
+		WinWaitActive("ahk_class #32770")
+		Send("y")
+		WinWaitActive("Paper output to contractor")
+		Send("{Enter}")
 	}
 
 	FinishNoEmail()
 	{
 		this.ClickOK()
-    UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770")).FindFirstByName("No").Click()
-		; WinWaitActive("ahk_class #32770")
-		; Send("n")
+    ;UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770")).FindFirstByName("No").Click()
+		WinWaitActive("ahk_class #32770")
+		Send("n")
 
 	}
 }
@@ -3008,53 +3062,52 @@ class SketchTool {
 	OpenImageDialog()
 	{
 
-    UIA := UIA_Interface()
-    WinActivate, ahk_exe sketchtool.exe
-    tdEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
-    tdEl.FindFirstByName("Insert image from file...").Click()
-    uia := "",tdEl := ""
-		/*SendInput("!i")
+    ;~ UIA := UIA_Interface()
+    ;~ WinActivate, ahk_exe sketchtool.exe
+    ;~ tdEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
+    ;~ tdEl.FindFirstByName("Insert image from file...").Click()
+    ;~ uia := "",tdEl := ""
+		SendInput("!i")
 		Sleep(50)
 		SendInput("{Down 8}")
 		Sleep(50)
 		SendInput("{Enter}")
-    */
 	}
 
 	OpenSaveDialog()
 	{
-		;Send("!f{Enter}")
-    UIA := UIA_Interface()
-    stEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
-    stEl.FindFirstByName("File").Click()
-    stEl.FindFirstByName("Export...").Click()
+		Send("!f{Enter}")
+    ;~ UIA := UIA_Interface()
+    ;~ stEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
+    ;~ stEl.FindFirstByName("File").Click()
+    ;~ stEl.FindFirstByName("Export...").Click()
 	}
 
 	LoadImage(filename,ungroup := true)
 	{
 		this.OpenImageDialog()
 		this.WaitDialogBox()
-		;Send(filename)
-		;Send("{Enter}")
-    UIA := UIA_Interface()
-    dlgEl := UIA.ElementFromHandle(WinExist("ahk_class #32770"))
-    fneditEl := dlgEl.FindByPath(3.1).SetValue(filename)
-    dlgEl.FindByPath(5).Click()
+		Send(filename)
+		Send("{Enter}")
+    ;~ UIA := UIA_Interface()
+    ;~ dlgEl := UIA.ElementFromHandle(WinExist("ahk_class #32770"))
+    ;~ fneditEl := dlgEl.FindByPath(3.1).SetValue(filename)
+    ;~ dlgEl.FindByPath(5).Click()
 		this.WaitCloseDialogBox()
 		if (ungroup = true)
 		{
-			;send("!i{Down}{Enter}")
-      stEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
-      imageEl := stEl.FindFirstByNameAndType("Image","MenuItem").Click()
-      stEl.FindFirstByName("Ungroup").Click()
+			send("!i{Down}{Enter}")
+      ;stEl := UIA.ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe"))
+      ;imageEl := stEl.FindFirstByNameAndType("Image","MenuItem").Click()
+      ;stEl.FindFirstByName("Ungroup").Click()
 
 		}
 	}
 
 	SubmitAndExit()
 	{
-		;ControlClick("OK","ahk_exe sketchtoolapplication.exe")
-    UIA_Interface().ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe")).FindFirstByName("OK").Click()
+		ControlClick("OK","ahk_exe sketchtoolapplication.exe")
+    ;UIA_Interface().ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe")).FindFirstByName("OK").Click()
 	}
 
 	SaveImage(filename := "")
@@ -3063,11 +3116,11 @@ class SketchTool {
 		this.WaitDialogBox()
 		if (filename != "")
 		{
-			;send(filename)
-			;Send("{Enter}")
-      dlgEl := UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770"))
-      dlgEl.FindFirstByNameAndType("File name:","Edit").SetValue(filename)
-      dlgEl.FindFirstByNameAndType("Save","Button").Click()
+			send(filename)
+			Send("{Enter}")
+      ;dlgEl := UIA_Interface().ElementFromHandle(WinExist("ahk_class #32770"))
+      ;dlgEl.FindFirstByNameAndType("File name:","Edit").SetValue(filename)
+      ;dlgEl.FindFirstByNameAndType("Save","Button").Click()
 			this.waitCloseDialogBox()
 		}
 		else
@@ -3774,32 +3827,6 @@ treeSketchFromTemplate(treefile)
 	}
 }
 
-class TreeSketch extends Ticket
-{
-
-	__New()
-	{
-		return this
-	}
-
-	Init()
-	{
-
-	}
-
-	LocationDataCheck()
-	{
-		if (this.HasData() = false) {
-		return this.GetDataFromOneCallInfo()
-		}
-	}
-
-
-
-}
-
-
-
 treeAutoFill()
 {
 	global
@@ -4053,24 +4080,6 @@ setPoleLandbase()
 			setTemplateText(v "street.skt", street)
 		}
 	}
-	;~ if (landbase = "n")
-	;~ loadImage("polen.skt")
-	;~ else if (landbase = "s")
-	;~ {
-	;~ loadImage("poles.skt")
-	;~ setTemplateText("spolenum.skt", polenum)
-	;~ setTemplateText("sstreet.skt", street)
-	;~ }
-	;~ else if (landbase = "w")
-	;~ loadImage("polew.skt")
-	;~ else if (landbase = "e")
-	;~ loadImage("polee.skt")
-	;~ else if(landbase = "sw")
-	;~ loadImage("polesw.skt")
-	;~ else if(landbase = "ne")
-	;~ loadImage("polene.skt")
-	;~ else if(landbase = "se")
-	;~ loadImage("polese.skt")
 	WinWaitActive, ahk_exe mobile.exe
 }
 
@@ -4141,18 +4150,16 @@ autofillExistingSketch()
 		setTemplateText("bellprimarydate.skt",getCurrentDate())
 		wait()
 		setTemplateText("RPtotalpages.skt", totalpages)
-		IF currentpage =
-			currentpage = 1
-		IF TOTALPAGES =
-			TOTALPAGES = 1
-		wait()
+		if (currentpage = "")
+			currentpage := 1
+		if (totalpages = "")
+			totalpages := 1
 		ControlClick("OK","ahk_exe sketchtoolapplication.exe")
 		focusTeldig()
 	}
 	Else
 	{
 		WinWaitClose,ahk_exe SketchToolApplication.exe
-		;ST_SAVEEXIT()
 		newPagePrompt()
 	}
 }
@@ -4260,6 +4267,7 @@ loadImageNG(x) ; loads template without ungrouping
 	openimagedialog()
 	waitdialogbox()
 	SendInput %x%
+
 	Sleep 50
 
 	Send,{enter}
@@ -4362,14 +4370,10 @@ writePageNumber() ; page number prompt will replace with auto numbering
 	}
 	currentpage := currentpage + 1
 	Sleep 300
-	loadImageNG("currentpage.skt")
-	wait()
-	SendInput, {f2}%currentpage%{enter}
-	wait()
-	SendInput ^q
-	Sleep 300
-	loadImageNG("totalpages.skt")
-	SendInput, {f2}%totalpages%
+	if (currentpage)
+		setTemplateText("currentpage.skt",currentpage)
+	if (totalpages)
+		setTemplateText("totalpages.skt",totalpages)
 	Sleep 1000
 }
 
@@ -4427,23 +4431,9 @@ writeRPPageNumber() {
 	;Send {CLICK 25,111}{CLICK 1035,85, DOWN}{CLICK 1060,122,UP}%TOTALPAGES%{ENTER}^q
 	Sleep 1000
 }
-/*readDigBoxClicks() {
-	ToolTip, Click upper left corner
-	KeyWait, LButton, D
-	MouseGetPos, x1, y1
-	ToolTip,
-	Sleep 500
-	Tooltip, Click bottom right corner
-	KeyWait, LButton, D
-	MouseGetPos, x2, y2
-	Tooltip,
-	coordinates := [x1, y1, x2, y2]
-	return coordinates
-}
-*/
+
 getPoints(inst1, inst2) {
 	ToolTip, % inst1
-	;KeyWait, LButton, D
 	Loop
 	{
 		if (GetKeyState("LButton") = 1)
@@ -4474,9 +4464,6 @@ getPoints(inst1, inst2) {
 			Return
 		}
 	}
-	;KeyWait, LButton, D
-	;MouseGetPos, x2, y2
-	;Tooltip,
 	coordinates := [x1, y1, x2, y2]
 	return coordinates
 }
@@ -4486,7 +4473,6 @@ getPoint(inst1) {
 	Keywait, LButton, D, L
 	MouseGetPos, x1, y1
 	Tooltip,
-	;arccoord := [x1, y1]
 	arccoord := new Point(x1,y1)
 	return arccoord
 }
@@ -5385,19 +5371,39 @@ Numpadenter::
 ST_SAVEEXIT()
 return
 
-ST_SAVEEXIT()
+getStnCodeSuffix()
 {
 	global
 	if (stationcode = "BCGN01")
-		util := "B"
+		return "B"
 	else if (stationcode = "BCGN02")
-		util := "B"
+		return "B"
 	else if (stationcode = "ROGYRK01")
-		util := "R"
+		return "R"
 	else if (stationcode = "ROGSIM01")
-		util := "R"
+		return "R"
+	else if (stationcode = "ENVIN01")
+		return "ENVI"
 	else
-		util := "APT"
+		return "APT"
+}
+
+ST_SAVEEXIT()
+{
+	global
+	util := getStnCodeSuffix()
+	;~ if (stationcode = "BCGN01")
+		;~ util := "B"
+	;~ else if (stationcode = "BCGN02")
+		;~ util := "B"
+	;~ else if (stationcode = "ROGYRK01")
+		;~ util := "R"
+	;~ else if (stationcode = "ROGSIM01")
+		;~ util := "R"
+	;~ else if (stationcode = "ENVIN01")
+		;~ util := "ENVI"
+	;~ else
+		;~ util := "APT"
 	MsgBox,4,Save,Save Sketch?
 	focusSketchTool()
 	IfMsgBox, Yes
@@ -5429,9 +5435,11 @@ ST_SAVEEXIT()
 	{
 		Case "BP" :
 		loadImage("bell primary.skt")
+
 		Case "BA" :
 		loadImage("bellaux.skt")
-		Case "RP" :
+
+		Case "RP":
 		rogersunits := getRogersUnits()
 		totalpages := getRPPages()
 		loadImage("catv primary.skt")
@@ -5440,8 +5448,19 @@ ST_SAVEEXIT()
 		setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
 		setTemplateText("RPtotalpages.skt",totalpages)
 		Sleep 100
+
+		Case "EP":
+		enviunits := getRogersUnits()
+		totalpages := getRPPAGes()
+		loadImage("catv primary.skt")
+		(InStr(enviunits[1],"M")) ? loadImageNG("rogerspaint.skt") :
+		setTemplateText("units.skt",enviunits[1] . enviunits[2])
+		setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
+		setTemplateText("RPtotalpages.skt",totalpages)
+
 		Case "RA" :
 		loadImage("rogersaux.skt")
+
 		Case "AP" :
 		aptumunits := getaptumUnits()
 		totalpages := getRPPages()
@@ -5472,7 +5491,7 @@ ST_SAVEEXIT()
 	;Msgbox, 4132, Page Number, Insert page numbers?
 	;ifMsgBox, Yes
 	;{
-	IF (FORM = "RP")
+	IF (FORM = "RP") || (form = "EP")
 		wait()
 	else if (form = "BP")
 		writeRPPageNumber()
@@ -8837,3 +8856,43 @@ getCoords(){
 ;TESTS
 
 ;run tests - need a hotkey??
+
+
+#IfWinNotActive ahk_exe mobile.exe
+#IfWinNotActive ahk_exe sketchtoolapplication.exe
+#IfWinNotActive ahk_exe gvim.exe
+:::o::
+Launcher()
+return
+
+Launcher()
+{
+	Inputbox,prog,Enter program string
+	switch prog
+	{
+		case "mobile":	if !(Winexist("ahk_exe mobile.exe"))
+							Run, "C:\TelDigMobile\TelDigMobile.exe"
+						else
+							Winactivate, ahk_exe mobile.exe
+
+		case "streets":	if !(Winexist("ahk_exe streets.exe"))
+							Run, streets.exe
+						else
+							Winactivate, ahk_exe streets.exe
+
+		case "envab": if !(Winexist("Envi Burial Drawings"))
+							Run, explore C:\Users\Cr\As Builts\Envi Burial Drawings-20220331T170129Z-001\Envi Burial Drawings
+					  else
+							Winactivate, Envi Burial Drawings
+	}
+}
+
+getAllTickets() {
+  ; get number of Tickets
+  ; get list of all ticket numbers
+  ; check main data folder to see if ticket number present
+  ; for each:
+    ; open drawing and get ticket data including coordinates
+    ; lookup and get all drawings for ticket number
+    ; create folder for each ticket number
+}

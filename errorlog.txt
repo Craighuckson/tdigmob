@@ -817,3 +817,8 @@
 20220627160137 - Cannot access ChildPath Item #9 -> 4
 20220627160138 - Invalid IAccessible Object
 20220627160138 - Cannot access ChildPath Item #9 -> 4
+20220629112856 - Invalid IAccessible Object
+20220629112858 - Cannot access ChildPath Item #9 -> 4
+20220629142841 - Cannot access ChildPath Item #2 -> 7
+20220629171503 - Cannot access ChildPath Item #2 -> 7
+20220705234302 - Cannot access ChildPath Item #4 -> 1

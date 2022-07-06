@@ -3,7 +3,7 @@
 #include <Yunit\Window>
 
 #t::
-Yunit.Use(YunitWindow).Test(Bell)
+Yunit.Use(YunitWindow).Test(TicketListOps)
 return
 
 class TreeTestSuite
@@ -36,4 +36,44 @@ class Rogers
 		stationcode := "BCGN01"
 		Yunit.Assert(isTicketRogers(stationcode) = false)
 	}
+}
+
+class TicketListOps
+{
+  Start()
+  {
+    WinActivate("ahk_exe mobile.exe")
+  }
+  ShouldGetCorrectNumberofTickets()
+  {
+    num := 99
+    Yunit.Assert(getNumberofTickets() = num)
+  }
+
+  ShouldReturnAList()
+  {
+    Yunit.Assert(IsObject(getListofTicketNumbers()) = true)
+  }
+
+  ListLengthShouldEqualNumberofTickets()
+  {
+    Yunit.Assert(getNumberofTickets() = getListofTicketNumbers().Length())
+  }
+
+  ; ShouldBeFalseIfDataFolderEmpty()
+  ; {
+  ;   Yunit.Assert(lookForOldTickets() = false)
+  ; }
+
+  ; ShouldBeFalseIfValidTicketFolderPresent()
+  ; {
+  ;   FileCreateDir("C:\Users\Cr\teldig\data\20222322655")
+  ;   Yunit.Assert(lookForOldTickets() = false)
+  ; }
+
+  ; ShouldBeTrueWhenOldTicketFolderPresent()
+  ; {
+
+  ;   Yunit.Assert(lookForOldTickets() = true)
+  ; }
 }
