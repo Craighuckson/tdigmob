@@ -26,7 +26,7 @@
 */
 
 #Include <AHKEZ>
-	
+
 Class DebugGUI
 {
 
@@ -34,17 +34,17 @@ Class DebugGUI
     this.Paste(pText . this.opt.NL)
     Return
   }
- 
+
   Clear() {
-    this.opt.LineNumber:=0  
+    this.opt.LineNumber:=0
     this.gui.HelpPage := 1
     EditClear(this.gui.hEdit)
   }
- 
+
   Close() {
    PostMessage(WM_SYSCOMMAND:=0x112, SC_CLOSE:=0xF060, this.gui.hGui)
   }
- 
+
   GuiSize(Option) {
     Switch Option
     {
@@ -173,7 +173,7 @@ Class DebugGUI
       vText .= Format("{:0.4d}: {}", this.opt.LineNumber, pText)
     } else if (this.opt.Tag = "Timestamp") {
       FormatTime, vTime, Now, HH:mm:ss
-      vText .= vTime "." Format("{:03d}",SubStr(A_TickCount ,-2)) ": " pText 
+      vText .= vTime "." Format("{:03d}",SubStr(A_TickCount ,-2)) ": " pText
     } else if (this.opt.Tag = "DateTime") {
       FormatTime, vTime, Now, yyyy-MMM-dd HH:mm:ss
       vText .= vTime ": " pText
@@ -182,7 +182,7 @@ Class DebugGUI
     }
     return vText
   }
- 
+
   _GetThemeSettings(Theme) {
     ;Monotype fonts: Consolas, Lucida Console, Courier New
     ;NOTE: Hex Colors must start with "0x"
@@ -210,12 +210,12 @@ Class DebugGUI
        this.opt.FontColor  := "Default"
        this.opt.FontName   := "Default"
     }
-  } 
+  }
 
   _ParseParams(ParamsCSV) {
     Loop, Parse, ParamsCSV, CSV
-    { 
-      param := Trim(A_LoopField) 
+    {
+      param := Trim(A_LoopField)
       if (SubStr(param,1,1)="+")
         param := SubStr(param,2)
       if StrStartsWith(param, "FontSize") {
@@ -238,10 +238,10 @@ Class DebugGUI
    }
   }
 
-  _PauseHelp(Text:="Press HELP to continue...") { 
+  _PauseHelp(Text:="Press HELP to continue...") {
     this.Paste(Text)
     ControlSelect(this.gui.hResume, this.gui.hGui)
-    this.gui.Paused:=True  
+    this.gui.Paused:=True
     While (this.gui.Paused)
     {
       Sleep, 200
@@ -251,10 +251,10 @@ Class DebugGUI
   ;** Class Functions
 
   __New(ParamsCSV := "") {
- 
+
     this.gui := {}
     this.opt := {}
- 
+
 Help_Pages:
 ;======================================================================
 ;----------------------------------------------------------------------
@@ -307,7 +307,7 @@ help_page_2 =
 
 Help for Class_DebugGUI                                  (page 2 of 2)
 ======================================================================
- 
+
 Functions:
 
   Append(Text) ; append text with CRLF
@@ -340,7 +340,7 @@ Press HELP to continue...
 )"
 
 Gui_Default_Params:
-  
+
   this.opt.ControlColor := "Default"
   this.opt.FontColor    := "Default"
   this.opt.FontName     := "Default"
@@ -353,7 +353,7 @@ Gui_Default_Params:
   this.opt.Theme        := "PowerShell"  ; "Cmd, Default, PowerShell"
   this.opt.Title        := "Debug GUI"
   this.opt.WindowColor  := "Default"
-  
+
   this._ParseParams(ParamsCSV)
 
   this._GetThemeSettings(this.opt.Theme)
@@ -361,7 +361,7 @@ Gui_Default_Params:
   Gui_Create:
 
   static GuiName := "DEBUG:"
-  
+
   hGUI     := Gui(GuiName "New", "+Resize +AlwaysOnTop", this.opt.Title)
               Gui("Font", "s" this.opt.FontSize "c" this.opt.FontColor, this.opt.FontName)
               Gui("Color", this.opt.WindowColor, this.opt.ControlColor)
@@ -402,7 +402,7 @@ Gui_Show:
 
   Gui(GuiName "Show", "AutoSize")
   this.GuiSize("Small")
-  
+
   if (this.opt.ShowHide="Hide")
    this.Hide()
 
@@ -434,7 +434,7 @@ Gui_Timer_Start:
   _OnTick() {
     if !WinActive(ahkid(this.gui.hGUI))
       Return
-    if GetKeyState("Escape", "P") { 
+    if GetKeyState("Escape", "P") {
       if WinActive(ahkid(this.gui.hGui))
         Gui, % this.gui.hGUI . ":Destroy"
     }
@@ -541,12 +541,12 @@ Gui_Timer_Start:
     GUIControl("Move", this.gui.hEdit,    "w" GuiWidth  - 35 "h" GuiHeight - 55)
     GUIControl("Move", this.gui.hResume,  "y" GuiHeight - 40)
     GUIControl("Move", this.gui.hClear,   "y" GuiHeight - 40)
-    GUIControl("Move", this.gui.hCopy,    "y" GuiHeight - 40) 
-    GUIControl("Move", this.gui.hHelp,    "y" GuiHeight - 40) 
-    GUIControl("Move", this.gui.hExitApp, "y" GuiHeight - 40) 
+    GUIControl("Move", this.gui.hCopy,    "y" GuiHeight - 40)
+    GUIControl("Move", this.gui.hHelp,    "y" GuiHeight - 40)
+    GUIControl("Move", this.gui.hExitApp, "y" GuiHeight - 40)
     Return
   }
- 
+
   _WM_SYSCOMMAND(wp, lp) {
     static SC_CLOSE := 0xF060
     if (A_Gui != this.gui.AGui || wp != SC_CLOSE)
@@ -557,13 +557,13 @@ Gui_Timer_Start:
       IfMsgBox, No
         Return 1
     ;*/
-  
+
     Gui, %A_Gui%: Destroy
-  
+
     this._Dispose()
-  } 
- 
-  _HICON() { ; Reference Png2HICON.ahk 
+  }
+
+  _HICON() { ; Reference Png2HICON.ahk
   B64 := "
   (Join LTrim
   iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAHLklEQVR42sWXC2xUZRbHz73zuPOe6WPamdJpp0xrnOJKUcFSUaAElxCWwDbZFNkVcYUsGolVQEOL0aqr
@@ -640,7 +640,7 @@ Gui_Timer_Start:
     }
     MsgBox(0, vTitle, vOut)
   } ;End_ListVars
-  
+
   ListArray(Options = "", Title = "List Array 2D", Array = "", Gui#="ListArray_") {
     ;Options: 1=1D Array, 2=2D Array
     Switch Options {
@@ -671,7 +671,7 @@ Gui_Timer_Start:
     if (Is2D) {
       For key1, element in Array
         For key2, Value in element
-          LV_Add("", key1, key2, value)    
+          LV_Add("", key1, key2, value)
     }
     Gui("Show", "AutoSize", Title)
     ControlSelect(hBtnOK)
