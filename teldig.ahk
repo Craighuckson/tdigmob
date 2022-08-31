@@ -2958,6 +2958,16 @@ QAFail()
 
 class QA {
 
+    Autocomplete()
+    {
+        inputbox,file,Write save file name
+        QA.Start()
+	focussketchtool()
+	loadImageNG(A_MyDocuments . "\qayes.skt")
+	
+
+    }
+
     Finalize()
     {
 /* 		Loop
