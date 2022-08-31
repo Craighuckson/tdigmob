@@ -1,4 +1,4 @@
-﻿
+﻿ 
 ;TELDIG MASTER SCRIPT;
 
 ;TODO - ADD APTUM TO TIMESHEET, UPDATE PYTHON TIMESHEET AS WELL
@@ -2098,7 +2098,7 @@ else ;if using different boundaries
     return
 
     !f10::
-        CraigRPA.ClearRogersFromTemplate()
+        CraigRPA.ClearFromTemplate()
     return
 
     RShift::
@@ -2273,7 +2273,7 @@ getPoleNumber(diginfo){
 
 clearMulti(){
     ;load ticket
-    CraigRPA.ClearRogersFromTemplate()
+    CraigRPA.ClearFromTemplate()
     sleep 500
     Mobile.SelectPending()
     Mobile.FinishWithEmail()
@@ -2736,7 +2736,7 @@ class CraigRPA {
         return True
     }
 
-    ClearRogersFromTemplate(completeOnSite:=false,t:="") {
+    ClearFromTemplate(completeOnSite:=false,t:="") {
 
         s := new Sketch
         if (completeOnSite == false) {
@@ -2783,7 +2783,10 @@ class CraigRPA {
             dbarray := {"N":north,"S":south,"W":west,"E":east}
             SplashImage,,,,Writing Dig Area
             for k,v in dbarray {
-                s.WriteTemplateText(t.form = "RA" ? "RA" k "Boundary.skt" : k "Boundary.skt",v)
+                if (t.form = "EP")
+                    s.WriteTemplateText(k . "Boundaryenvi.skt",v)
+                else
+                    s.WriteTemplateText(t.form = "RA" ? "RA" k "Boundary.skt" : k "Boundary.skt",v)
                 sleep 500
             }
 
@@ -2793,8 +2796,11 @@ class CraigRPA {
                 s.WriteTemplateText("currentpage.skt",currentpage)
             sleep 500
 
-            ;location of total pages differs for RA and RP
-            s.WriteTemplateText(t.form = "RA" ? "totalpages.skt" : "RPtotalpages.skt",totalpages)
+            ;location of total pages differs for RA and RP envi and beanfield do not have total pages on first sheet
+            if (t.form = "EP")
+                sleep 50
+            else
+                s.WriteTemplateText(t.form = "RA" ? "totalpages.skt" : "RPtotalpages.skt",totalpages)
             sleep 500
 
             ;write units only on first page
@@ -2802,15 +2808,22 @@ class CraigRPA {
                 s.WriteTemplateText("units.skt",units)
 
             sleep 500
-            s.LoadImage(t.GetClearStamp(clearreason),false)
+            if (t.form = "RP" || t.form = "RA")
+                s.LoadImage(t.GetClearStamp(clearreason),false)
+            else if (t.form = "EP")
+                s.LoadImage("envi clear.skt",false)
 
             ;date is only written on the first page
-            if (t.form = "RP")
+            if (t.form = "RP" || t.form = "EP")
                 s.WriteTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
             sleep 500
 
             ;writes in additional legend details / name / id depending on which form is current
-            s.LoadImage(t.form = "RA" ? "rogersaux.skt" : "catv primary.skt",false)
+            if (t.form = "RP" || t.form = "EP")
+                s.LoadImage("catv primary.skt",false)
+            else if (t.form = "RA")
+                s.LoadImage("rogersaux.skt",false)
+           
 
             SplashImage,,,,Saving image
             s.SaveImage(saveFileName)
@@ -2830,7 +2843,10 @@ class CraigRPA {
 
         ;MsgBox, Press Ok to write to timesheet
         SplashImage,,,,Writing to timesheet
-        t.WriteRogersClearUnitsToTimesheet(units,this.today)
+        if (t.form = "RP" || t.form = "RA")
+            t.WriteRogersClearUnitsToTimesheet(units,this.today)
+        else
+            addtotimesheet()
         t:="",s:=""
         SplashImage,Off
     }
@@ -2917,7 +2933,7 @@ class CraigRPA {
         IfMsgbox, Yes
         {
             completeOnSite := true
-            this.ClearRogersFromTemplate(completeOnSite,t)
+            this.ClearFromTemplate(completeOnSite,t)
             return
         }
         else
@@ -3344,6 +3360,8 @@ GetFormType()
             return "BA"
         if (Instr(this.stationcode,"APT"))
             return "AA"
+        if (Instr(this.stationcode,"ENV"))
+            return "EA"
         else
             throw Exception("Can't open form - no station code",1)
     }
@@ -3366,6 +3384,8 @@ GetFormType()
         {
             return "AP"
         }
+        else if (Instr(this.stationCode,"ENV"))
+            return "EP"
         else
         {
             throw Exception("Can't open form - no station code",1)
@@ -7782,7 +7802,7 @@ return
 
 parser()
 {
-	commands := {"?":"parserhelp","edit sketch":"focusTeldig","emergency":"emergency","grid":"changeGridSizeto16", "edit script": "editscr", "repl":"repl", "getmouse":"getmousepos", "tkt billing": "ticketBillingLookup", "qa": "gradeqa"}
+	commands := {"?":"parserhelp","edit sketch":"focusTeldig","emergency":"emergency","grid":"changeGridSizeto16", "edit script": "editscr", "repl":"repl", "getmouse":"getmousepos", "tkt billing": "ticketBillingLookup", "qa": "gradeqa", "magick": "imtest"}
 	command := strlower(InputBox(,"Enter String"))
 	if (command = "?") {
 		helpstr := ""
@@ -8677,18 +8697,25 @@ writeBellPrimClear()
 utilCount()
 {
 	CONTROLGET, TKLIST, LIST, col3,SysListView321, ahk_exe mobile.exe
-	if (errorlevel)
-		msgbox % "There was a problem"
+	if (errorlevel) {
+		msgbox % "Couldn't obtain ticket info"
+        return
+    }
 	oUtility := StrSplit(tklist,"`n")
-	belllist := [], roglist := []
+	belllist := [], roglist := [], beanfield :=[], envi := []
 	for i in oUtility
 	{
 		if (oUtility[i] == "BCGN01") or if (oUtility[i] == "BCGN02")
 			belllist.push(i)
 		else if (oUtility[i] == "ROGYRK01") or if (oUtility[i] == "ROGSIM01")
 			roglist.Push(i)
+        else if (oUtility[i] == "APTUM01")
+            beanfield.Push(i)
+        else if (oUtility[i] == "ENVIN01")
+            envi.Push(i)
+            
 	}
-	MsgBox % "You have " . belllist.length() . " Bell tickets and " . roglist.length() . " Rogers tickets left!"
+	MsgBox % "You have " . belllist.length() . " Bell tickets, " . roglist.length() . " Rogers tickets and " . beanfield.length() . " Beanfield tickets and " . envi.length() . " Envi tickets left"
 }
 
 sketchSearch()
@@ -8982,4 +9009,25 @@ getmousepos(byref x := 0,byref y := 0)
 {
 	mousegetpos,x,y
 	msgbox,% "X: " . x "`nY: " . y
+}
+
+imtest()
+{
+    commands := []
+    commands.Push("viewbox 0,0 700,700")
+    commands.Push("stroke black")
+    commands.Push("line 0,0 700,700")
+    cmdstring := ""
+    for idx,command in commands 
+    {
+        cmdstring .= command . "`n"
+    }
+    FileDelete, test.mvg
+    FileAppend, %cmdstring%, test.mvg
+    if ErrorLevel
+        MsgBox % "'test.mvg' could not be written'"
+    FileDelete, demo.png
+    RunWait, %comspec% /c magick mvg:test.mvg show:
+    if !(Fileexist("demo.png"))
+        MsgBox % "No output file created"
 }

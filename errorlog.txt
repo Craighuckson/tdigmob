@@ -919,3 +919,14 @@
 20220826085036 - Cannot access ChildPath Item #9 -> 4
 20220826145519 - Invalid IAccessible Object
 20220826145525 - Cannot access ChildPath Item #9 -> 4
+20220829135223 - Invalid IAccessible Object
+20220829135223 - Cannot access ChildPath Item #9 -> 4
+20220830130843 - Invalid IAccessible Object
+20220830130843 - Cannot access ChildPath Item #9 -> 4
+20220830182131 - "DoDefaultAction" Cmd Not Implemented
+20220830231140 - "DoDefaultAction" Cmd Not Implemented
+20220830231802 - "DoDefaultAction" Cmd Not Implemented
+20220830232217 - "DoDefaultAction" Cmd Not Implemented
+20220830232542 - "DoDefaultAction" Cmd Not Implemented
+20220830233044 - "DoDefaultAction" Cmd Not Implemented
+20220830233331 - "DoDefaultAction" Cmd Not Implemented
