@@ -1,4 +1,4 @@
-﻿ 
+﻿
 ;TELDIG MASTER SCRIPT;
 
 ;TODO - ADD APTUM TO TIMESHEET, UPDATE PYTHON TIMESHEET AS WELL
@@ -103,6 +103,7 @@ Menu("Mobile","Add","Load From Template","AFFromClearTemplate")
 Menu, Mobile, Add, Regular Sync, mobilesyncr
 Menu, mobile, Add, Reset Form&Var, resetformVar
 Menu,Mobile,Add, Grade &QA, gradeQA
+Menu,Mobile,Add, Autocomplete QA, AutoQA
 Menu,mobile, Add, View ticket count, utilCount
 Menu,mobile,Add, Search for Sketch, sketchSearch
     Menu,mobile,Add, Clear multiple, clearMulti
@@ -1874,7 +1875,7 @@ else
             Case "HSS": loadImage("B - horizontal st centre to centre.skt")
             Case "VSS": loadImage("B - vertical centre to centre.skt")
             Case "INT": loadImage("B - intersection.skt")
-            Case "Custom": openimagedialog()
+            Case "LD": insertEZDrawRP()
             Default:	MsgBox % "No valid option selected. Please load form manually!"
         }
         if landbase in N,S,E,W,H,V
@@ -2122,6 +2123,15 @@ else ;if using different boundaries
     ^f9::
         gradeQA()
     return
+
+    ^f11::
+        QA.Autocomplete()
+        return
+
+    autoQA()
+    {
+      QA.Autocomplete()
+    }
 
     gradeQA()
     {
@@ -2679,6 +2689,11 @@ Assert(a,b,params*)
     }
 }
 
+qaautofill()
+{
+
+}
+
 ;CLASS DEFINITIONS
 
 class Go360
@@ -2784,9 +2799,13 @@ class CraigRPA {
             SplashImage,,,,Writing Dig Area
             for k,v in dbarray {
                 if (t.form = "EP")
-                    s.WriteTemplateText(k . "Boundaryenvi.skt",v)
+                    s.WriteTemplateText(k . "Boundaryenvi.skt", v)
+                else if (t.form = "AP")
+                    s.WriteTemplateText(k . "boundaryapt.skt", v)
+                else if (t.form = "RA")
+                    s.WriteTemplateText(k . "raboundary.skt", v)
                 else
-                    s.WriteTemplateText(t.form = "RA" ? "RA" k "Boundary.skt" : k "Boundary.skt",v)
+                    s.WriteTemplateText(k . "boundary.skt", v)
                 sleep 500
             }
 
@@ -2797,7 +2816,7 @@ class CraigRPA {
             sleep 500
 
             ;location of total pages differs for RA and RP envi and beanfield do not have total pages on first sheet
-            if (t.form = "EP")
+            if (t.form = "EP" || t.form = "AP")
                 sleep 50
             else
                 s.WriteTemplateText(t.form = "RA" ? "totalpages.skt" : "RPtotalpages.skt",totalpages)
@@ -2812,18 +2831,24 @@ class CraigRPA {
                 s.LoadImage(t.GetClearStamp(clearreason),false)
             else if (t.form = "EP")
                 s.LoadImage("envi clear.skt",false)
+            else if (t.form = "AP")
+                s.LoadImage("aptumclear.skt",false)
 
             ;date is only written on the first page
-            if (t.form = "RP" || t.form = "EP")
+            if (t.form = "RP" || t.form = "EP" || t.form = "AP")
                 s.WriteTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
             sleep 500
 
             ;writes in additional legend details / name / id depending on which form is current
             if (t.form = "RP" || t.form = "EP")
                 s.LoadImage("catv primary.skt",false)
-            else if (t.form = "RA")
+            else if (t.form = "AP")
+                s.LoadImage("aptumprimary.skt",false)
+            else if (t.form = "AA")
+                s.LoadImage("aptumaux.skt",false)
+            else
                 s.LoadImage("rogersaux.skt",false)
-           
+
 
             SplashImage,,,,Saving image
             s.SaveImage(saveFileName)
@@ -2844,7 +2869,7 @@ class CraigRPA {
         ;MsgBox, Press Ok to write to timesheet
         SplashImage,,,,Writing to timesheet
         if (t.form = "RP" || t.form = "RA")
-            t.WriteRogersClearUnitsToTimesheet(units,this.today)
+            t.WriteClearUnitsToTimesheet(units,t.form)
         else
             addtotimesheet()
         t:="",s:=""
@@ -2978,9 +3003,14 @@ class QA {
     {
         inputbox,file,Write save file name
         QA.Start()
-	focussketchtool()
-	loadImageNG(A_MyDocuments . "\qayes.skt")
-	
+        focussketchtool()
+        loadImageNG(A_MyDocuments . "\qayes.skt")
+        jpgSave(file)
+        sleep 700
+        ControlClick("OK","ahk_exe sketchtoolapplication.exe")
+        focusTeldig()
+
+
 
     }
 
@@ -3232,195 +3262,194 @@ class Ticket
     HasData()
     {
         if (this.street)
-        {
-        return true
+            return true
+        Else
+            return false
     }
-    Else
-        return false
-}
 
-GetClearStamp(clearreason)
-{
-    if (clearreason = 1)
-        return "rogclear.skt"
-    else if (clearreason = 2)
-        return "ftth.skt"
-    else if (clearreason = 3)
-        return "exclusion agreement r.skt"
-    else if (clearreason = 4)
-        return "hvclear.skt"
-}
-
-GetDataFromOneCallInfo()
-{
-    if (this.HasData() = false) {
-        Mobile.SelectLocationTab()
-        ControlGet, number, Line,1, edit2, ahk_exe Mobile.exe
-        ControlGet, street, line,1, Edit6, ahk_exe Mobile.exe
-        ControlGet, intersection, line,1,edit10, ahk_exe mobile.exe
-        ControlGet, intersection2, line,1,edit12, ahk_exe mobile.exe
-        ControlGet, stationCode, line,1, edit9, ahk_exe mobile.exe
-        ControlGetText, digInfo, edit22, ahk_exe mobile.exe
-        controlget, ticketNumber, line, 1, edit1, ahk_exe mobile.exe
-        controlget, town, line, 1, edit13, ahk_exe mobile.exe
-        ControlGet, remarks, line, 1, Edit23, % MOBILEWIN
-        this.number := number
-        this.street := CraigRpa.FixStreetName(street)
-        this.intersection := CraigRPA.FixStreetName(intersection)
-        this.intersection2 := CraigRPA.FixStreetName(intersection2)
-        this.stationCode := stationCode
-        this.ticketNumber := ticketNumber
-        this.digInfo := digInfo
-        this.remarks := remarks
-        this.town := CraigRPA.FixTownName(town)
-        this.workType := this.GetWorkType()
-        return this
-    }
-}
-
-GetClearData()
-{
-    static currentpage,totalpages,units,digareatype,clearreason,editnorth,editsouth,editwest,editeast,savefile
-    Gui, clform:Add, Text, x22 y20 w70 h20 , Current Page:
-    Gui, clform:Add, Text, x22 y50 w70 h20 , Total Pages:
-    Gui, clform:Add, Text, x22 y80 w70 h20 , Units:
-    Gui, clform:Add, Edit, x102 y20 w80 h20 vcurrentpage, 1
-    Gui, clform:Add, Edit, x102 y50 w80 h20 vtotalpages, 1
-    Gui, clform:Add, Edit, x102 y80 w80 h20 vunits, 1C
-    Gui, clform:Add, Text, x22 y110 w80 h20 , Dig Area Type:
-    Gui, clform:Add, Radio,checked x102 y110 w90 h20 Group vdigareatype, Manual
-    Gui, clform:Add, Radio,gwatchdaradio x202 y110 w110 h20 , Private Property
-    Gui, clform:Add, Text, x22 y140 w80 h20, Clear Reason:
-    Gui, clform:Add, Radio,checked x102 y140 w110 h20 Group vclearreason, Regular
-    Gui, clform:Add, Radio, x202 y140 w110 h20,FTTH
-    Gui, clform:Add, Radio,x322 y140 w110 h20,Fibre Only
-    Gui, clform:Add, Radio,x422 y140 w110 h20,Hydro Vac
-    Gui, clform:Add, Text, x22 y170 w70 h30 , North:
-    Gui, clform:Add, Text, x22 y210 w70 h30 , South:
-    Gui, clform:Add, Text, x22 y250 w70 h30 , West:
-    Gui, clform:Add, Text, x22 y290 w70 h30 , East:
-    Gui, clform:Add, Edit,Uppercase x102 y170 w350 h20 veditnorth,
-    Gui, clform:Add, Edit, Uppercase x102 y210 w350 h20 veditsouth,
-    Gui, clform:Add, Edit, Uppercase x102 y250 w350 h20 veditwest,
-    Gui, clform:Add, Edit, Uppercase x102 y290 w350 h20 vediteast,
-    Gui, clform:Add, Text, x22 y330 w80 h20 , Save File Name
-    Gui, clform:Add, Edit, Uppercase x102 y330 w350 h20 vsaveFile,
-    Gui, clform:Add, Button, x187 y360 w100 h30 , Submit
-    Gui, clform:Show,x643 y8 w600 h421, Clear Locate Form Creator
-    WinWaitClose, Clear Locate Form Creator
-    cleardata := []
-    cleardata.Push(currentpage)
-    cleardata.Push(totalpages)
-    cleardata.Push(units)
-    cleardata.Push(clearreason)
-    cleardata.Push(editnorth)
-    cleardata.Push(editsouth)
-    cleardata.Push(editwest)
-    cleardata.Push(editeast)
-    cleardata.Push(saveFile)
-    return cleardata
-
-    watchDARadio:
-        north := "NPL " . this.number . " " . this.street
-        south := "SPL " this.number " " this.street
-        west := "WPL " this.number " " this.street
-        east := "EPL " this.number " " this.street
-        GuiControl, clform:Text, Edit4,%north%
-        GuiControl, clform:Text, Edit5,%south%
-        GuiControl, clform:Text, Edit6,%west%
-        GuiControl, clform:Text, Edit7,%east%
-        editnorth := north
-        editsouth := south
-        editwest := west
-        editeast := east
-    return
-
-}
-
-ForceAuxilliary()
-;returns string representing auxilliary for particular utility
-{
-    if (this.stationCode = "ROGYRK01"){
-    return "RA"
-}
-else if (this.stationCode = "ROGSIM01"){
-    return "RA"
-}
-else{
-    return "BA"
-}
-
-}
-
-;Determines which form will be used for drawing, returns Str
-GetFormType()
-{
-    if !(this.stationcode)
+    GetClearStamp(clearreason)
     {
-        Throw Exception("No object data",-1)
+        if (clearreason = 1)
+            return "rogclear.skt"
+        else if (clearreason = 2)
+            return "ftth.skt"
+        else if (clearreason = 3)
+            return "exclusion agreement r.skt"
+        else if (clearreason = 4)
+            return "hvclear.skt"
     }
 
-    if (this.form)
+    GetDataFromOneCallInfo()
     {
-        if (Instr(this.stationcode,"ROG"))
+        if (this.HasData() = false) {
+            Mobile.SelectLocationTab()
+            ControlGet, number, Line,1, edit2, ahk_exe Mobile.exe
+            ControlGet, street, line,1, Edit6, ahk_exe Mobile.exe
+            ControlGet, intersection, line,1,edit10, ahk_exe mobile.exe
+            ControlGet, intersection2, line,1,edit12, ahk_exe mobile.exe
+            ControlGet, stationCode, line,1, edit9, ahk_exe mobile.exe
+            ControlGetText, digInfo, edit22, ahk_exe mobile.exe
+            controlget, ticketNumber, line, 1, edit1, ahk_exe mobile.exe
+            controlget, town, line, 1, edit13, ahk_exe mobile.exe
+            ControlGet, remarks, line, 1, Edit23, % MOBILEWIN
+            this.number := number
+            this.street := CraigRpa.FixStreetName(street)
+            this.intersection := CraigRPA.FixStreetName(intersection)
+            this.intersection2 := CraigRPA.FixStreetName(intersection2)
+            this.stationCode := stationCode
+            this.ticketNumber := ticketNumber
+            this.digInfo := digInfo
+            this.remarks := remarks
+            this.town := CraigRPA.FixTownName(town)
+            this.workType := this.GetWorkType()
+            return this
+        }
+    }
+
+    GetClearData()
+    {
+        static currentpage,totalpages,units,digareatype,clearreason,editnorth,editsouth,editwest,editeast,savefile
+        Gui, clform:Add, Text, x22 y20 w70 h20 , Current Page:
+        Gui, clform:Add, Text, x22 y50 w70 h20 , Total Pages:
+        Gui, clform:Add, Text, x22 y80 w70 h20 , Units:
+        Gui, clform:Add, Edit, x102 y20 w80 h20 vcurrentpage, 1
+        Gui, clform:Add, Edit, x102 y50 w80 h20 vtotalpages, 1
+        Gui, clform:Add, Edit, x102 y80 w80 h20 vunits, 1C
+        Gui, clform:Add, Text, x22 y110 w80 h20 , Dig Area Type:
+        Gui, clform:Add, Radio,checked x102 y110 w90 h20 Group vdigareatype, Manual
+        Gui, clform:Add, Radio,gwatchdaradio x202 y110 w110 h20 , Private Property
+        Gui, clform:Add, Text, x22 y140 w80 h20, Clear Reason:
+        Gui, clform:Add, Radio,checked x102 y140 w110 h20 Group vclearreason, Regular
+        Gui, clform:Add, Radio, x202 y140 w110 h20,FTTH
+        Gui, clform:Add, Radio,x322 y140 w110 h20,Fibre Only
+        Gui, clform:Add, Radio,x422 y140 w110 h20,Hydro Vac
+        Gui, clform:Add, Text, x22 y170 w70 h30 , North:
+        Gui, clform:Add, Text, x22 y210 w70 h30 , South:
+        Gui, clform:Add, Text, x22 y250 w70 h30 , West:
+        Gui, clform:Add, Text, x22 y290 w70 h30 , East:
+        Gui, clform:Add, Edit,Uppercase x102 y170 w350 h20 veditnorth,
+        Gui, clform:Add, Edit, Uppercase x102 y210 w350 h20 veditsouth,
+        Gui, clform:Add, Edit, Uppercase x102 y250 w350 h20 veditwest,
+        Gui, clform:Add, Edit, Uppercase x102 y290 w350 h20 vediteast,
+        Gui, clform:Add, Text, x22 y330 w80 h20 , Save File Name
+        Gui, clform:Add, Edit, Uppercase x102 y330 w350 h20 vsaveFile,
+        Gui, clform:Add, Button, x187 y360 w100 h30 , Submit
+        Gui, clform:Show,x643 y8 w600 h421, Clear Locate Form Creator
+        WinWaitClose, Clear Locate Form Creator
+        cleardata := []
+        cleardata.Push(currentpage)
+        cleardata.Push(totalpages)
+        cleardata.Push(units)
+        cleardata.Push(clearreason)
+        cleardata.Push(editnorth)
+        cleardata.Push(editsouth)
+        cleardata.Push(editwest)
+        cleardata.Push(editeast)
+        cleardata.Push(saveFile)
+        return cleardata
+
+        watchDARadio:
+            north := "NPL " . this.number . " " . this.street
+            south := "SPL " this.number " " this.street
+            west := "WPL " this.number " " this.street
+            east := "EPL " this.number " " this.street
+            GuiControl, clform:Text, Edit4,%north%
+            GuiControl, clform:Text, Edit5,%south%
+            GuiControl, clform:Text, Edit6,%west%
+            GuiControl, clform:Text, Edit7,%east%
+            editnorth := north
+            editsouth := south
+            editwest := west
+            editeast := east
+        return
+
+    }
+
+    ;returns string representing auxilliary for particular utility
+    ForceAuxilliary()
+    
+    {
+        if (this.stationCode = "ROGYRK01")
             return "RA"
-        if (Instr(this.stationcode,"BC"))
-            return "BA"
-        if (Instr(this.stationcode,"BA"))
-            return "BA"
-        if (Instr(this.stationcode,"APT"))
-            return "AA"
-        if (Instr(this.stationcode,"ENV"))
-            return "EA"
+        else if (this.stationCode = "ROGSIM01")
+            return "RA"
         else
-            throw Exception("Can't open form - no station code",1)
+            return "BA"
     }
-    else
+
+
+    ;Determines which form will be used for drawing, returns Str
+    GetFormType()
     {
+        if !(this.stationcode)
+        {
+            Throw Exception("No object data",-1)
+        }
 
-        if (InStr(this.stationcode,"ROG"))
+        if (this.form)
         {
-            return "RP"
+            if (Instr(this.stationcode,"ROG"))
+                return "RA"
+            if (Instr(this.stationcode,"BC"))
+                return "BA"
+            if (Instr(this.stationcode,"BA"))
+                return "BA"
+            if (Instr(this.stationcode,"APT"))
+                return "AA"
+            if (Instr(this.stationcode,"ENV"))
+                return "EA"
+            else
+                throw Exception("Can't open form - no station code",1)
         }
-        else if (Instr(this.stationCode,"BC"))
-        {
-            return "BP"
-        }
-        else if(Instr(this.stationCode,"BA"))
-        {
-            return "BP"
-        }
-        else if(Instr(this.stationCode,"APT"))
-        {
-            return "AP"
-        }
-        else if (Instr(this.stationCode,"ENV"))
-            return "EP"
         else
         {
-            throw Exception("Can't open form - no station code",1)
+            if (InStr(this.stationcode,"ROG"))
+                return "RP"
+            
+            else if (Instr(this.stationCode,"BC"))
+                return "BP"
+            
+            else if(Instr(this.stationCode,"BA"))
+                return "BP"
+            
+            else if(Instr(this.stationCode,"APT"))
+                return "AP"
+            
+            else if (Instr(this.stationCode,"ENV"))
+                return "EP"
+            
+            else
+                throw Exception("Can't open form - no station code",1)
+            
         }
-
     }
 
-}
+    WriteClearUnitsToTimesheet(units,form) 
+    {
+        today:= A_DD . " " . A_MM . " " . A_YYYY
+        SplashImage,,,,Adding Units to Timesheet
+        switch form
+        {
+            case "RP","RA":
+                timesheetEntry := this.ticketnumber "," this.number " " this.street ",," units ",,,`n"
+            case "AP","AA":
+                timesheetEntry := this.ticketnumber "," this.street ",,,,,APTUM " . units . "`n"
+            case "EP","EA":
+                timesheetEntry := this.ticketnumber "," this.street ",,,,,ENVI " . units . "`n"
+        }
+        timesheetLocation := "C:\Users\Cr\timesheet" today ".txt"
+        FileAppend, %timesheetEntry%, %timesheetLocation%
+        SplashImage, Off
+        if (ErrorLevel) 
+            msgbox, No entry added
+            
+        }    
+    }
+    
 
-WriteRogersClearUnitsToTimesheet(units) {
-    today:= A_DD . " " . A_MM . " " . A_YYYY
-    SplashImage,,,,Adding Rogers Units to Timesheet
-    timesheetEntry := this.ticketnumber "," this.number " " this.street ",," units ",,,`n"
-    timesheetLocation := "C:\Users\Cr\timesheet" today ".txt"
-    FileAppend, %timesheetEntry%, %timesheetLocation%
-    SplashImage, Off
-    if (ErrorLevel) {
-        msgbox, No entry added
-    return
-
-}
 ;msgbox, Wrote:`n%timesheetEntry%`nto %timesheetLocation%
 
-}
-}
+
 
 class Sketch extends Sketchtool
 {
@@ -3429,51 +3458,52 @@ class Sketch extends Sketchtool
     }
 
     ;returns an integer representing digboundary
-    GetDigType(){
+    GetDigType()
+    {
     return this.digtype := GetDigBoundaries()
-}
+    }
 
-;returns a digarea object(north,south,east,west)
-getDigArea(){
-    return this.digarea := getRegDA()
-}
+    ;returns a digarea object(north,south,east,west)
+    getDigArea(){
+        return this.digarea := getRegDA()
+    }
 
-GetForm(Ticket){
-    return Ticket.GetFormType()
-}
+    GetForm(Ticket){
+        return Ticket.GetFormType()
+    }
 
-;Base routine to start a new sketch form
-Initialize(Ticket)
-{
-    Ticket.GetDataFromOneCallInfo()
-    Mobile.SelectDrawingsTab()
-    Mobile.SelectNewForm()
-    Mobile.SelectDrawingForm(Ticket.GetFormType())
-    SketchTool.WaitUntilSketchToolReady()
-}
+    ;Base routine to start a new sketch form
+    Initialize(Ticket)
+    {
+        Ticket.GetDataFromOneCallInfo()
+        Mobile.SelectDrawingsTab()
+        Mobile.SelectNewForm()
+        Mobile.SelectDrawingForm(Ticket.GetFormType())
+        SketchTool.WaitUntilSketchToolReady()
+    }
 
-;writes dig area to sketch
-putDigArea(form){
+    ;writes dig area to sketch
+    putDigArea(form){
 
-		/*
-		accepts a dig area object(north, south, west, east)
-    */
-    setTemplateText(form = "RA" ? "RANBoundary.skt":"NBoundary.skt",this.digarea.north)
-    setTemplateText(form = "RA" ? "RASBoundary.skt":"SBoundary.skt",this.digarea.south)
-    setTemplateText(form = "RA" ? "RAWBoundary.skt":"WBoundary.skt",this.digarea.west)
-    setTemplateText(form = "RA" ? "RAEBoundary.skt":"EBoundary.skt",this.digarea.east)
-}
+            /*
+            accepts a dig area object(north, south, west, east)
+        */
+        setTemplateText(form = "RA" ? "RANBoundary.skt":"NBoundary.skt",this.digarea.north)
+        setTemplateText(form = "RA" ? "RASBoundary.skt":"SBoundary.skt",this.digarea.south)
+        setTemplateText(form = "RA" ? "RAWBoundary.skt":"WBoundary.skt",this.digarea.west)
+        setTemplateText(form = "RA" ? "RAEBoundary.skt":"EBoundary.skt",this.digarea.east)
+    }
 
-WriteTemplateText(template, text)
-{
-    SketchTool.LoadImage(template,false)
-    Send("{F2}")
-    Sleep(200)
-    SendInput(text)
-    Sleep(50)
-    Send("{Enter}")
-    Sleep(200)
-}
+    WriteTemplateText(template, text)
+    {
+        SketchTool.LoadImage(template,false)
+        Send("{F2}")
+        Sleep(200)
+        SendInput(text)
+        Sleep(50)
+        Send("{Enter}")
+        Sleep(200)
+    }
 
 }
 
@@ -5245,9 +5275,10 @@ return
 return
 #ifwinactive
 
-jpgSave()
+jpgSave(filename := "")
 {
-    filename := inputbox("File name", "Enter save file name for jpeg")
+    if !(filename)
+      filename := inputbox("File name", "Enter save file name for jpeg")
     if ErrorLevel
         return
     saveFile()
@@ -5594,7 +5625,7 @@ ST_SAVEEXIT()
         {
             loadImageNG("rogerspaint.skt")
         }
-        setTemplateText("units.skt",aptumunits)
+        setTemplateText("units.skt",aptumunits[1] . aptumunits[2])
         setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
         setTemplateText("RPtotalpages.skt",totalpages)
         Sleep 100
@@ -5617,7 +5648,7 @@ ST_SAVEEXIT()
     ;Msgbox, 4132, Page Number, Insert page numbers?
     ;ifMsgBox, Yes
     ;{
-    IF (FORM = "RP") || (form = "EP")
+    IF (FORM = "RP" || form = "EP" || form = "AP")
         wait()
     else if (form = "BP")
         writeRPPageNumber()
@@ -6862,14 +6893,15 @@ getLocationMobileList()
     address.town := TKT_ARRAY[9]
     address.street := TKT_ARRAY[6]
     address.NUMBER := TKT_ARRAY[5]
-    address.intersection := TKT_ARRAY[14]
+    address.intersection := TKT_ARRAY[16]
 return address
 }
 
 ; regex function adapted for streets and trips data
 fixstreetName1() {
     address := getLocationMobileList()
-    address.street := RegExReplace(address.street,"^ |^\d+ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*")
+    address.street := StrReplace(address.street,",")
+    address.street := RegExReplace(address.street,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*")
     address.intersection:= RegExReplace(address.intersection,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*")
     address.town:= RegExReplace(address.town,"\,.*")
 return address
@@ -8638,10 +8670,16 @@ return
 ; SKETCH_HEIGHT := 640
 
 ^F5::
-insertEZDrawRP:
-drawElement(FileSelectFile("C:\Users\Cr\Documents\"),189,409,757,761)
-clickSelection()
+insertEZDrawRP()
 return
+
+
+insertEZDrawRP()
+{
+    drawElement(FileSelectFile("C:\Users\Cr\Documents\"),189,409,757,761)
+    clickSelection()
+}
+
 
 insertEZDrawBA:
 drawElement(FileSelectFile("C:\Users\Cr\Documents\"),115,496)
@@ -8723,7 +8761,7 @@ utilCount()
             beanfield.Push(i)
         else if (oUtility[i] == "ENVIN01")
             envi.Push(i)
-            
+
 	}
 	MsgBox % "You have " . belllist.length() . " Bell tickets, " . roglist.length() . " Rogers tickets and " . beanfield.length() . " Beanfield tickets and " . envi.length() . " Envi tickets left"
 }
@@ -9028,7 +9066,7 @@ imtest()
     commands.Push("stroke black")
     commands.Push("line 0,0 700,700")
     cmdstring := ""
-    for idx,command in commands 
+    for idx,command in commands
     {
         cmdstring .= command . "`n"
     }
