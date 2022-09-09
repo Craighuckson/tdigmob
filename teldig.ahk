@@ -5538,24 +5538,10 @@ ST_SAVEEXIT()
 {
     global
     util := getStnCodeSuffix()
-    ;~ if (stationcode = "BCGN01")
-    ;~ util := "B"
-    ;~ else if (stationcode = "BCGN02")
-    ;~ util := "B"
-    ;~ else if (stationcode = "ROGYRK01")
-    ;~ util := "R"
-    ;~ else if (stationcode = "ROGSIM01")
-    ;~ util := "R"
-    ;~ else if (stationcode = "ENVIN01")
-    ;~ util := "ENVI"
-    ;~ else
-    ;~ util := "APT"
     MsgBox,4,Save,Save Sketch?
     focusSketchTool()
     IfMsgBox, Yes
     {
-        ;saveSketch := 1
-        ;move to end
         saveFile()
         WAITDIALOGBOX()
         IF ERRORLEVEL
@@ -5602,7 +5588,7 @@ ST_SAVEEXIT()
     (InStr(enviunits[1],"M")) ? loadImageNG("rogerspaint.skt") :
         setTemplateText("units.skt",enviunits[1] . enviunits[2])
         setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
-        setTemplateText("RPtotalpages.skt",totalpages)
+        setTemplateText("RPtotalpages.skt",currentpage . "/" . totalpages)
 
     Case "RA" :
         loadImage("rogersaux.skt")
@@ -5617,10 +5603,12 @@ ST_SAVEEXIT()
         }
         setTemplateText("units.skt",aptumunits[1] . aptumunits[2])
         setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
-        setTemplateText("RPtotalpages.skt",totalpages)
+        setTemplateText("RPtotalpages.skt",currentpage . "/" . totalpages)
         Sleep 100
+
     Case "AA" :
         loadImage("aptumaux.skt")
+
     Case "EA":
         loadImage("envi auxilliary.skt")
     }
