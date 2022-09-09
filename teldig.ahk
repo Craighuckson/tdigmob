@@ -26,6 +26,7 @@ ListLines, On
 ;#Include multiviewer.ahk
 #Include C:\Users\Cr\teldig\vpn.ahk
 #Include C:\Users\Cr\teldig\aptumlookup.ahk
+#Include <chrome>
 BlockInput, SendAndMouse
 SetControlDelay, 50
 Menu, Tray, Icon, C:\Users\Cr\teldig\tico.png
@@ -1908,19 +1909,20 @@ writeDigArea()
 {
     global
     digboundary := getDigBoundaries() ; asks for INT representing dig boundaries
+    
     if (digboundary = "") ;no entry
     {
         getRegDA() ; asks line by line for dig box - returns north south east west
         wait()
-        if (form = "RA") ;this might not need to be here TODO: check if can do ternary below since all that needs to change is boundary.skt etc
+        
+        focusSketchTool()
+        if (form = "RA" || form = "AA" || form || "EA") ;this might not need to be here TODO: check if can do ternary below since all that needs to change is boundary.skt etc
         {
             writeRAdigarea()
             clickselection()
             return
         }
-        ;setTemplateText -
-        focusSketchTool()
-        if (form = "AP")
+        else if (form = "AP")
         {
             digarray := {(north):"Nboundaryapt.skt",(south):"sboundaryapt.skt",(west):"wboundaryapt.skt"
             ,(east):"eboundaryapt.skt"}
@@ -1935,12 +1937,14 @@ writeDigArea()
             digarray := {(north):"Nboundary.skt",(south):"sboundary.skt",(west):"wboundary.skt"
             ,(east):"eboundary.skt"}
         }
+        
         for k,v in digarray
         {
             setTemplateText(v,k)
         }
         digarray :=
     }
+    
     else ;if using different boundaries
     {
         switch digboundary
@@ -3005,7 +3009,7 @@ class QA {
         QA.Start()
         focussketchtool()
         loadImageNG(A_MyDocuments . "\qayes.skt")
-        jpgSave(file)
+        picSave(file)
         sleep 700
         ControlClick("OK","ahk_exe sketchtoolapplication.exe")
         focusTeldig()
@@ -3050,7 +3054,7 @@ class QA {
 
     SaveMarkUp()
     {
-        jpgSave()
+        picSave()
     }
 
     Start()
@@ -3367,7 +3371,7 @@ class Ticket
 
     ;returns string representing auxilliary for particular utility
     ForceAuxilliary()
-    
+
     {
         if (this.stationCode = "ROGYRK01")
             return "RA"
@@ -3405,26 +3409,26 @@ class Ticket
         {
             if (InStr(this.stationcode,"ROG"))
                 return "RP"
-            
+
             else if (Instr(this.stationCode,"BC"))
                 return "BP"
-            
+
             else if(Instr(this.stationCode,"BA"))
                 return "BP"
-            
+
             else if(Instr(this.stationCode,"APT"))
                 return "AP"
-            
+
             else if (Instr(this.stationCode,"ENV"))
                 return "EP"
-            
+
             else
                 throw Exception("Can't open form - no station code",1)
-            
+
         }
     }
 
-    WriteClearUnitsToTimesheet(units,form) 
+    WriteClearUnitsToTimesheet(units,form)
     {
         today:= A_DD . " " . A_MM . " " . A_YYYY
         SplashImage,,,,Adding Units to Timesheet
@@ -3440,12 +3444,12 @@ class Ticket
         timesheetLocation := "C:\Users\Cr\timesheet" today ".txt"
         FileAppend, %timesheetEntry%, %timesheetLocation%
         SplashImage, Off
-        if (ErrorLevel) 
+        if (ErrorLevel)
             msgbox, No entry added
-            
-        }    
+
+        }
     }
-    
+
 
 ;msgbox, Wrote:`n%timesheetEntry%`nto %timesheetLocation%
 
@@ -5271,20 +5275,23 @@ return
 ; HOTKEY CTRL ALT X FOR JPG SAVE
 #ifwinactive Tel ahk_exe SketchToolApplication.exe
 !^X::
-    jpgSave()
+    picSave()
 return
 #ifwinactive
 
-jpgSave(filename := "")
+picSave(filename := "", type := ".jpg")
 {
-    if !(filename)
+    if (filename == "")
       filename := inputbox("File name", "Enter save file name for jpeg")
     if ErrorLevel
         return
     saveFile()
     waitDialogBox()
     Send, % "C:\Users\Cr\Desktop\qa\" . filename
-    Send, !tj{enter} ; changes file type to save to jpeg
+    if (type = ".jpg")
+      Send, !tj{enter} ; changes file type to save to jpeg
+    elif (type == ".bmp")
+      Send, !tb{enter}
 }
 
 ;WIN NUMPAD INSERT for ok in auxilliary, SAVES FIRST and prompts page numbers now
@@ -7345,22 +7352,13 @@ recordsLookup()
 	global town
 	global street
 	global intersection
-		;~ WinActivate, AHK_EXE mobile.exe
-		;~ clickLocationTab()
-		;~ getticketdata(number,street,intersection,intersection2,stationcode, diginfo, ticketNumber,town,ticketdata)
-		;~ fixstreetName()
-		;~ IF (stationCode = "BCGN01") or if (stationcode = "BCGN02")
-			;~ bellsearch2()
-		;~ IF (stationCode = "ROGYRK01") or if (stationcode = "ROGSIM01")
-			;~ rogersLookup2()
-		;~ IF (stationCode = "CDST01")
-			;~ GOSUB, CDS_LOOKUP
-	WINACTIVATE, AHK_EXE mobile.EXE
+  focusTeldig()
 	clickLocationTab()
 	getTicketData()
 	sleep 200
 	clickDigInfoTab()
 	ControlGet,didata, List,, SysListView321, ahk_exe mobile.exe
+
 	Loop, Parse, didata, `n
 	{
 		if instr(A_LoopField, "LATITUDE")
@@ -7372,55 +7370,49 @@ recordsLookup()
 			long := substr(A_LoopField, 13)
 		}
 	}
-	;msgbox % "(" lat "," long ")"
-	if (stationCode = "ROGYRK01") || if (stationCode = "ROGSIM01")
 
+	if (stationCode = "ROGYRK01") || if (stationCode = "ROGSIM01")
 	{
-		;~ vpnstatus := isvpn()
-		;~ loop
-		;~ {
-			;~ if (vpnstatus = false)
-			;~ {
-				;~ vpnToggle()
-				;~ vpnstatus := true
-			;~ }
-			;~ else break
-		;~ }
-		;~ WinClose, ahk_exe vpnui.exe
 		if !WinExist("ahk_exe chrome.exe")
 		{
 			Run, C:\Program Files\Google\Chrome\Application\chrome.exe  --remote-debugging-port=9222
 		}
+
 		WinActivate, ahk_exe chrome.exe
 		WinWaitActive, ahk_exe chrome.exe
-		try {
-			if !driver
-				driver := ChromeGet()
-			currenturl := driver.Url
-			if (currenturl != "http://10.13.218.247/go360rogersviewer/map.jsp?m=0&isIE=-1&isTOUCH=0&lang=EN#")
-			{
-				driver.Get("http://10.13.218.247/go360rogersviewer/")
-				driver.findElementbyId("username").SendKeys("craig.huckson")
-				driver.findElementbyId("password").SendKeys("locates1")
-				driver.findElementbyxpath("/html/body/div/form/div[3]/div[2]/div/button").click()
-				sleep 1000
-			}
-			driver.findElementbyId("form_marqueezoom_btn").click() ; clicks marquee zoom to clear stuff
-			if !(driver.findElementbyId("id_search_div").IsDisplayed())
-				driver.findElementbyId("form_btn").click() ;search button
 
-			driver.findElementbyxpath("//*[@id='tab_featureform']/div[1]/div[3]/ul/li[1]/a/span[1]").click()
-			driver.FindElementbyId("longitudeSearchInput").clear()
-			driver.findElementbyId("longitudeSearchInput").SendKeys(long)
-			driver.findElementbyId("latitudeSearchInput").clear()
-			driver.findElementbyId("latitudeSearchInput").SendKeys(lat)
-			driver.findElementbyCss("#id_search_div > div:nth-child(1) > table > tbody > tr:nth-child(8) > td:nth-child(4) > a").click()
-			driver.findElementbyCss("body > div:nth-child(7) > div.panel-header.panel-header-noborder.window-header > div.panel-tool > a.panel-tool-close").click()
+    try
+    {
+      if !driver
+			driver := ChromeGet()
+    }
+
+    catch
+    {
+      msgbox % "Couldn't get ChromeDriver instance"
+      return
+    }
+
+    currenturl := driver.Url
+		if (currenturl != "http://10.13.218.247/go360rogersviewer/map.jsp?m=0&isIE=-1&isTOUCH=0&lang=EN#")
+		{
+			driver.Get("http://10.13.218.247/go360rogersviewer/")
+			driver.findElementbyId("username").SendKeys("craig.huckson")
+			driver.findElementbyId("password").SendKeys("locates1")
+			driver.findElementbyxpath("/html/body/div/form/div[3]/div[2]/div/button").click()
+			sleep 1000
 		}
-		catch e {
-			MsgBox % "The lookup failed due to an error (" e.Message "," e.Extra ", line " e.Line ")"
-			return
-		}
+
+		driver.findElementbyId("form_marqueezoom_btn").click() ; clicks marquee zoom to clear stuff
+		if !(driver.findElementbyId("id_search_div").IsDisplayed())
+			driver.findElementbyId("form_btn").click() ;search button
+		driver.findElementbyxpath("//*[@id='tab_featureform']/div[1]/div[3]/ul/li[1]/a/span[1]").click()
+		driver.FindElementbyId("longitudeSearchInput").clear()
+		driver.findElementbyId("longitudeSearchInput").SendKeys(long)
+		driver.findElementbyId("latitudeSearchInput").clear()
+		driver.findElementbyId("latitudeSearchInput").SendKeys(lat)
+		driver.findElementbyCss("#id_search_div > div:nth-child(1) > table > tbody > tr:nth-child(8) > td:nth-child(4) > a").click()
+    driver.findElementbyCss("body > div:nth-child(7) > div.panel-header.panel-header-noborder.window-header > div.panel-tool > a.panel-tool-close").click()
 	}
 
 	else if (stationCode "BCGN01") || if (stationCode = "BCGN02")
@@ -9059,23 +9051,8 @@ getmousepos(byref x := 0,byref y := 0)
 	msgbox,% "X: " . x "`nY: " . y
 }
 
-imtest()
+#f11::
+save_bitmap()
 {
-    commands := []
-    commands.Push("viewbox 0,0 700,700")
-    commands.Push("stroke black")
-    commands.Push("line 0,0 700,700")
-    cmdstring := ""
-    for idx,command in commands
-    {
-        cmdstring .= command . "`n"
-    }
-    FileDelete, test.mvg
-    FileAppend, %cmdstring%, test.mvg
-    if ErrorLevel
-        MsgBox % "'test.mvg' could not be written'"
-    FileDelete, demo.png
-    RunWait, %comspec% /c magick mvg:test.mvg show:
-    if !(Fileexist("demo.png"))
-        MsgBox % "No output file created"
+  picSave(,".bmp")
 }
