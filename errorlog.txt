@@ -930,3 +930,10 @@
 20220830232542 - "DoDefaultAction" Cmd Not Implemented
 20220830233044 - "DoDefaultAction" Cmd Not Implemented
 20220830233331 - "DoDefaultAction" Cmd Not Implemented
+20220906105436 - Invalid IAccessible Object
+20220906105436 - Cannot access ChildPath Item #9 -> 4
+20220906105438 - Invalid IAccessible Object
+20220906105438 - Cannot access ChildPath Item #9 -> 4
+20220907155505 - Cannot access ChildPath Item #2 -> 1
+20220908133254 - Invalid IAccessible Object
+20220908133254 - Cannot access ChildPath Item #9 -> 4

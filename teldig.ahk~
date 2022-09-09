@@ -1711,7 +1711,7 @@ sketchAutoFill()
 				bellPrimaryAutofill()
 				return
 			}
-			
+
 			else
 			{
 				bellPrimaryAutofill()
@@ -1878,7 +1878,7 @@ setCustomDigArea(digarray)
 
 ;DIG AREA
 ;this function needs cleanup
-writeDigArea() 
+writeDigArea()
 {
 	global
 	digboundary := getDigBoundaries() ; asks for INT representing dig boundaries
@@ -2642,7 +2642,7 @@ class Go360
 class CraigRPA {
 
 	today:= A_DD . " " . A_MM . " " . A_YYYY
-	
+
 	__ClearTemplateExists(Ticket)
 	{
 		if !(FileExist(A_MyDocuments . "\" . Ticket.ticketnumber . "*.*")) {
@@ -2652,7 +2652,7 @@ class CraigRPA {
 		}
 		return True
 	}
-	
+
 	__FirstPageExists(Ticket)
 	{
 		ticketnumber := Ticket.ticketnumber
@@ -2888,7 +2888,7 @@ class QA {
 
 	SaveMarkUp()
 	{
-		jpgSave()
+		picSave()
 	}
 
 	Start()
@@ -4231,7 +4231,7 @@ loadImageNG(x) ; loads template without ungrouping
 	openimagedialog()
 	waitdialogbox()
 	SendInput %x%
-	
+
 	Sleep 50
 
 	Send,{enter}
@@ -5079,11 +5079,11 @@ return
 ; HOTKEY CTRL ALT X FOR JPG SAVE
 #ifwinactive Tel ahk_exe SketchToolApplication.exe
 !^X::
-	jpgSave()
+	picSave()
 	return
 #ifwinactive
 
-jpgSave()
+picSave()
 {
 	filename := inputbox("File name", "Enter save file name for jpeg")
 	if ErrorLevel
@@ -5399,10 +5399,10 @@ ST_SAVEEXIT()
 	{
 		Case "BP" :
 		loadImage("bell primary.skt")
-		
+
 		Case "BA" :
 		loadImage("bellaux.skt")
-		
+
 		Case "RP":
 		rogersunits := getRogersUnits()
 		totalpages := getRPPages()
@@ -5412,7 +5412,7 @@ ST_SAVEEXIT()
 		setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
 		setTemplateText("RPtotalpages.skt",totalpages)
 		Sleep 100
-		
+
 		Case "EP":
 		enviunits := getRogersUnits()
 		totalpages := getRPPAGes()
@@ -5421,10 +5421,10 @@ ST_SAVEEXIT()
 		setTemplateText("units.skt",enviunits[1] . enviunits[2])
 		setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
 		setTemplateText("RPtotalpages.skt",totalpages)
-		
+
 		Case "RA" :
 		loadImage("rogersaux.skt")
-		 
+
 		Case "AP" :
 		aptumunits := getaptumUnits()
 		totalpages := getRPPages()
@@ -8838,7 +8838,7 @@ Launcher()
 							Run, "C:\TelDigMobile\TelDigMobile.exe"
 						else
 							Winactivate, ahk_exe mobile.exe
-		
+
 		case "streets":	if !(Winexist("ahk_exe streets.exe"))
 							Run, streets.exe
 						else
@@ -8848,5 +8848,3 @@ Launcher()
 							Run, explore C:\Users\Cr\As Builts\Envi Burial Drawings-20220331T170129Z-001\Envi Burial Drawings
 	}
 }
-
-
