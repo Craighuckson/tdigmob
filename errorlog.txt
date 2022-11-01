@@ -937,3 +937,351 @@
 20220907155505 - Cannot access ChildPath Item #2 -> 1
 20220908133254 - Invalid IAccessible Object
 20220908133254 - Cannot access ChildPath Item #9 -> 4
+20220911214033 - "DoDefaultAction" Cmd Not Implemented
+20220912101850 - Invalid IAccessible Object
+20220912101850 - Cannot access ChildPath Item #9 -> 4
+20220914094823 - "DoDefaultAction" Cmd Not Implemented
+20220914103226 - "DoDefaultAction" Cmd Not Implemented
+20220914122621 - "DoDefaultAction" Cmd Not Implemented
+20220915223125 - Cannot access ChildPath Item #2 -> 7
+20220915231413 - "DoDefaultAction" Cmd Not Implemented
+20220916114623 - "DoDefaultAction" Cmd Not Implemented
+20220916130224 - Invalid IAccessible Object
+20220916130224 - Cannot access ChildPath Item #9 -> 4
+20220916130226 - Invalid IAccessible Object
+20220916130226 - Cannot access ChildPath Item #9 -> 4
+20220916130226 - Invalid IAccessible Object
+20220916130226 - Cannot access ChildPath Item #9 -> 4
+20220919122514 - "DoDefaultAction" Cmd Not Implemented
+20220919122814 - "DoDefaultAction" Cmd Not Implemented
+20220919123716 - "DoDefaultAction" Cmd Not Implemented
+20220919123850 - "DoDefaultAction" Cmd Not Implemented
+20220922123356 - "DoDefaultAction" Cmd Not Implemented
+20220922205743 - Cannot access ChildPath Item #2 -> 7
+20220922211852 - "DoDefaultAction" Cmd Not Implemented
+20220923164804 - Cannot access ChildPath Item #2 -> 7
+20220926150220 - "DoDefaultAction" Cmd Not Implemented
+20220926210454 - "DoDefaultAction" Cmd Not Implemented
+20220926210647 - "DoDefaultAction" Cmd Not Implemented
+20220926210704 - "DoDefaultAction" Cmd Not Implemented
+20220926210720 - "DoDefaultAction" Cmd Not Implemented
+20220926210735 - "DoDefaultAction" Cmd Not Implemented
+20220926210751 - "DoDefaultAction" Cmd Not Implemented
+20220926210807 - "DoDefaultAction" Cmd Not Implemented
+20220926210842 - "DoDefaultAction" Cmd Not Implemented
+20220926210903 - "DoDefaultAction" Cmd Not Implemented
+20220926210925 - "DoDefaultAction" Cmd Not Implemented
+20220926210952 - "DoDefaultAction" Cmd Not Implemented
+20220926211013 - "DoDefaultAction" Cmd Not Implemented
+20220926211101 - "DoDefaultAction" Cmd Not Implemented
+20220926211117 - "DoDefaultAction" Cmd Not Implemented
+20220926211140 - "DoDefaultAction" Cmd Not Implemented
+20220926211156 - "DoDefaultAction" Cmd Not Implemented
+20220926211211 - "DoDefaultAction" Cmd Not Implemented
+20220926211227 - "DoDefaultAction" Cmd Not Implemented
+20220926211244 - "DoDefaultAction" Cmd Not Implemented
+20220926211300 - "DoDefaultAction" Cmd Not Implemented
+20220926211315 - "DoDefaultAction" Cmd Not Implemented
+20220926211330 - "DoDefaultAction" Cmd Not Implemented
+20220927110455 - "DoDefaultAction" Cmd Not Implemented
+20220927232254 - "DoDefaultAction" Cmd Not Implemented
+20220929104215 - "DoDefaultAction" Cmd Not Implemented
+20220929104248 - "DoDefaultAction" Cmd Not Implemented
+20220929104258 - "DoDefaultAction" Cmd Not Implemented
+20220929104436 - "DoDefaultAction" Cmd Not Implemented
+20220929170612 - Could not access an IAccessible Object
+20220929170643 - Could not access an IAccessible Object
+20220929170716 - Invalid IAccessible Object
+20220929170716 - Cannot access ChildPath Item #2 -> 1
+20220929170745 - Could not access an IAccessible Object
+20220929170816 - Could not access an IAccessible Object
+20220929170845 - Could not access an IAccessible Object
+20220929170914 - Could not access an IAccessible Object
+20220929170944 - Could not access an IAccessible Object
+20220929171013 - Could not access an IAccessible Object
+20220929171042 - Could not access an IAccessible Object
+20220929171111 - Could not access an IAccessible Object
+20220929171140 - Could not access an IAccessible Object
+20220929171912 - Invalid IAccessible Object
+20220929171912 - Cannot access ChildPath Item #2 -> 1
+20220929171939 - Invalid IAccessible Object
+20220929171939 - Cannot access ChildPath Item #2 -> 1
+20220929172005 - Could not access an IAccessible Object
+20220929172038 - Could not access an IAccessible Object
+20220929172105 - Could not access an IAccessible Object
+20220929172134 - Could not access an IAccessible Object
+20220929172205 - Could not access an IAccessible Object
+20220929172231 - Invalid IAccessible Object
+20220929172231 - Cannot access ChildPath Item #2 -> 1
+20220929172320 - "DoDefaultAction" Cmd Not Implemented
+20220929172542 - Could not access an IAccessible Object
+20220929172544 - Cannot access ChildPath Item #2 -> 1
+20220929172544 - Cannot access ChildPath Item #2 -> 1
+20220929172544 - Cannot access ChildPath Item #2 -> 1
+20220930103515 - Invalid IAccessible Object
+20220930103515 - Cannot access ChildPath Item #9 -> 4
+20220930103517 - Invalid IAccessible Object
+20220930103517 - Cannot access ChildPath Item #9 -> 4
+20220930122214 - Could not access an IAccessible Object
+20220930122234 - Cannot access ChildPath Item #2 -> 7
+20220930155426 - Cannot access ChildPath Item #2 -> 7
+20221002092055 - "DoDefaultAction" Cmd Not Implemented
+20221002092102 - Invalid IAccessible Object
+20221002092102 - Cannot access ChildPath Item #2 -> 1
+20221002092125 - "DoDefaultAction" Cmd Not Implemented
+20221002093217 - "DoDefaultAction" Cmd Not Implemented
+20221002093222 - Could not access an IAccessible Object
+20221002093251 - Could not access an IAccessible Object
+20221002093318 - Could not access an IAccessible Object
+20221002093346 - Invalid IAccessible Object
+20221002093346 - Cannot access ChildPath Item #2 -> 1
+20221002093412 - Could not access an IAccessible Object
+20221002093440 - Could not access an IAccessible Object
+20221002093507 - Could not access an IAccessible Object
+20221002093537 - Could not access an IAccessible Object
+20221002093606 - Could not access an IAccessible Object
+20221002140516 - Could not access an IAccessible Object
+20221002140543 - Could not access an IAccessible Object
+20221002140610 - Could not access an IAccessible Object
+20221002140637 - Could not access an IAccessible Object
+20221002140703 - Could not access an IAccessible Object
+20221002140730 - Could not access an IAccessible Object
+20221002140757 - Could not access an IAccessible Object
+20221002140826 - Could not access an IAccessible Object
+20221002140853 - Invalid IAccessible Object
+20221002140853 - Cannot access ChildPath Item #2 -> 1
+20221002140855 - Cannot access ChildPath Item #2 -> 1
+20221002140855 - Cannot access ChildPath Item #2 -> 1
+20221002140855 - Cannot access ChildPath Item #2 -> 1
+20221002141056 - Could not access an IAccessible Object
+20221002141057 - Cannot access ChildPath Item #2 -> 1
+20221002141058 - Cannot access ChildPath Item #2 -> 1
+20221002141058 - Cannot access ChildPath Item #2 -> 1
+20221002141155 - Could not access an IAccessible Object
+20221002141157 - Cannot access ChildPath Item #2 -> 1
+20221002141157 - Cannot access ChildPath Item #2 -> 1
+20221002141157 - Cannot access ChildPath Item #2 -> 1
+20221002141805 - Could not access an IAccessible Object
+20221002141807 - Cannot access ChildPath Item #2 -> 1
+20221002141807 - Cannot access ChildPath Item #2 -> 1
+20221002141808 - Cannot access ChildPath Item #2 -> 1
+20221003113736 - Could not access an IAccessible Object
+20221003113738 - Invalid IAccessible Object
+20221003113738 - Cannot access ChildPath Item #9 -> 4
+20221003113739 - Invalid IAccessible Object
+20221003113739 - Cannot access ChildPath Item #9 -> 4
+20221003113739 - Invalid IAccessible Object
+20221003113739 - Cannot access ChildPath Item #9 -> 4
+20221003113820 - "DoDefaultAction" Cmd Not Implemented
+20221003151513 - Could not access an IAccessible Object
+20221003151547 - Could not access an IAccessible Object
+20221003151619 - Invalid IAccessible Object
+20221003151619 - Cannot access ChildPath Item #2 -> 1
+20221003151646 - Could not access an IAccessible Object
+20221003151713 - Could not access an IAccessible Object
+20221003151743 - Invalid IAccessible Object
+20221003151743 - Cannot access ChildPath Item #2 -> 1
+20221003151816 - Invalid IAccessible Object
+20221003151816 - Cannot access ChildPath Item #2 -> 1
+20221003160035 - Invalid IAccessible Object
+20221003160035 - Cannot access ChildPath Item #2 -> 1
+20221003160114 - Invalid IAccessible Object
+20221003160114 - Cannot access ChildPath Item #2 -> 1
+20221003160144 - Invalid IAccessible Object
+20221003160144 - Cannot access ChildPath Item #2 -> 1
+20221003160212 - Invalid IAccessible Object
+20221003160212 - Cannot access ChildPath Item #2 -> 1
+20221003160245 - Could not access an IAccessible Object
+20221003160320 - Could not access an IAccessible Object
+20221003160421 - Could not access an IAccessible Object
+20221003160451 - Invalid IAccessible Object
+20221003160451 - Cannot access ChildPath Item #2 -> 1
+20221003160455 - Cannot access ChildPath Item #2 -> 1
+20221003160455 - Cannot access ChildPath Item #2 -> 1
+20221003160456 - Cannot access ChildPath Item #2 -> 1
+20221004140644 - "DoDefaultAction" Cmd Not Implemented
+20221004140710 - Could not access an IAccessible Object
+20221004143116 - Could not access an IAccessible Object
+20221004202724 - Cannot access ChildPath Item #2 -> 7
+20221010221424 - Cannot access ChildPath Item #4 -> 1
+20221011151449 - Cannot access ChildPath Item #2 -> 7
+20221012101027 - "DoDefaultAction" Cmd Not Implemented
+20221012101039 - Cannot access ChildPath Item #2 -> 7
+20221012101051 - Could not access an IAccessible Object
+20221012101058 - Cannot access ChildPath Item #4 -> 1
+20221012101058 - Cannot access ChildPath Item #4 -> 1
+20221012101059 - Cannot access ChildPath Item #4 -> 1
+20221012114152 - Could not access an IAccessible Object
+20221012114236 - Could not access an IAccessible Object
+20221012114321 - Could not access an IAccessible Object
+20221012114349 - Could not access an IAccessible Object
+20221012114417 - Could not access an IAccessible Object
+20221012114447 - Could not access an IAccessible Object
+20221012114514 - Could not access an IAccessible Object
+20221012114542 - Could not access an IAccessible Object
+20221012114610 - Could not access an IAccessible Object
+20221012114653 - Invalid IAccessible Object
+20221012114653 - Cannot access ChildPath Item #2 -> 1
+20221012114721 - Could not access an IAccessible Object
+20221012114749 - Invalid IAccessible Object
+20221012114749 - Cannot access ChildPath Item #2 -> 1
+20221012114750 - Invalid IAccessible Object
+20221012114750 - Cannot access ChildPath Item #9 -> 4
+20221012114751 - Invalid IAccessible Object
+20221012114751 - Cannot access ChildPath Item #9 -> 4
+20221012114751 - Invalid IAccessible Object
+20221012114751 - Cannot access ChildPath Item #9 -> 4
+20221013094554 - Cannot access ChildPath Item #2 -> 7
+20221016221414 - "DoDefaultAction" Cmd Not Implemented
+20221018084744 - Cannot access ChildPath Item #2 -> 7
+20221018090605 - Cannot access ChildPath Item #2 -> 7
+20221018104824 - Cannot access ChildPath Item #2 -> 1
+20221019160710 - Invalid IAccessible Object
+20221019160710 - Cannot access ChildPath Item #9 -> 4
+20221019160710 - Invalid IAccessible Object
+20221019160710 - Cannot access ChildPath Item #9 -> 4
+20221021160725 - Could not access an IAccessible Object
+20221021160728 - Invalid IAccessible Object
+20221021160728 - Cannot access ChildPath Item #9 -> 4
+20221023203425 - Cannot access ChildPath Item #2 -> 7
+20221023205336 - Cannot access ChildPath Item #2 -> 7
+20221023211833 - Cannot access ChildPath Item #2 -> 7
+20221023220515 - Cannot access ChildPath Item #2 -> 7
+20221023224757 - Cannot access ChildPath Item #2 -> 7
+20221023224929 - Cannot access ChildPath Item #2 -> 7
+20221023231014 - Cannot access ChildPath Item #2 -> 7
+20221024131450 - "DoDefaultAction" Cmd Not Implemented
+20221024142639 - Cannot access ChildPath Item #2 -> 1
+20221024161941 - Invalid IAccessible Object
+20221024161941 - Cannot access ChildPath Item #2 -> 1
+20221024161942 - Invalid IAccessible Object
+20221024161942 - Cannot access ChildPath Item #9 -> 4
+20221024161942 - Invalid IAccessible Object
+20221024161942 - Cannot access ChildPath Item #9 -> 4
+20221024161943 - Invalid IAccessible Object
+20221024161943 - Cannot access ChildPath Item #9 -> 4
+20221024162208 - Could not access an IAccessible Object
+20221024162209 - Invalid IAccessible Object
+20221024162209 - Cannot access ChildPath Item #9 -> 4
+20221024162411 - Could not access an IAccessible Object
+20221024162439 - Could not access an IAccessible Object
+20221024162440 - Invalid IAccessible Object
+20221024162440 - Cannot access ChildPath Item #9 -> 4
+20221024162440 - Invalid IAccessible Object
+20221024162441 - Cannot access ChildPath Item #9 -> 4
+20221024162441 - Invalid IAccessible Object
+20221024162441 - Cannot access ChildPath Item #9 -> 4
+20221025080850 - Cannot access ChildPath Item #4 -> 1
+20221027082254 - Could not access an IAccessible Object
+20221027082254 - Could not access an IAccessible Object
+20221027082257 - Could not access an IAccessible Object
+20221027082607 - Could not access an IAccessible Object
+20221027082614 - Could not access an IAccessible Object
+20221027083039 - Could not access an IAccessible Object
+20221027083039 - Could not access an IAccessible Object
+20221027083044 - Could not access an IAccessible Object
+20221027083044 - Could not access an IAccessible Object
+20221027083159 - Could not access an IAccessible Object
+20221027083159 - Could not access an IAccessible Object
+20221027083200 - Could not access an IAccessible Object
+20221027083204 - Could not access an IAccessible Object
+20221027083435 - Could not access an IAccessible Object
+20221027083436 - Could not access an IAccessible Object
+20221027083437 - Could not access an IAccessible Object
+20221027083440 - Could not access an IAccessible Object
+20221027083944 - Could not access an IAccessible Object
+20221027083945 - Could not access an IAccessible Object
+20221027083946 - Could not access an IAccessible Object
+20221027083950 - Could not access an IAccessible Object
+20221027084314 - Could not access an IAccessible Object
+20221027084314 - Could not access an IAccessible Object
+20221027084405 - Could not access an IAccessible Object
+20221027084405 - Could not access an IAccessible Object
+20221027084406 - Could not access an IAccessible Object
+20221027084409 - Could not access an IAccessible Object
+20221027084701 - Could not access an IAccessible Object
+20221027084701 - Could not access an IAccessible Object
+20221027084703 - Could not access an IAccessible Object
+20221027084705 - Could not access an IAccessible Object
+20221027104353 - Could not access an IAccessible Object
+20221027104353 - Could not access an IAccessible Object
+20221027104400 - Could not access an IAccessible Object
+20221027104401 - Could not access an IAccessible Object
+20221027104402 - Could not access an IAccessible Object
+20221027104411 - Could not access an IAccessible Object
+20221027104756 - Could not access an IAccessible Object
+20221027105403 - Could not access an IAccessible Object
+20221027105403 - Could not access an IAccessible Object
+20221027105405 - Could not access an IAccessible Object
+20221027105408 - Could not access an IAccessible Object
+20221027113217 - Could not access an IAccessible Object
+20221027113217 - Could not access an IAccessible Object
+20221027113218 - Could not access an IAccessible Object
+20221027113220 - Could not access an IAccessible Object
+20221027122919 - Could not access an IAccessible Object
+20221027122920 - Could not access an IAccessible Object
+20221027122921 - Could not access an IAccessible Object
+20221027122923 - Could not access an IAccessible Object
+20221027181854 - Could not access an IAccessible Object
+20221027181855 - Could not access an IAccessible Object
+20221027181916 - Could not access an IAccessible Object
+20221027181940 - Could not access an IAccessible Object
+20221027182044 - Could not access an IAccessible Object
+20221027182107 - Could not access an IAccessible Object
+20221027182107 - Could not access an IAccessible Object
+20221027184107 - Could not access an IAccessible Object
+20221027184111 - Could not access an IAccessible Object
+20221027184355 - Could not access an IAccessible Object
+20221027184405 - Could not access an IAccessible Object
+20221027184408 - Could not access an IAccessible Object
+20221027184436 - Could not access an IAccessible Object
+20221027184502 - Could not access an IAccessible Object
+20221028143424 - Could not access an IAccessible Object
+20221028143437 - Could not access an IAccessible Object
+20221029123343 - Could not access an IAccessible Object
+20221029123352 - Could not access an IAccessible Object
+20221029123429 - Could not access an IAccessible Object
+20221029123436 - Could not access an IAccessible Object
+20221029123929 - Could not access an IAccessible Object
+20221029124347 - Could not access an IAccessible Object
+20221029124358 - Could not access an IAccessible Object
+20221029124404 - Could not access an IAccessible Object
+20221029124425 - Could not access an IAccessible Object
+20221029124454 - Could not access an IAccessible Object
+20221029124742 - Could not access an IAccessible Object
+20221029124936 - Could not access an IAccessible Object
+20221029125512 - Could not access an IAccessible Object
+20221029125548 - Could not access an IAccessible Object
+20221029125621 - Could not access an IAccessible Object
+20221029130527 - Could not access an IAccessible Object
+20221029130619 - Could not access an IAccessible Object
+20221029130640 - Could not access an IAccessible Object
+20221029131049 - Could not access an IAccessible Object
+20221029131605 - Could not access an IAccessible Object
+20221029131639 - Could not access an IAccessible Object
+20221029131829 - Could not access an IAccessible Object
+20221029131846 - Could not access an IAccessible Object
+20221029131908 - Could not access an IAccessible Object
+20221029131911 - Could not access an IAccessible Object
+20221029132402 - Could not access an IAccessible Object
+20221029132406 - Could not access an IAccessible Object
+20221029191428 - Could not access an IAccessible Object
+20221029191435 - Could not access an IAccessible Object
+20221030205843 - Could not access an IAccessible Object
+20221030205914 - Could not access an IAccessible Object
+20221030205918 - Could not access an IAccessible Object
+20221030212440 - Could not access an IAccessible Object
+20221030212444 - Could not access an IAccessible Object
+20221030215324 - Could not access an IAccessible Object
+20221030215349 - Could not access an IAccessible Object
+20221030215353 - Could not access an IAccessible Object
+20221031122951 - Could not access an IAccessible Object
+20221031123027 - Could not access an IAccessible Object
+20221031123846 - Could not access an IAccessible Object
+20221031123905 - Could not access an IAccessible Object
+20221031124028 - Could not access an IAccessible Object
+20221031124031 - Could not access an IAccessible Object
+20221031235527 - Could not access an IAccessible Object
+20221101000307 - Could not access an IAccessible Object
+20221101000631 - Could not access an IAccessible Object
+20221101000647 - Could not access an IAccessible Object

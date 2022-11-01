@@ -2,7 +2,7 @@
 
 getVPNPass()
 {
-	VPNPASS := "yjH8i32*"
+	VPNPASS := "cY^y7v38"
 	return VPNPaSS
 }
 

@@ -70,3 +70,8 @@ TypeError: 'NoneType' object is not subscriptable
 2022-07-20 09:22:07,116
 2022-07-20 09:22:07,116
 2022-07-20 09:22:07,132
+2022-09-19 09:58:04,560
+Traceback (most recent call last):
+  File "C:\Users\Cr\Locatedraw\Locate-draw\ezdrawlnew.py", line 1181, in load_sketch_template
+    with open(f"{filename}.pkl", "rb") as pk:
+FileNotFoundError: [Errno 2] No such file or directory: 'C:/Users/Cr/Locatedraw/Locate-draw/BOROS LINK 33 TREES R.pkl.pkl'

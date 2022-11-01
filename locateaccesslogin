@@ -2,3 +2,10 @@
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+#Include <UIA_Interface>
+
+	WinActivate,ahk_exe LocateAccess.exe
+	UIA := UIA_Interface()
+	win:= UIA.GetChromiumContentElement()
+	pass := win.FindFirstByName("Password").setfocus()
+	pass.setvalue("Locatesup1")

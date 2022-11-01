@@ -14,6 +14,7 @@ ListLines, On
 #include <findtext>
 #include <DebugWindow>
 ;#include <V1TOV1FUNC>
+;#include <libcon>
 #include <json>
 #include <Acc>
 #include *i scrollbox.ahk
@@ -21,6 +22,7 @@ ListLines, On
 #include <UIA_Interface>
 #include <AHKEZ>
 #Include <AHKEZ_Debug>
+#Include <EntryForm>
 ;#Include Canvas.ahk
 #Include <printstack>
 ;#Include multiviewer.ahk
@@ -59,17 +61,17 @@ sketch_bounds := {ulx:192, uly:512,lrx:948,lry:1152,width:756,height:640}
 YorkMaps := "https://maps.york.ca/Html5ViewerPublic/Index.html?viewer=GeneralInteractiveMap.YorkMaps"
 
 ;setup of GUI for Bell primary sheet
-Gui, Add, CheckBox, x172 y80 w100 h30 vbellhydro, Bell Hydro
-Gui, Add, CheckBox, x172 y110 w100 h30 vbridgealert, Bridge Alert
-Gui, Add, CheckBox, x172 y140 w150 h30 vcableconduit, Cables May or May Not Be in Conduit
-Gui, Add, CheckBox, x172 y170 w100 h30 vhanddig, Hand Dig Only
-Gui, Add, CheckBox, x172 y200 w100 h30 vprioritycable, Priority Cable Present
-Gui, Add, CheckBox, x172 y230 w100 h30 vemptyconduit, Unable to Locate Empty Ducts
-Gui, Add, CheckBox, x172 y260 w100 h30 vunlocateable, Unlocatable Future Use
-Gui, Add, Button, x82 y310 w100 h30 , OK
-Gui, Add, Button, x272 y310 w100 h30 , Cancel
-Gui, Add, CheckBox, x72 y20 w100 h30 VCABLE, Cable
-Gui, Add, CheckBox, x272 y20 w100 h30 VCONDUIT, Conduit
+Gui, 1: Add, CheckBox, x172 y80 w100 h30 vbellhydro, Bell Hydro
+Gui, 1: Add, CheckBox, x172 y110 w100 h30 vbridgealert, Bridge Alert
+Gui, 1: Add, CheckBox, x172 y140 w150 h30 vcableconduit, Cables May or May Not Be in Conduit
+Gui, 1: Add, CheckBox, x172 y170 w100 h30 vhanddig, Hand Dig Only
+Gui, 1: Add, CheckBox, x172 y200 w100 h30 vprioritycable, Priority Cable Present
+Gui, 1: Add, CheckBox, x172 y230 w100 h30 vemptyconduit, Unable to Locate Empty Ducts
+Gui, 1: Add, CheckBox, x172 y260 w100 h30 vunlocateable, Unlocatable Future Use
+Gui, 1: Add, Button, x82 y310 w100 h30 , OK
+Gui, 1: Add, Button, x272 y310 w100 h30 , Cancel
+Gui, 1: Add, CheckBox, x72 y20 w100 h30 VCABLE, Cable
+Gui, 1: Add, CheckBox, x272 y20 w100 h30 VCONDUIT, Conduit
 
 ;setup of GUI for Rogers warnings rog gui
 Gui,2: Add, CheckBox, x172 y80 w100 h30 vfibreonly, Fibre Only
@@ -247,22 +249,6 @@ getRegDA()
     WinWaitClose, Enter Dig Area
 
     digarea := {}
-    ;~ INPUTBOX, north, Dig Box, ENTER THE NORTH MOST BOUNDARY,,,,,,,,%NORTH%
-    ;~ StringUpper, north, north
-    ;~ if ErrorLevel
-    ;~ Return
-    ;~ INPUTBOX, south, Dig Box, ENTER THE SOUTH MOST BOUNDARY,,,,,,,,%SOUTH%
-    ;~ StringUpper, south, south
-    ;~ if ErrorLevel
-    ;~ Return
-    ;~ INPUTBOX, west, Dig Box, ENTER THE WEST MOST BOUNDARY,,,,,,,,%WEST%
-    ;~ Stringupper, west, west
-    ;~ if ErrorLevel
-    ;~ Return
-    ;~ inputbox, east, Dig Box, ENTER THE EAST MOST BOUNDARY,,,,,,,,%EAST%
-    ;~ StringUpper, east, east
-    ;~ if ErrorLevel
-    ;~ Return
     digarea["north"] := north
     digarea["south"] := south
     digarea["west"] := west
@@ -334,7 +320,7 @@ rogersWarning()
     GuiControl, 2:, railway, 0
     Gui, 2: Show, x411 y174 h383 w483, Please select all that apply
     WinWaitClose, ahk_id %GUIHWND%
-return
+    return
 }
 
 setBLToBLDA()
@@ -347,7 +333,7 @@ setBLToBLDA()
     {
         choice := "SINGLE"
     }
-    fixstreetName()
+    ;fixstreetName()
     if landbase contains nw,sw,se,ne,NW,SW,SE,NE
     {
         intdir := InputBox("Horizontal (H), Vertical (V), Both(B)?")
@@ -554,22 +540,8 @@ writeRogersClearReason()
 
 setBLtoBLSketch(landbase,intdir){
     global
-    if (isTicketRogers(stationcode))
-    {
-        rclear := rogclear()
-        if(rclear)
-        {
-            writeRogersClearReason()
-            return
-        }
-    }
     if (intdir)
     {
-        ;if !FileExist("C:\Users\Cr\Documents\" landbase "CLTOBL" intdir ".skt")
-        ;{
-        ;Msgbox, Unable to load sketch (template not created)
-        ;return
-        ;}
         loadImage(landbase "CLTOBL" intdir ".skt")
     }
     else
@@ -670,7 +642,7 @@ setDWToDWDA()
     num1 := DWnum1
     num2 := DWnum2
     num := [num1,num2]
-    fixstreetName()
+    ;fixstreetName()
     if(landbase = "nw" || landbase = "ne" || landbase = "se" || landbase = "sw")
     {
         xstreet := "", vstreet := ""
@@ -704,20 +676,21 @@ setDWToDWDA()
     }
 
     signs := INPUTBOX("Signs? ")
-    if (signs = "y"){
-        signs := true
-    }
-    if signs {
+    StringLower,signs,signs
+    if (signs = "y")
+    {
         signdist := InputBox("Distance from curb? ")
     }
 
     switch landbase
     {
     Case "n":
-        if signs {
+        if (signs = "y")
+        {
             north := signdist . " N/NCL " . street
         }
-        else {
+        else
+        {
             north := "NPL " street
         }
         south := "NCL " street
@@ -725,7 +698,7 @@ setDWToDWDA()
         east := "ERE DW " num.2 " " street
 
     Case "nrc":
-        if signs {
+        if (signs == "y") {
             north := signdist . " N/NCL " . street
         }
         else {
@@ -769,7 +742,7 @@ setDWToDWDA()
 
     Case "s":
         north := "SCL " street
-        if signs {
+        if (signs == "y") {
             south := signdist . " S/SCL " . street
         }
         else {
@@ -780,7 +753,7 @@ setDWToDWDA()
 
     Case "src":
         north := "NCL " street
-        if signs {
+        if (signs == "y") {
             south := signdist . " S/SCL " . street
         }
         else {
@@ -823,7 +796,7 @@ setDWToDWDA()
 
     Case "w":
         north := "WCL " street
-        if signs
+        if (signs == "y")
         {
             south := signdist . " W/WCL " . street
         }
@@ -834,7 +807,7 @@ setDWToDWDA()
 
     Case "e":
         north := "ECL " street
-        if signs
+        if (signs == "y")
         {
             south := signdist . " E/ECL " . street
         }
@@ -863,14 +836,6 @@ setDWToDWDA()
 setDWToDWSketch()
 {
     global
-    if (isTicketRogers(stationcode))
-    {
-        rclear := rogclear()
-        if(rclear)
-        {
-            writeRogersClearReason()
-        }
-    }
     if(intdir)
         loadimage(landbase "dwtodw" intdir ".skt")
     Else
@@ -899,7 +864,7 @@ setPL4DigArea(num1:="", num2:="")
     ; Gui, PL4: Destroy
     ;landbase:=getLandbase()
     ;num:=getBLNum()
-    fixstreetName()
+    ;fixstreetName()
     ;Inputbox,street,Street,Enter street name,,,,,,,,%street%
     num1 := pl4num1, num2 := pl4num2
     num := [num1,num2]
@@ -966,7 +931,8 @@ setStreetToStreetDigArea()
 {
     global
     northxstreet:="",southxstreet:="",ystreet:="", westystreet:="", eastystreet:="",xstreet:=""
-    fixstreetName()
+    ;fixstreetName()
+    
     landbase := InputBox(,"Enter landbase? N/E/S/W")
     if(landbase = "w" || landbase = "e")
     {
@@ -1153,7 +1119,7 @@ setRCDA()
     global
     landbase := getlandbase() ;NSEW etc (String)
     num := getBLNum() ;is an array
-    fixstreetName()
+    ;fixstreetName()
     rclimit := InputBox("Crossing limit? (CL / PL ?)")
     rclimit := StrUpper(rclimit)
     Switch landbase
@@ -1217,7 +1183,7 @@ setPLDigArea()
     global
     landbase:=getLandbase()
     num:=getBLNum()
-    fixstreetName()
+    ;fixstreetName()
     switch landbase
     {
     case "n":
@@ -1310,35 +1276,15 @@ setPL4Sketch(landbase){
 setPLToPLSketch(landbase)
 {
     global
-
-    if (stationCode = "ROGYRK01") or if (stationcode = "ROGSIM01")
-        rclear := ROGCLEAR()
-    if (rclear)
+    Loop
     {
-        local rclearreason := Inputbox("(C)lear or (F)TTH")
-        if rclearreason not in c,C,f,F
-        {
-            MsgBox % Invalid result
-            setPLToPLSketch(landbase)
-        }
-        if ErrorLevel
-            return
-        (rclearreason = "c") ? loadImage("rogclear.skt") : loadImage("rogftth.skt")
-    return rclear
-}
-;~ if !FileExist("C:\Users\Cr\Documents\" landbase "pltopl.skt")
-;~ {
-;~ Msgbox, Unable to load sketch (template not created)
-;~ return
-;~ }
-Loop {
-    choice := InputBox("1.CL to Rear PL`n2.CL to Front Pl")
-} Until choice in 1,2
+        choice := InputBox("1.CL to Rear PL`n2.CL to Front Pl")
+    }   Until choice in 1,2
 
-if (FileExist(A_MyDocuments "\" landbase "pltopl" choice ".skt"))
-    loadImage(landbase "pltopl" choice ".skt")
-else
-    loadImage(landbase "pltopl.skt")
+    if (FileExist(A_MyDocuments "\" landbase "pltopl" choice ".skt"))
+        loadImage(landbase "pltopl" choice ".skt")
+    else
+        loadImage(landbase "pltopl.skt")
 }
 
 setRogersclear()
@@ -1371,7 +1317,7 @@ setSGasDigArea()
     {
         num := getBLNum()
     }
-    fixStreetName()
+    ;fixStreetName()
     switch landbase
     {
     case "w":
@@ -1426,7 +1372,7 @@ setLGasDigArea()
     {
         num := getBLNum()
     }
-    fixStreetName()
+    ;fixStreetName()
     switch landbase
     {
     case "w":
@@ -1503,40 +1449,42 @@ writeRAdigarea()
 
 ;SKETCHTOOL MODULES
 
-autoinsertSketches()
+autoinsertSketches(email = "y")
 {
     global
-    project := []
+    if !(project)
+        project := []
 
     ;COMMENT EITHER THE NEXT TWO LINES OR THE FOLLOWING 2 LINES AT A TIME - NOT BOTH
-
-    ;FileSelectFile, projfile,,%A_ScriptDir%, Select project,
-    ;units := Inputbox("Enter units")
-
-    projfile:="C:\Users\Cr\Documents\cua rogers.skt"
-    units := "1C"
-    ;~ loop, Read, %projfile%
-    ;~ {
-    ;~ project.Push(A_LoopReadLine)
-    ;~ }
-    ;~ totalpages := project.Length()
-    ;~ Loop % project.Length()
-    ;~ {
-    LOCATIONDATACHECK()
-    setform()
-    waitSTLoad()
-    loadImage(PROJFILE)
-    Sleep 500
-    stproj_saveexit()
-    ControlClick("OK", "ahk_exe sketchtoolapplication.exe")
-    focusTeldig()
-    ;~ }
-    ;Msgbox, Done!
-    proj:=""
-    rogersunits := ["","1C"]
-    addtotimesheet()
-    FinishNoEmail()
-    SetTimer,checkforNewTicket, 200 ;use this for looping
+    if !(projfile)
+    {
+        FileSelectFile, projfile,,c:\users\cr\archived\autohotkey, Select project,
+        units := Inputbox("Enter units")
+        loop, Read, %projfile%
+        {
+            project.Push(A_LoopReadLine)
+        }
+    }
+    totalpages := project.Length()
+    Loop % project.Length()
+    {
+        LOCATIONDATACHECK()
+        setform()
+        waitSTLoad()
+        loadImage(project[A_Index])
+        Sleep 500
+        stproj_saveexit()
+        ControlClick("OK", "ahk_exe sketchtoolapplication.exe")
+        focusTeldig()
+    }
+        ;Msgbox, Done!
+        ;rogersunits := ["","1C"]
+        addtotimesheet()
+        if (email == "n")
+            FinishNoEmail()
+        else
+            finishemail()
+        SetTimer,checkforNewTicket, 200 ;use this for looping
 }
 
 projectSketch()
@@ -1737,6 +1685,17 @@ sketchAutoFill()
 else
 {
     writeDigArea()
+    if (stationCode = "ROGYRK01") or if (stationCode = "ROGSIM01")
+        {
+            rclear := rogClear()
+            if(rclear)
+            {
+                loadImage("rogclear.skt")
+                ST_SAVEEXIT()
+                newPagePrompt()
+                return
+            }
+        }
 
     ; checks for alternate or regular dig areas and writes
     ;next section is essentially prebaked vs custom dig area/sketch
@@ -1745,21 +1704,17 @@ else
         if(digboundary = "1")
         {
             setDWToDWSketch()
-            if !(rclear)
-            {
-                setDWtext()
-            }
+            setDWtext()
         }
+
         if(digboundary = "2")
         {
             setBLtoBLSketch(landbase,intdir)
-            if !(rclear)
-            {
-                setBLtext(landbase,intdir,xstreet,vstreet)
-                if (!intdir)
-                    setOffsetLabel(landbase)
-            }
+            setBLtext(landbase,intdir,xstreet,vstreet)
+            if (!intdir)
+                setOffsetLabel(landbase)
         }
+
         if(digboundary = "3")
         {
             setRCSketch(landbase)
@@ -1901,7 +1856,6 @@ writeDigArea()
     {
         getRegDA() ; asks line by line for dig box - returns north south east west
         wait()
-
         focusSketchTool()
         if (form == "RA" || form == "AA" || form == "EA")
         {
@@ -2132,7 +2086,11 @@ else ;if using different boundaries
     }
 
     F10::
-        autoinsertSketches()
+        MsgBox, 4, Email, Email result to contractor?
+        IfMsgBox, Yes
+            autoinsertSketches()
+        IfMsgBox, No
+            autoinsertSketches("n")
     return
 
     ;MOBILE HOTSTRINGS
@@ -2426,9 +2384,11 @@ setForm()
     clickdrawingtab()
     ;move this to main routine
     locationDataCheck()
+    uia := UIA_Interface()
+    win := uia.ElementFromHandle(WinActive("A"))
     Loop
     {
-        if (stationcode == "CCS")
+        if (stationcode == "CCS" or stationcode == "")
         {
             Loop
             {
@@ -2448,56 +2408,89 @@ setForm()
         if (stationCode == "BCGN01" and form = "") or if (stationCode == "BCGN02" and form = "") or if (stationCode == "BAGN02" and form = "")
         {
             TrayTip,Form, Opening Bell Primary Form,5
-            openForm("|<>*117$65.zj8DD44D64w8EEEF88XA90EUUUWEG2IG0V1114UY4gY13m3m9z899D24447W2EG+E4888844UYIU8EEEE88X8N0EyyyUEEsEHw", "BP")
+            ;openForm("|<>*117$65.zj8DD44D64w8EEEF88XA90EUUUWEG2IG0V1114UY4gY13m3m9z899D24447W2EG+E4888844UYIU8EEEE88X8N0EyyyUEEsEHw", "BP")
             ;openBellPrimary()
+
+            win.FindFirstByName("ui-btn").click()
+            win.WaitElementExistByName("SKETCH_FORM")
+            d := win.FindByPath("1.3.6.6.3.1.5.1").click()
+            form := "BP"
             break
         }
         else if (stationCode == "BCGN01") or if (stationCode == "BCGN02") or if (stationCode == "BAGN02")
         {
-            openForm("|<>*122$71.l13lVD0MEYTEG28n2E0kV8YUY4UZ4U1F2+91891/904W4AG2Tm2GHk948EYMUY4WY0F8Fl81189581yEWWE228m6E24n8YU44C44yA4wlxw","BA")
+            ;openForm("|<>*122$71.l13lVD0MEYTEG28n2E0kV8YUY4UZ4U1F2+91891/904W4AG2Tm2GHk948EYMUY4WY0F8Fl81189581yEWWE228m6E24n8YU44C44yA4wlxw","BA")
             ;openBellAux()
+            win.FindFirstByName("ui-btn").click()
+            win.WaitElementExistByName("SKETCH_FORM")
+            d := win.FindByPath("1.3.6.6.3.1.6.1").click()
+            form := "BA"
             break
         }
         else if (stationCode == "ROGYRK01" and form = "") or if (stationCode == "ROGSIM01" and form = "") or if (stationCode == "ROGPEL01" and form = "")
         {
-            openForm("|<>*122$51.D33l1sTw+0MF880EWU2W91024I0YF880EWU4Xl1s22Y0WF880EIUDm91022W12F880EADM/lxw214","RP")
+            ;openForm("|<>*122$51.D33l1sTw+0MF880EWU2W91024I0YF880EWU4Xl1s22Y0WF880EIUDm91022W12F880EADM/lxw214","RP")
             TrayTip,Form,Opening Rogers Primary form,5
             ;openCATVPrimary()
+            win.FindFirstByName("ui-btn").click()
+            d := win.WaitElementExistByNameAndType("CABLE TV","hyperlink")
+            form := "RP"
+            d.click()
             break
         }
         else if (stationCode == "ROGYRK01") or if (stationCode == "ROGSIM01")
         {
-            openForm("|<>*119$71.6xz7Y41wSD60N0EE88216FA4W0V0EE444WQC4120UU8894ccD241z0SEHlF8E48220UUYWI8U8E441118Yc90EE88216F8kPsUSEE41kVF000000000000000000T00000E","RA")
+            ;openForm("|<>*119$71.6xz7Y41wSD60N0EE88216FA4W0V0EE444WQC4120UU8894ccD241z0SEHlF8E48220UUYWI8U8E441118Yc90EE88216F8kPsUSEE41kVF000000000000000000T00000E","RA")
             TrayTip,Form,Opening Rogers Auxilliary Form,5
+            win.FindFirstByName("ui-btn").click()
+            d := win.WaitElementExistByNameAndType("SKETCH_FORM","hyperlink")
+            form := "RA"
+            d.click()
 
             ;openCATVAux()
             break
         }
         else if (stationCode == "APTUM01" and form = "")
         {
-            openForm("|<>*135$46.D3kSS7Vt0FW90U8s22E4411U890EE460UYNt0EM22EY411U892EE450FW90U8nks7blsQU","AP")
+            ;openForm("|<>*135$46.D3kSS7Vt0FW90U8s22E4411U890EE460UYNt0EM22EY411U892EE450FW90U8nks7blsQU","AP")
+            win.FindFirstByName("ui-btn").click()
+            d := win.WaitElementExistByNameAndType("COGECO","hyperlink")
+            d.click()
+            form := "AP"
             ;openAptumPrimary()
             break
         }
         else if(stationCode == "APTUM01")
         {
-            openForm("|<>*134$68.jTlt10T7XlUG0UUEE42AWMAU8E441118b3824110EEG9FHkV0Tk7Y4wIIU8E4411194d824110EEG9+G0UUEE42AWFay87Y410Q8IF00000000000000007k00002","AA")
+            ;openForm("|<>*134$68.jTlt10T7XlUG0UUEE42AWMAU8E441118b3824110EEG9FHkV0Tk7Y4wIIU8E4411194d824110EEG9+G0UUEE42AWFay87Y410Q8IF00000000000000007k00002","AA")
+            win.FindFirstByName("ui-btn").click()
+            win.WaitElementExistByName("SKETCH_FORM")
+            d := win.FindByPath("1.3.6.6.3.1.2.1").click()
+            form := "AA"
             break
         }
         else if(stationCode == "ENVIN01" and form = "")
         {
-            openForm("|<>*141$60.wkgD32SzkVUkYG32E48lUcYG2WE48mUgYG2mE49GwYWW2GS49GUWWW2+E45+UWWW2+E46AUVVW26E46AyUV722T42AU","EP")
+            ;openForm("|<>*141$60.wkgD32SzkVUkYG32E48lUcYG2WE48mUgYG2mE49GwYWW2GS49GUWWW2+E45+UWWW2+E46AUVVW26E46AyUV722T42AU","EP")
+            win.FindFirstByName("ui-btn").click()
+            win.WaitElementExistByName("SKETCH_FORM")
+            d := win.FindByPath("1.3.6.6.3.1.13.1").click()
+            form := "EP"
             break
         }
         else if (stationCode == "ENVIN01")
         {
-            openForm("|<>*119$71.6xz7Y41wSD60N0EE88216FA4W0V0EE444WQC4120UU8894ccD241z0SEHlF8E48220UUYWI8U8E441118Yc90EE88216F8kPsUSEE41kVF000000000000000000T00000E","EA")
+            ;openForm("|<>*119$71.6xz7Y41wSD60N0EE88216FA4W0V0EE444WQC4120UU8894ccD241z0SEHlF8E48220UUYWI8U8E441118Yc90EE88216F8kPsUSEE41kVF000000000000000000T00000E","EA")
+            win.FindFirstByName("ui-btn").click()
+            win.WaitElementExistByName("SKETCH_FORM")
+            d := win.FindByPath("1.3.6.6.3.1.2.1").click()
+            form := "EA"
             break
         }
         else
         {
-            form := ""
-            continue
+            MsgBox % "Please select form manually and press OK to continue"
+            break
         }
     }
 }
@@ -2578,10 +2571,7 @@ if (type = "1")
     FileAppend, %useexisting%`n%house1%`n%house2%,%A_MyDocuments%\%ticketNumber%.txt
     msgbox, %useexisting%`n%house1%`n%house2%
     MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
-return
-;units
-;
-
+    return
 }
 else
 {
@@ -2794,11 +2784,23 @@ class CraigRPA {
                 else if (t.form = "AP")
                     s.WriteTemplateText(k . "boundaryapt.skt", v)
                 else if (t.form = "RA")
-                    s.WriteTemplateText(k . "raboundary.skt", v)
+                    s.WriteTemplateText("ra" . k . "boundary.skt", v)
                 else
                     s.WriteTemplateText(k . "boundary.skt", v)
                 sleep 500
             }
+
+            ;MOVED CLEAR STAMP TO HERE
+            if (t.form = "RP" || t.form = "RA")
+                s.LoadImage(t.GetClearStamp(clearreason),false)
+            else if (t.form = "EP")
+                s.LoadImage("envi clear.skt",false)
+            else if (t.form = "AP")
+                s.LoadImage("aptumclear.skt",false)
+
+            ;SAVE HERE TO AVOID PROBLEMS WITH REUSE
+            SplashImage,,,,Saving image
+            s.SaveImage(saveFileName)
 
             SplashImage,,,,Completing rest of form
             ;if this is the Rogers primary sheet, the current page is NOT put on the sketch
@@ -2841,8 +2843,7 @@ class CraigRPA {
                 s.LoadImage("rogersaux.skt",false)
 
 
-            SplashImage,,,,Saving image
-            s.SaveImage(saveFileName)
+
             sleep 500
             SketchTool.SubmitAndExit()
             focusTeldig()
@@ -2917,7 +2918,7 @@ class CraigRPA {
 
     FixStreetName(street)
     {
-        return RegExReplace(street,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*")
+        return RegExReplace(street,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*|\*\**.*")
     }
 
     FixTownName(town)
@@ -3108,13 +3109,13 @@ class Mobile
 
     SelectPending()
     {
-        CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
-
-        ;UIA := UIA_Interface()
-        ;Winactivate, ahk_exe mobile.exe
-        ;mobEl := UIA.ElementFromHandle(WinExist("ahk_exe mobile.exe"))
-        ;mobEl.FindFirstByNameAndType("Request status:","ComboBox").SetValue("PENDING")
-        ;UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByNameAndType("Request status:","ComboBox").SetValue("PENDING")
+        ;CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
+        UIA := UIA_Interface()
+        win := uia.ElementFromHandle(Winexist("ahk_exe locateaccess.exe"))
+        r := win.FindFirstByName("ANALYSED").click()
+        Send,m
+        win.WaitElementExistByName("MOBILE")
+        Send,Enter
     }
 
     ClickOK()
@@ -3602,23 +3603,6 @@ pedAutoFill() {
 useExisting()
 {
     global
-    matches := []
-    Loop, Files, %A_MyDocuments%\*.skt
-    {
-        if (InStr(A_LoopFileName,street)) && if (InStr(A_LoopFileName,number))
-            matches.Push(A_LoopFileName)
-        else if (InStr(A_LoopFileName,street)) && if (InStr(A_LoopFileName,intersection))
-            matches.Push(A_LoopFileName)
-    }
-
-    if (matches.Length() > 0) {
-        matchstr := ""
-        for idx,match in matches {
-            matchstr .= match . "`n"
-        }
-    }
-
-    MsgBox % "Possible matches: `n" . matchstr
 
     Loop
     {
@@ -3882,20 +3866,13 @@ treeSketchFromTemplate(treefile)
     global
     Loop {
 
-        north := FileReadLine(treefile,2)
-        south := FileReadLine(treefile,3)
-        west := FileReadLine(treefile,4)
-        east := FileReadLine(treefile,5)
-        treetype := FileReadLine(treefile,6)
-        street := FileReadLine(treefile,7)
-        landbase := FileReadLine(treefile,8)
-        number := FileReadline(treefile,9)
-        cabloc := FileReadLine(treefile,10)
-        meas1 := FileReadLine(treefile,11)
-        meas2 := FileReadLine(treefile,12)
-        label := FileReadLine(treefile,13)
-        label2 := FileReadLine(treefile,14)
-        filename := FileReadLine(treefile,15)
+        for key,val in {north:2, south:3, west:4, east: 5, treetype:6, street:7, landbase:8, number:9, cabloc:10, meas1:11, meas2:12, label:13, label2:14, filename:15}
+        ;double deref here to initialize new variables
+        {
+          %key% := FileReadLine(treefile,val)
+        }
+
+        key := "", val := ""
 
         clickdrawingtab()
         setForm()
@@ -3910,20 +3887,23 @@ treeSketchFromTemplate(treefile)
             labels := [meas1,label]
         }
 
-        tda := {"north":north, "south":south, "west":west, "east":east}
-
         rogersunits := "1M"
-        setTreeDigArea(tda)
+        tda := [["NBoundary.skt",north], ["SBoundary.skt", south], ["WBoundary.skt",west], ["EBoundary.skt", east], ["units.skt", rogersunits] ]
+        for i in tda {
+          setTemplateText(tda[i][1], tda[i][2])
+        }
         loadImageNG(treeSketchBuilder(landbase, cabloc))
         setTreeLabels(labels,street,cabloc,landbase,treetype,number)
-        setTemplateText("units.skt",rogersunits)
-        setTemplateText("totalpages.skt",1)
-        loadImage("catv primary.skt")
-        setTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
         SketchTool.SaveImage(filename)
+        for template,text in {"units.skt":rogersunits, "totalpages.skt":1, "rogersPrimarydate.skt": A_YYYY "-" A_MM "-" A_DD}
+        {
+          setTemplateText(template,text)
+        }
+        loadImage("catv primary.skt")
         sleep 500
         SketchTool.SubmitAndExit()
         focusTeldig()
+        Mobile.SelectLocationTab()
         addtotimesheet()
         sleep 500
         Mobile.SelectPending()
@@ -3954,7 +3934,26 @@ treeSketchFromTemplate(treefile)
     }
 }
 
-treeAutoFill()
+treeGui()
+{
+  global ticketnumber
+  tform := "-c 'Tree Entry Form'"
+  taddress := "-p 'Tree Address' -in E -o Uppercase"
+  tstreet := "-p Street -in E -o Uppercase"
+  tlandbase := "-p Landbase -in E Uppercase"
+  tnumber := "-p 'House Number' -in E"
+  tposition := "-p Position -in E -cb '1=curb side,2=property side,3=both'"
+  tmeas1 := "-p 'Measurement 1' -in E"
+  tmeas2 := "-p 'Measurement 2' -in E"
+  tlabel1 := "-p 'Label 1' -in E Uppercase"
+  tlabel2 := "-p 'Label 2' -in E Uppercase"
+  tsavefile := "-p 'Save filename' -in E Uppercase"
+  treeform := EntryForm(tform, taddress, tstreet, tlandbase, tnumber, tposition, tmeas1, tmeas2, tlabel1, tlabel2, tsaveFile)
+  return treeform
+}
+
+
+treeAutofill()
 {
     global
     locationDataCheck()
@@ -4004,109 +4003,48 @@ treeAutoFill()
         else
         {
             clickdrawingtab()
-            treeDigArea := getTreeDigArea()
-            treetype := treeDigArea["treetype"]
-            rclear := rogClear()
-            if (rclear)
-            {
-                setform()
-                waitSTload()
-                setTreeDigArea(treeDigArea)
-                writeRogersClearReason()
-                rclear := ""
-                ST_SAVEEXIT()
-                return
-            }
-            InputBox, street, Street, Street?,,,,,,, %street%
-            InputBox, landbase, landbase, Which Direction?
-            InputBox, number,Number, Enter house number?
-            InputBox, cabloc, Location, Where is cable relative to tree?`n1 = closer to road`n2 = closer to property`n3 = both sides of tree,,,,,,,,2
-            labels := getTreeLabels(cabloc)
+            ; treeDigArea := getTreeDigArea()
+            ; treetype := treeDigArea["treetype"]
+            ; rclear := rogClear()
+            ; if (rclear)
+            ; {
+            ;     setform()
+            ;     waitSTload()
+            ;     setTreeDigArea(treeDigArea)
+            ;     writeRogersClearReason()
+            ;     rclear := ""
+            ;     ST_SAVEEXIT()
+            ;     return
+            ; }
+            ; InputBox, street, Street, Street?,,,,,,, %street%
+            ; InputBox, landbase, landbase, Which Direction?
+            ; InputBox, number,Number, Enter house number?
+            ; InputBox, cabloc, Location, Where is cable relative to tree?`n1 = closer to road`n2 = closer to property`n3 = both sides of tree,,,,,,,,2
+            ; labels := getTreeLabels(cabloc)
             ;write a template file (ticketnumber)trees.txt
+
+            treeform := treeGui()
+            treedata := treeform["output"]
+            treen := "2M NORTH OF STUMP " . treedata[1]
+            trees := "2M SOUTH OF STUMP " . treedata[1]
+            treew := "2M WEST OF STUMP " . treedata[1]
+            treee := "2M EAST OF STUMP " . treedata[1]
             treefile := JoinPath(A_MyDocuments,ticketnumber . ".txt")
             MsgBox % treefile
-            FileAppend(ticketnumber "`n" treeDigArea["north"] "`n" treeDigArea["south"] "`n" treeDigArea["west"] "`n" treeDigArea["east"] "`n" treetype "`n" street "`n" landbase "`n" number "`n" cabloc "`n",treefile)
+            FileAppend(ticketnumber . "`n" . treen . "`n" . trees . "`n" . treew . "`n" . treee . "`nSTUMP`n" . treedata[2] . "`n" . treedata[3] . "`n" . treedata[4] . "`n" . treedata[5] . "`n" treedata[6] . "`n" . treedata[7] . "`n" . treedata[8] . "`n" . treedata[9] . "`n" . treedata[10], treefile)
+            ; FileAppend(ticketnumber "`n" treeDigArea["north"] "`n" treeDigArea["south"] "`n" treeDigArea["west"] "`n" treeDigArea["east"] "`n" treetype "`n" street "`n" landbase "`n" number "`n" cabloc "`n",treefile)
             ;make sure the labels correspond to a single cable or double cable sketch
-            if (cabloc =3)
-            {
-                FileAppend(labels[1] "`n" labels[2] "`n" labels[3] "`n" labels[4] "`n" number " " street " TREES R.SKT",treefile)
-            }
-            else
-                FileAppend(labels[1] "`n" "x`n" labels[2] "`n" "x`n" number " " street " TREES R.SKT",treefile)
-            finishnow := InputBox("Complete ticket now?")
-            ;back out if want to finish later
-            if (finishnow = "n" || finishnow = "N")
-            {
-                MsgBox("Ticket info saved to file")
-                ticketnumber := "",landbase := "",number :="",cabloc := "",labels := "",treefile := "",treeDigArea := "",stationcode := "",intersection := "",intersection2 := ""
-                resetformVar()
-                return
-            }
-            setform()
-            waitSTLoad()
-            setTreeDigArea(treeDigArea)
-            loadimageNG(treeSketchBuilder(landbase,cabloc))
-            setTreeLabels(labels,street, cabloc, landbase, treetype,number)
-            rogersunits := "1M"
-            setTemplateText("units.skt",rogersunits)
-            setTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
-            setTemplateText("totalpages.skt",1)
-            SketchTool.SaveImage(A_MyDocuments "\" ticketnumber " TREE PLANTING R.skt")
-            sleep 500
-            SketchTool.SubmitAndExit()
-            focusTeldig()
-
+            ; if (cabloc =3)
+            ; {
+            ;     FileAppend(labels[1] "`n" labels[2] "`n" labels[3] "`n" labels[4] "`n" number " " street " TREES R.SKT",treefile)
+            ; }
+            ; else
+            ;     FileAppend(labels[1] "`n" "x`n" labels[2] "`n" "x`n" number " " street " TREES R.SKT",treefile)
+            MsgBox("Ticket info saved to file")
+            ticketnumber := "",landbase := "",number :="",cabloc := "",labels := "",treefile := "",treeDigArea := "",stationcode := "",intersection := "",intersection2 := ""
+            resetformVar()
         }
     }
-    if (currentpage < totalpages)
-        treeAutoFill()
-    addtotimesheet()
-}
-
-treeAutoFillFromTemplate()
-{
-    global
-    ;readTreeTemplate
-    setform()
-    waitSTLoad()
-    if (form = "BP")
-    {
-        bellPrimaryPoleAutofill()
-        ST_SAVEEXIT()
-    }
-    else
-    {
-        if (useExisting() = "y")
-        {
-            autofillExistingSketch()
-        }
-        else
-        {
-            treeDigArea := getTreeDigArea()
-            treetype := treeDigArea["treetype"]
-            rclear := rogClear()
-            if (rclear)
-            {
-                setTreeDigArea(treeDigArea)
-                writeRogersClearReason()
-                rclear := ""
-                ST_SAVEEXIT()
-                return
-            }
-            InputBox, street, Street, Street?,,,,,,, %street%
-            InputBox, landbase, landbase, Which Direction?
-            InputBox, number,Number, Enter house number?
-            InputBox, cabloc, Location, Where is cable relative to tree?`n1 = closer to road`n2 = closer to property`n3 = both sides of tree
-            labels := getTreeLabels(cabloc)
-            setTreeDigArea(treeDigArea)
-            loadimageNG(treeSketchBuilder(landbase,cabloc))
-            setTreeLabels(labels,street, cabloc, landbase, treetype,number)
-            WinWaitClose, AHK_EXE SKETCHTOOLAPPLICATION.EXE
-        }
-    }
-    if (currentpage < totalpages)
-        treeAutoFill()
-    addtotimesheet()
 }
 
 ;returns object with measuremetns and cable labels
@@ -4411,7 +4349,10 @@ saveFile() ; opens save dialog
 
 focusTeldig() ;makes teldig window active and enlarges to full size
 {
-    WinActivate, ahk_exe mobile.exe
+    if (winexist("ahk_exe locateaccess.exe"))
+        WinActivate,ahk_exe locateaccess.exe
+    else
+        WinActivate, ahk_exe mobile.exe
 }
 
 focusSketchTool()
@@ -4421,14 +4362,25 @@ focusSketchTool()
 
 clickLocationTab()
 {
-    Acc_Get("DoAction", "4.1.4.1.4.1.4.1.4.11.4",1,"ahk_exe mobile.exe")
-    Sleep 150
+   ; Acc_Get("DoAction", "4.1.4.1.4.1.4.1.4.11.4",1,"ahk_exe mobile.exe")
+   ; Sleep 150
+   uia := UIA_Interface()
+   win := uia.ElementFromHandle(Winactive("A"))
+   nnx := win.WaitElementExistByName("NNX",,,,1)
+   if (!nnx)
+    d := win.FindByPath("1.3.1.1.3.2.1").click()
 }
 
 clickDigInfoTab()
 {
-    Acc_Get("DoAction","4.1.4.1.4.1.4.1.4.11.4",2,"ahk_exe mobile.exe")
-    Sleep 150
+    ;Acc_Get("DoAction","4.1.4.1.4.1.4.1.4.11.4",2,"ahk_exe mobile.exe")
+    ;Sleep 150
+    uia := UIA_Interface()
+    win := uia.ElementFromHandle(Winactive("A"))
+    gi := win.WaitElementExistByName("Grid info",,,,2)
+    if (!gi)
+        win.FindByPath("1.3.3.1.2.2.1").click()
+    
 }
 
 clickdrawingtab()
@@ -4465,24 +4417,107 @@ clickNewForm()
 
 statusPending() ; change ticket status to pending
 {
-    CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
+    ;CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
+    UIA := UIA_Interface()
+    win := uia.ElementFromHandle(Winexist("ahk_exe locateaccess.exe"))
+    r := win.FindFirstByName("ANALYSED").click()
+    Send,m
+    win.WaitElementExistByName("MOBILE")
+    Send,Enter
 }
 
 getTicketData()
 {	;pulls data from ticket on mobile
     ;returns a ticket object
     global
-    ControlGet, number, Line,1, edit2, ahk_exe Mobile.exe
-    ControlGet, street, line,1, Edit6, ahk_exe Mobile.exe
-    ControlGet, intersection, line,1,edit10, ahk_exe mobile.exe
-    ControlGet, intersection2, line,1,edit12, ahk_exe mobile.exe
-    ControlGet, stationCode, line,1, edit9, ahk_exe mobile.exe
-    ControlGetText, digInfo, edit22, ahk_exe mobile.exe
-    controlget, ticketNumber, line, 1, edit1, ahk_exe mobile.exe
-    controlget, town, line, 1, edit13, ahk_exe mobile.exe
-    ;ticketdata := [number, street, intersection, intersection2, stationcode, diginfo, ticketnumber, town]
+    /* ; ControlGet, number, Line,1, edit2, ahk_exe Mobile.exe
+    ; ControlGet, street, line,1, Edit6, ahk_exe Mobile.exe
+    ; ControlGet, intersection, line,1,edit10, ahk_exe mobile.exe
+    ; ControlGet, intersection2, line,1,edit12, ahk_exe mobile.exe
+    ; ControlGet, stationCode, line,1, edit9, ahk_exe mobile.exe
+    ; ControlGetText, digInfo, edit22, ahk_exe mobile.exe
+    ; controlget, ticketNumber, line, 1, edit1, ahk_exe mobile.exe
+    ; controlget, town, line, 1, edit13, ahk_exe mobile.exe */
+/*     uia := UIA_Interface()
+ *     win := uia.ElementFromHandle(WinActive("A"))
+ *     win.WaitElementExistByName("Plant")
+ *     s := win.FindFirstByName("Address")
+ *     street := s.FindByPath("P1+1.1").GetCurrentPropertyValue("Value")
+ *     number := street
+ *     sc := win.FindFirstByName("Utility")
+ *     stationCode := sc.FindByPath("P1+1.1").GetCurrentPropertyValue("Value")
+ *     i := win.FindFirstByName("Intersection 1")
+ *     intersection := i.FindByPath("P1+1.1").GetCurrentPropertyValue("Value")
+ *     x := win.FindFirstByName("Intersection 2")
+ *     intersection2 := x.FindByPath("P1+1.1").GetCurrentPropertyValue("Value")
+ *     if (stationCode == "ROGYRK01") 
+ *         di := win.FindFirstByName("Additional location info")
+ *     else
+ *         di := win.FindFirstByName("Remarks")
+ *     digInfo := di.FindByPath("P1+1.1").GetCurrentPropertyValue("Value")
+ *     tn := win.FindFirstByName("Request #")
+ *     ticketNumber := tn.FindByPath("P1+1.1").GetCurrentPropertyValue("Value")
+ *     t := win.FindFirstByName("City, State")
+ *     town := t.FindByPath("P1+1.1").GetCurrentPropertyValue("Value")
+ */
+    ladatapath := "C:\Users\Cr\AppData\Local\TelDigFusion.Data\data\"
+    uia := UIA_Interface()
+    win := uia.ElementFromHandle(WinExist("A"))
+    doc := win.FindFirstByNameAndType("LocateAccess - Cable Control Systems","Document").Value
+    a := StrSplit(doc,"/")
+    subdir := a.8 . "_" . a.9
+    stationcode := a.9
+    ladatapath .= subdir
+    ;file loop needs full pattern similar to dir cmd
+    Loop, Files, %ladatapath%\*.txt, R
+    {
+        file := A_LoopFileLongPath
+    }
+    if (stationcode == "ROGYRK01") 
+    {
+        FileReadLine,number,%file%,32
+        FileReadLine,street,%file%,34
+        FileReadLine,intersection,%file%,35
+        FileReadLine,intersection2,%file%,36
+        FileReadLine,digInfo,%file%,64
+        FileReadLine,ticketnumber,%file%,4
+        FileReadLine,town,%file%,30
+        number := StrReplace(number,"UR_NO_CIVIC_INITI::")
+        street := StrReplace(street,"UR_NOM_ARTER_PRINC::")
+        intersection := StrReplace(intersection,"UR_NOM_ARTER_INTER_1::")
+        intersection2 := StrReplace(intersection2,"UR_NOM_ARTER_INTER_2::")
+        digInfo := StrReplace(diginfo,"UR_INFO_ADDIT_TROU::")
+        ticketnumber := StrReplace(ticketnumber,"UR_ID_REQUE::")
+        town := StrReplace(town,"UR_NOM_TESSE_1::")
+    }
+    else if (stationcode == "APTUM01")
+    {
+        FileRead,aptfile,%file%
+        lines := StrSplit(aptfile,"`n")
+        for lineidx, line in lines {
+            if (Instr(line,"Address")) {
+                n := RegExReplace(line,".*:.")
+            }
+            number := Trim(RegExReplace(n,",.*")," `n`r")
+            street := Trim(RegExReplace(n,".*,.")," `n`r")
+           
+            if (Instr(line,"Intersecting Street 1")) {
+                intersection := Trim(RegExReplace(line,".*:.")," `n`r")
+            }
+            if (Instr(line,"Intersecting Street 2")) {
+                intersection2 := Trim(RegExReplace(line,".*:.")," `n`r")
+            }
+            if (Instr(line,"REQUEST #:")) {
+                ticketnumber := Trim(RegExReplace(line,".*:.")," `n`r")
+            }
+            if (Instr(line,"Region/County")) {
+                town := Trim(RegExReplace(line,".*:.")," `n`r")
+            }
+        }
+    }
     ticketdata := {number : number, street : street, intersection : intersection, intersection2 : intersection2, stationCode : stationCode, digInfo: digInfo, ticketNumber : ticketNumber, town : town}
     sleep 1000
+    msgbox % obj2string(ticketdata)
 return ticketdata
 }
 
@@ -5059,7 +5094,9 @@ addToTimesheetFromPrevious(aptumunits := "",rogersunits := "")
 {
     global
     splashtexton,,,,Adding to logsheet
-    FileAppend,% ticketnumber "," number " " street "," rogersunits[1] "," rogersunits[2] "," aptumunits[1] "," aptumunits[2]
+    FileAppend,% ticketnumber "," number " " street "," rogersunits[1] "," rogersunits[2] "," aptumunits[1] "," aptumunits[2] ", `n", C:\Users\Cr\timesheet%today%.txt
+    if ErrorLevel
+        MsgBox % "Couldn't write to timesheet"
     SplashTextOff
 }
 
@@ -5476,11 +5513,13 @@ stproj_saveexit()
         setTemplateText("units.skt",units)
         setTemplateText("bellprimarydate.skt",today)
         setTemplateText("totalpages.skt",totalpages)
+
     Case "BA" :
         loadImage("bellaux.skt")
         setTemplateText("bellauxilliarydate.skt",today)
         setTemplateText("currentpage.skt",currentpage)
         setTemplateText("totalpages.skt",totalpages)
+
     Case "RP" :
         ;units := Inputbox("Enter units")
         loadImage("catv primary.skt")
@@ -5492,19 +5531,31 @@ stproj_saveexit()
         setTemplateText("units.skt",units)
         setTemplateText("rogersprimarydate.skt",today)
         setTemplateText("TOTALPAGES.skt",TOTALPAGES)
+
     Case "RA" :
         loadImage("rogersaux.skt")
         setTemplateText("totalpages.skt",totalpages)
         setTemplateText("currentpage.skt",currentpage)
+
     Case "AP":
         loadImage("cogeco primary.skt")
         setTemplateText("units.skt",units)
         setTemplateText("rogersprimarydate.skt",today)
-        setTemplateText("totalpages.skt",TOTALPAGES)
-        setTemplateText("currentpage.skt",currentpage)
+        setTemplateText("RPtotalpages.skt",currentpage . "/" . totalpages)
 
     Case "AA":
         loadImage("aptumaux.skt")
+        setTemplateText("totalpages.skt",totalpages)
+        setTemplateText("currentpage.skt",currentpage)
+
+    Case "EP":
+        loadImage("catv primary.skt")
+        setTemplateText("units.skt",units)
+        setTemplateText("rogersprimarydate.skt",today)
+        setTemplateText("RPtotalpages.skt",currentpage . "/" . totalpages)
+
+    Case "EA":
+        loadImage("envi auxilliary.skt")
         setTemplateText("totalpages.skt",totalpages)
         setTemplateText("currentpage.skt",currentpage)
     }
@@ -5881,22 +5932,28 @@ finishemail()
 {
     global
     focusTeldig()
-    tickettimeend := (A_TickCount - timestart) / 1000
-    FileAppend, %ticketnumber% total - %tickettimeend%`n, timelog.txt
     currentpage := "", totalpages := ""
-    clickLocationTab()
     STATUSPENDING()
     if (form = "BP" or form = "BA")
         bellMarked := "", bellClear := ""
     else if (form = "RP" or form = "RA")
         rogersMarked := "", rogersClear := ""
     form := "", locationDataObtained := "",landbase := "",intdir := "",choice := "",rclear :="", num := "", timestart := ""
-    SetControlDelay, -1
-    ControlClick, Button43,,,,,NA
-    WinWaitActive, ahk_class #32770
-    ControlClick, Button1,,,,,NA
-    WinWaitActive,Paper output to contractor
-    ControlClick, Button4,,,,,NA
+    ;~ SetControlDelay, -1
+    ;~ ControlClick, Button43,,,,,NA
+    ;~ WinWaitActive, ahk_class #32770
+    ;~ ControlClick, Button1,,,,,NA
+    ;~ WinWaitActive,Paper output to contractor
+    ;~ ControlClick, Button4,,,,,NA
+    uia := UIA_Interface()
+    win := uia.ElementFromHandle(winactive("ahk_exe locateaccess.exe"))
+    win.FindFirstByName("Save").click()
+    y := win.WaitElementExistByName("Yes",,,,,1000)
+    if (!y)
+        MsgBox % "timed out"
+    win.FindFirstByName("Yes").click()
+    win.WaitElementExistByName("OK",,,,,1000)
+    win.FindFirstByName("OK").click()
 }
 
 numpaddel:: ;COMPLET TICKET WITHOUT EMAILING
@@ -6883,8 +6940,8 @@ return address
 fixstreetName1() {
     address := getLocationMobileList()
     address.street := StrReplace(address.street,",")
-    address.street := RegExReplace(address.street,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*")
-    address.intersection:= RegExReplace(address.intersection,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*")
+    address.street := RegExReplace(address.street,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*|\*\**.*")
+    address.intersection:= RegExReplace(address.intersection,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*|\*\**.*")
     address.town:= RegExReplace(address.town,"\,.*")
 return address
 }
@@ -6893,21 +6950,10 @@ return address
 fixstreetName()
 {
     global
-    intersection:= RegExReplace(intersection,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*")
-    intersection2 := RegExReplace(intersection,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*")
+    intersection:= RegExReplace(intersection,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*|\*\**.*")
+    intersection2 := RegExReplace(intersection,"^ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*|\*\**.*")
     town:= RegExReplace(town,"\,.*")
-    if (stationcode = "APTUM01")
-    {
-        street := RegExReplace(street, "\t.*")
-
-        number := RegExReplace(street, "\D")
-        street := RegExReplace(street, "\d....")
-    }
-    else
-    {
-        street := RegExReplace(street,"^ |^\d+ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*|^\d+, ")
-    }
-
+    street := RegExReplace(street,"^ |^\d+ | \(REGIONAL.*| \(COUNTY.*| \(HIGHW.*|^\d...|\*\**.*")
 }
 
 #IFWINACTIVE AHK_EXE MOBILE.EXE
@@ -7141,7 +7187,7 @@ rogersLookup()
         }
     ;WinActivate, ahk_exe chrome.exe
     WinClose, ahk_exe vpnui.exe
-    fixStreetName()
+    ;fixStreetName()
     ;Run,test_rOGERSLOOKUP.py "pytest" "-s"
     ;Run %ComSpec% /c ""C:\My Utility.exe" "param 1" "second param" >"C:\My File.txt""
     global driver
@@ -7217,7 +7263,7 @@ rogersLookup2()
     }
     WinActivate, ahk_exe chrome.exe
     WinClose, ahk_exe vpnui.exe
-    fixStreetName()
+    ;fixStreetName()
     global driver
     if !(driver)
         driver := ChromeGet()
@@ -7327,25 +7373,27 @@ recordsLookup()
     global town
     global street
     global intersection
-  focusTeldig()
-    clickLocationTab()
+    focusTeldig()
     getTicketData()
     sleep 200
     clickDigInfoTab()
-    ControlGet,didata, List,, SysListView321, ahk_exe mobile.exe
-
-    Loop, Parse, didata, `n
-    {
-        if instr(A_LoopField, "LATITUDE")
-        {
-            lat := substr(A_LoopField, 11)
-        }
-        if instr(A_LoopField, "LONGITUDE")
-        {
-            long := substr(A_LoopField, 13)
-        }
-    }
-
+/*     ControlGet,didata, List,, SysListView321, ahk_exe mobile.exe
+ * 
+ *     Loop, Parse, didata, `n
+ *     {
+ *         if instr(A_LoopField, "LATITUDE")
+ *         {
+ *             lat := substr(A_LoopField, 11)
+ *         }
+ *         if instr(A_LoopField, "LONGITUDE")
+ *         {
+ *             long := substr(A_LoopField, 13)
+ *         }
+ *     }
+ */
+    c := getcoords()
+    long := c[1], lat := c[2]
+    msgbox % lat . "," . long
     if (stationCode = "ROGYRK01") || if (stationCode = "ROGSIM01")
     {
         if !WinExist("ahk_exe chrome.exe")
@@ -7443,7 +7491,7 @@ loop {
     }
     else break
 }
-fixStreetName()
+;fixStreetName()
 driver := ChromeGet()
     ;driver := ComObjCreate("Selenium.EdgeDriver")
     ;driver.Start()
@@ -8551,19 +8599,6 @@ Sleep 1000
 SendMessage, 0x112, 0xF170, 2,, Program Manager
 return
 
-::owcovid::
-; covid tracking form
-Run, https://docs.google.com/forms/d/e/1FAIpQLScU2XCTGCNtohl9KvmqoYOWenK4MvwPDRKa-BIZ0a3eGxrEZg/viewform?vc=0&c=0&w=1&flr=0&gxids=7628
-SetTitleMatchMode, 2
-CoordMode, Mouse, Screen
-tt = COVID-19 TRACKER
-WinWait, %tt%
-IfWinNotActive, %tt%,, WinActivate, %tt%
-    Sleep, 351
-Send, {Blind}{Tab}{Shift Down}{Shift Up}Huckson{vkBC}{Space}{Shift Down}c{Shift Up}raig{Tab}{Shift Down}n{Shift Up}{Tab}n{Tab}n{Tab}{Tab}
-Sleep, 1000
-Send, {Blind}{Enter}
-return
 
 ::owrogers::
 ;opens Go360
@@ -8833,100 +8868,28 @@ Loop,% rowlist.Count(){
 mb(obj2String(nc))
 return
 
-getCoords(){
-    ;obtains coordinates
-    global
-    static nc := []
-    focusTeldig()
-    Send("{Enter}")
-    sleep(300)
-    clickLocationTab()
-    getTicketData()
-    fixstreetName()
-    clickDigInfoTab()
-    ControlGet,didata, List,, SysListView321, ahk_exe mobile.exe
-    Loop, Parse, didata, `n
+getCoords()
+{
+    coords := []
+    ladatapath := "C:\Users\Cr\AppData\Local\TelDigFusion.Data\data\"
+    uia := UIA_Interface()
+    win := uia.ElementFromHandle(WinExist("A"))
+    doc := win.FindFirstByNameAndType("LocateAccess - Cable Control Systems","Document").Value
+    a := StrSplit(doc,"/")
+    subdir := a.8 . "_" . a.9
+    ladatapath .= subdir
+    ;file loop needs full pattern similar to dir cmd
+    Loop, Files, %ladatapath%\*.txt, R
     {
-        if instr(A_LoopField, "LATITUDE")
-        {
-            lat := substr(A_LoopField, 11)
-        }
-        if instr(A_LoopField, "LONGITUDE")
-        {
-            long := substr(A_LoopField, 13)
-        }
+        file := A_LoopFileLongPath
     }
-    if (number){
-        numstring := number . " " . street . ", " . town
-        ;Send(numstring "{Enter}")
-        sleep(100)
-        nc.Push(numstring)
-    }
-    else
-    {
-        ixnstring := street . "& " . intersection . ", " . town
-        ;Send(ixnstring "{Enter}")
-        sleep(100)
-        nc.Push(ixnstring)
-    }
-    Send("{Esc}")
-    sleep,100
-    Send("y")
-    sleep(200)
-    return nc
+    FileReadLine,lat,%file%,66
+    FileReadLine,long,%file%,67
+    ;strreplace is faster than regexreplace
+    coords[1] := strreplace(lat,"UR_POLY_X1::"), coords[2] := StrReplace(long,"UR_POLY_Y1::")
+    return coords
 }
-    ;mb("latitude: " . lat . " longitude: " . long)
-    ;WinActivate(ahkexe("streets.exe"))
-    ;sleep 300
-    ; if (number){
-    ; 	Send(number . " " . street . ", " . town "{Enter}")
-    ; }
-    ; else
-    ; {
-    ; 	Send(street . "& " . intersection . ", " . town "{Enter}")
-    ; }
-    ;Send("123z" "{Enter}")
-    ;sleep(400)
-    ;if (WinActive("Find"))
-    ;{
-    ;	Sleep(250)
-    ;	Control("TabRight",2,"SysTabControl321",AhkClass("#32770"))
-    ;	sleep(250)
-        ; ControlSetText("Edit1",lat,"Find")
-        ; sleep(250)
-        ; ControlSetText("Edit2",long,"Find")
-        ; Sleep(250)
-        ; ControlClick("Button1","Find")
-        ; sleep(250)
-        ; ControlClick("OK","Find")
-        ; sleep(200)
-        ; ; Send("{Tab 2}")
-        ; sleep(250)
-        ;mb()
-        ; Send("+{F10}")
-        ; sleep(260)
-        ; Send("n")
-        ; sleep(300)
-        ; if (number){
-        ; 	numstring := number . " " . street . ", " . town
-        ; 	;Send(numstring "{Enter}")
-        ; 	sleep(100)
-        ; 	nc.Push(numstring)
-        ; }
-        ; else
-        ; {
-        ; 	ixnstring := street . "& " . intersection . ", " . town
-        ; 	;Send(ixnstring "{Enter}")
-        ; 	sleep(100)
-        ; 	nc.Push(ixnstring)
-        ; }
-        ; focusTeldig()
-        ; sleep(100)
-        ;
-        ; ;Send("+{Tab 2}")
-        ;mb(obj2String(nc))
-
-;saveSKTasJPEG() {
+    
 
     ^f3::
     getTicketNumbersFromList()
@@ -9031,3 +8994,49 @@ save_bitmap()
 {
   picSave(,".bmp")
 }
+
+
+#IfWinActive, ahk_exe LocateAccess.exe
+
+Esc::
+uia := uia_interface()
+winactivate, ahk_exe locateaccess.exe
+lael := uia.ElementFromHandle(WinActive("ahk_exe LocateAccess.exe"))
+lael.FindFirstByNameandType("Cancel","Button").click()
+return
+
+^s::
+uia := uia_interface()
+result := Inputbox("Enter search term")
+gridwin := uia.ElementFromHandle(WinActive("A"))
+s := gridwin.FindFirstByName("Street").SetFocus()
+Send, %result%
+return
+
+^t::
+getticketdata()
+return
+
+^d::
+uia := uia_interface()
+win := uia.ElementFromHandle(Winactive("A"))
+Clipboard := win.dumpall()
+msgbox, dumped
+return
+
+F9::
+::SKAF::
+sketchAutoFill()
+return
+
+RShift::
+MBUTTON::
+Menu, Mobile, Show
+return
+
+NUMPADENTER:: ;FINISH AND EMAIL TICKET
+:::m::
+    finishemail()
+return
+
+

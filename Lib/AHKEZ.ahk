@@ -6,11 +6,11 @@ if (!A_IsCompiled && A_LineFile == A_ScriptFullPath) {
   ==================================================================================================
   Title:
     AHKEZ.ahk
-  About:  
+  About:
     The standard library for AHKEZ
-  Usage:  
+  Usage:
     #Include <AHKEZ>
-  GitHub: 
+  GitHub:
     https://github.com/jasc2v8/AHKEZ
   Version:
     0.1.7/2021-03-13_07:34/jasc2v8/remove FileInstall() as it conflicts with Ahk2Exe compiler
@@ -27,7 +27,7 @@ if (!A_IsCompiled && A_LineFile == A_ScriptFullPath) {
     Functions.ahk Version 1.41 <http://www.autohotkey.net/~polyethene/#functions>
   Objectives:
     1. Promote the use of AutoHotkey for programmers of all skill levels and languages
-    2. Make AutoHotkey **Easy**, Effective, and Fun to use 
+    2. Make AutoHotkey **Easy**, Effective, and Fun to use
     3. Minimize the confusion when to use percent signs: `variable` or `%variable%` ?
     4. For AHK_L_v1.1 only, I have no plans to update for the forthcoming AHL_L_v2
   License:
@@ -562,7 +562,7 @@ SetTitleMatchMode(MatchMode = "", Speed = "") {
       Case "slow":      Option := Speed
       Default:          Option := "fast"
     }
-    SetTitleMatchMode, %Option%    
+    SetTitleMatchMode, %Option%
   }
 }
 SetWinDelayDelay(Delay) {
@@ -743,7 +743,7 @@ WinMaximize(WinTitle = "", WinText = "", ExcludeTitle = "", ExcludeText = "") {
 WinMenuSelectItem(WinTitle, WinText, Menu, SubMenu1 = "", SubMenu2 = "", SubMenu3 = "", SubMenu4 = "", SubMenu5 = "", SubMenu6 = "") {
   WinMenuSelectItem, %WinTitle%, %WinText%, %Menu% , %SubMenu1%, %SubMenu2%, %SubMenu3%, %SubMenu4%, %SubMenu5%, %SubMenu6%
 }
-WinMinimize(WinTitle = "", WinText = "", ExcludeTitle = "", ExcludeText = "") { 
+WinMinimize(WinTitle = "", WinText = "", ExcludeTitle = "", ExcludeText = "") {
   WinMinimize, %WinTitle%, %WinText%, %ExcludeTitle%, %ExcludeText%
 }
 WinMinimizeAll() {
