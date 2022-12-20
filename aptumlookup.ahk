@@ -22,7 +22,7 @@ openFindDialog()
 	win := uia.ElementFromHandle(WinActive("ahk_exe MAPINFOR.EXE"))
 	win.FindFirstByName("Select").click()
 	sleep 150
-	win.FindFirstBy("ControlType=MenuItem AND Name='Find...	Ctrl+F' AND AutomationId='517'").Click()
+	win.FindFirstBy("Name='Find...'").Click()
 }
 
 isLongFindDialog()
@@ -127,9 +127,10 @@ finalizeAptumLookup(address)
 }
 
 
-aptumLookup()
+aptumLookup(address:="")
 {
-	InputBox, address, Address, Enter a Toronto Address
+    if (address == "")
+     InputBox, address, Address, Enter a Toronto Address
 	WinActivate,ahk_exe mapinfor.exe
 	openFindDialog()
 	if (isLongFindDialog() = true)
