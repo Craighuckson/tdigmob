@@ -1,0 +1,4 @@
+#include <Vis2>
+MsgBox % OCR("https://i.stack.imgur.com/sFPWe.png")
+
+#c:OCR()
