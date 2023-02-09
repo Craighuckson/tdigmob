@@ -1,0 +1,1 @@
+2023-01-03 16:18:15.466 aptum_lookup.py[6] activate_mapinfo -> 2023-01-03 16:22:24.468 aptum_lookup.py[6] activate_mapinfo -> 2023-01-03 16:25:16.485 aptum_lookup.py[7] activate_mapinfo -> 2023-01-03 16:27:35.251 aptum_lookup.py[11] activate_mapinfo -> 2023-01-03 16:40:24.939 aptum_lookup.py[15] open_find_dialog -> 2023-01-03 16:40:52.142 aptum_lookup.py[15] open_find_dialog -> 

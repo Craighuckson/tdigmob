@@ -71,11 +71,14 @@ setFindParams()
  * 	WinWait, %tt%
  * 	IfWinNotActive, %tt%,, WinActivate, %tt%
  */
- tt = Find ahk_class #32770
- WinWait, %tt%
- IfWinNotActive, %tt%,, WinActivate, %tt%
+/*  tt = Find ahk_class #32770
+ *  WinWait, %tt%
+ *  IfWinNotActive, %tt%,, WinActivate, %tt%
+ */
  uia := uia_interface()
- win := uia.ElementFromHandle(WinActive("ahk_class #32770"))
+ ;win := uia.ElementFromHandle(WinActive("ahk_class #32770"))
+ WinWaitActive, ahk_class #32770
+ win := uia.ElementFromHandle()
  win.FindFirstBy("ControlType=ComboBox AND Name='Search Table:' AND AutomationId='4'").SetFocus()
  Send,ro
  win.FindFirstBy("ControlType=ComboBox AND Name='Refine Search with Table:'").SetFocus()
@@ -110,11 +113,9 @@ finalizeAptumLookup(address)
  * 	WinWait, %tt%
  * 	IfWinNotActive, %tt%,, WinActivate, %tt%
  */
- tt = Find ahk_class #32770
- WinWait, %tt%
- IfWinNotActive, %tt%,, WinActivate, %tt%
  uia := uia_interface()
- win := uia.ElementFromHandle(WinActive("ahk_class #32770"))
+ win := uia.ElementFromHandle()
+ WinWaitActive, ahk_class #32770
  win.WaitElementExistByName("STREET")
  win.FindFirstByNameAndType("STREET","Edit").SetValue(address)
  win.FindFirstByName("OK").click()

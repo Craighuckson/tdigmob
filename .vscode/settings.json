@@ -94,5 +94,6 @@
 			"testassets"
 		],
 		"python.testing.unittestEnabled": false,
-		"python.testing.pytestEnabled": true, //won't trigger on spacebar)
+    "python.testing.pytestEnabled": true,
+    "AutoHotkey2.InterpreterPath": "c:\\Program Files\\AutoHotkey\\v2-alpha\\x64\\AutoHotkey.exe", //won't trigger on spacebar)
 }

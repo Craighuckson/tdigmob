@@ -1,4 +1,5 @@
-﻿
+
+
 ;TELDIG MASTER SCRIPT;
 
 ;TODO - ADD APTUM TO TIMESHEET, UPDATE PYTHON TIMESHEET AS WELL
@@ -9,9 +10,9 @@
 ;~ /* ;AUTOEXECUTE SECTION  */
 
 ;#NoEnv
-#Persistent
-ListLines, On
-#MenuMaskKey,VK07
+Persistent
+ListLines('On')
+A_MenuMaskKey := 'VK07'
 #include <findtext>
 #include <DebugWindow>
 ;#include <V1TOV1FUNC>
@@ -31,18 +32,19 @@ ListLines, On
 #Include C:\Users\Cr\teldig\vpn.ahk
 #Include C:\Users\Cr\teldig\aptumlookup.ahk
 #Include <chrome>
-BlockInput, SendAndMouse
-SetControlDelay, 50
-Menu, Tray, Icon, C:\Users\Cr\teldig\tico.png
+BlockInput('SendAndMouse')
+SetControlDelay(50)
+TraySetIcon('C:\Users\Cr\teldig\tico.png')
 
 ;Iniread section to preload variables between resets
-iniread, form, C:\Users\Cr\teldig\teldig.ini, variables, form, ""
+INI_FORM := 'C:\Users\Cr\teldig\teldig.ini'
+form := IniRead(INI_FORM,variables,form,"")
 ;iniread, stationcode, C:\Users\Cr\teldig\teldig.ini, variables, stationcode, ""
-iniread, bellmarked, C:\Users\Cr\teldig\teldig.ini, variables, bellmarked, ""
-iniread, bellclear, C:\Users\Cr\teldig\teldig.ini, variables, bellclear, ""
-iniread, rogersclear, C:\Users\Cr\teldig\teldig.ini, variables, rogersclear, ""
-iniread, rogersmarked, C:\Users\Cr\teldig\teldig.ini, variables, rogersmarked, ""
-iniread, locationdataobtained, C:\Users\Cr\teldig\teldig.ini, variables, locationdataobtained, 0
+bellmarked := IniRead(INI_FORM, variables, bellmarked, "")
+bellclear := IniRead(INI_FORM, variables,bellclear,"")
+rogersclear := IniRead(INI_FORM, variables, rogersclear,"")
+rogersmarked := IniRead(INI_FORM, variables, rogersmarked,"")
+locationdataobtained := IniRead(INI_FORM, variables, locationdataobtained, 0)
 iniread, street, C:\Users\Cr\teldig\teldig.ini, variables, street, ""
 iniread, intersection, C:\Users\Cr\teldig\teldig.ini, variables, intersection, ""
 iniread, currentpage, C:\Users\Cr\teldig\teldig.ini, variables, currentpage, ""
@@ -164,7 +166,7 @@ return
 return
 
 ;SKETCHTOOL SPECIFIC HOTKEYS/BUTTON HANDLERS
-#IfWinActive ahk_exe SKETCHTOOLAPPLICATION.EXE
+IfWinActive ahk_exe SKETCHTOOLAPPLICATION.EXE
 
 #D::
 ::dgarea::
@@ -181,7 +183,7 @@ return
     autofillCUA()
 return
 
-#IfWinActive
+IfWinActive
 
 ;SKETCHTOOL FUNCTIONS
 
@@ -1463,7 +1465,7 @@ writeRAdigarea()
 
 ;SKETCHTOOL MODULES
 
-autoinsertSketches(email = "n")
+autoinsertSketches(email := "n")
 {
     global
     if !(project)
@@ -2127,12 +2129,12 @@ setJobNumberto99()
     Sleep, 445
     Send, {Blind}{Alt Down}f{Alt Up}n
     Sleep, 148
-    tt = Set job number ahk_class #32770
+    tt := Set job number ahk_class #32770
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
     Sleep, 335
     Send, {Blind}99{Enter}
-    tt = TelDig Mobile - [Ticket list]
+    tt := TelDig Mobile - [Ticket list]
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
     Sleep, 1000
@@ -2731,7 +2733,7 @@ class Go360
 
         SetTitleMatchMode, 2
         CoordMode, Mouse, Window
-        tt = Go360 Rogers Viewer 3.0.0.24 - Google Chrome ahk_class Chrome_WidgetWin_1
+        tt := Go360 Rogers Viewer 3.0.0.24 - Google Chrome ahk_class Chrome_WidgetWin_1
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 1014
@@ -2743,7 +2745,7 @@ class Go360
     {
         SetTitleMatchMode, 2
         CoordMode, Mouse, Window
-        tt = Go360 Rogers Viewer 3.0.0.24 - Google Chrome ahk_class Chrome_WidgetWin_1
+        tt := Go360 Rogers Viewer 3.0.0.24 - Google Chrome ahk_class Chrome_WidgetWin_1
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 733
@@ -3443,7 +3445,7 @@ class Ticket
         Gui, clform:Add, Text, x22 y110 w80 h20 , Dig Area Type:
         Gui, clform:Add, Radio,checked x102 y110 w90 h20 Group vdigareatype, Manual
         Gui, clform:Add, Radio,gwatchdaradio x202 y110 w110 h20 , Private Property
-        Gui, clform:Add, Text, x22 y140 w80 h20, Clear Reason:
+        Gui, clform:Add, Text, x22 y140 w80 h20, Clear Reason
         Gui, clform:Add, Radio,checked x102 y140 w110 h20 Group vclearreason, Regular
         Gui, clform:Add, Radio, x202 y140 w110 h20,FTTH
         Gui, clform:Add, Radio,x322 y140 w110 h20,Fibre Only
@@ -4793,7 +4795,7 @@ autoDrawCable() { ;auto cable draw with 2 points
     points := getPoints("Click line origin", "Click line destination")
     SetTitleMatchMode, 2
     CoordMode, Mouse, Window
-    tt = TelDig SketchTool
+    tt := TelDig SketchTool
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
 
@@ -4829,7 +4831,7 @@ twoPointSL(type := "c")
     points := getPoints("Click line origin","Click line destination")
     SetTitleMatchMode, 2
     CoordMode, Mouse, Window
-    tt = TelDig SketchTool
+    tt := TelDig SketchTool
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
         wait()
@@ -4859,7 +4861,7 @@ r::
     ulx:=points.1,uly:=points.2,lrx:=points.3,lry:=points.4
     SetTitleMatchMode, 2
     CoordMode, Mouse, Window
-    tt = TelDig SketchTool
+    tt := TelDig SketchTool
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
         wait()
@@ -5357,7 +5359,7 @@ return
 #o::
 ::qacirc::
     ; win o for qa circle
-    loadImage(A_MyDocuments . "\qacorrection.skt")
+    loadImage("qacorrection.skt")
 return
 
 ;HOTKEY WIN + T FOR TEXT BOX
@@ -5638,7 +5640,7 @@ stproj_saveexit()
     if(currentpage)
         currentpage := currentpage + 1
     else
-        currentpage = 1
+        currentpage := 1
     switch form
     {
     Case "BP" :
@@ -7121,32 +7123,32 @@ bellsearch()
 
         SetTitleMatchMode, 2
         CoordMode, Mouse, Window
-        tt = Territory
+        tt := Territory
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 2000
         MouseClick, L, 1284, 500
         Sleep, 132
-        tt = ahk_class WindowsForms10.Window.808.app.0.378734a
+        tt := ahk_class WindowsForms10.Window.808.app.0.378734a
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 200
         MouseClick, L, 73, 32
-        tt = Zoom To Bell Address Range
+        tt := Zoom To Bell Address Range
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 200
         Send, {Blind}%bcitysearch%
         Sleep, 1177
         MouseClick, L, 367, 131
-        tt = Zoom To Bell Address Range
+        tt := Zoom To Bell Address Range
         WinWait, %tt%,,4,
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 250
         Send, {Blind}%street%
         Sleep, 300
         MouseClick, L, 365, 134
-        tt = Zoom To Bell Address Range
+        tt := Zoom To Bell Address Range
         WinWait, %tt%,,4,
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 250
@@ -7159,28 +7161,28 @@ bellsearch()
     {
         SetTitleMatchMode, 2
         CoordMode, Mouse, Window
-        tt = Territory
+        tt := Territory
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 2000
         MouseClick, L, 1259, 498
         Sleep, 133
-        tt = ahk_class WindowsForms10.Window.808.app.0.378734a
+        tt := ahk_class WindowsForms10.Window.808.app.0.378734a
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 319
         MouseClick, L, 48, 27
-        tt = Zoom To Bell Intersection
+        tt := Zoom To Bell Intersection
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 632
         Send, {Blind}%bcitysearch%{Enter}
-        tt = Zoom To Bell Intersection
+        tt := Zoom To Bell Intersection
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 226
         Send, {Blind}%street%{Enter}
-        tt = Zoom To Bell Intersection
+        tt := Zoom To Bell Intersection
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 218
@@ -7230,30 +7232,30 @@ bellsearch2()
 
         SetTitleMatchMode, 2
         CoordMode, Mouse, Window
-        tt = Territory
+        tt := Territory
         WinWait, %tt%,,5,
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 2000
         MouseClick, L, 1292, 497
         Sleep, 132
-        tt = ahk_class WindowsForms10.Window.808.app.0.378734a
+        tt := ahk_class WindowsForms10.Window.808.app.0.378734a
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 530
         MouseClick, L, 73, 32
-        tt = Zoom To Bell Address Range
+        tt := Zoom To Bell Address Range
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 709
         Send, {Blind}%town%{Enter}
         Sleep, 1177
-        tt = Zoom To Bell Address Range
+        tt := Zoom To Bell Address Range
         WinWait, %tt%,,4,
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 819
         Send, {Blind}%street%{Enter}
         Sleep, 959
-        tt = Zoom To Bell Address Range
+        tt := Zoom To Bell Address Range
         WinWait, %tt%,,,
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 819
@@ -7265,28 +7267,28 @@ bellsearch2()
     {
         SetTitleMatchMode, 2
         CoordMode, Mouse, Window
-        tt = Territory
+        tt := Territory
         WinWait(tt,,3)
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 2000
         MouseClick, L, 1253,500
         Sleep, 133
-        tt = ahk_class WindowsForms10.Window.808.app.0.378734a
+        tt := ahk_class WindowsForms10.Window.808.app.0.378734a
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 319
         MouseClick, L, 31,37
-        tt = Zoom To Bell Intersection
+        tt := Zoom To Bell Intersection
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 632
         Send,%town%{Enter}
-        tt = Zoom To Bell Intersection
+        tt := Zoom To Bell Intersection
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 226
         Send, %street%{Enter}
-        tt = Zoom To Bell Intersection
+        tt := Zoom To Bell Intersection
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             Sleep, 218
@@ -8086,7 +8088,7 @@ labelTool(text)
     {
         SetTitleMatchMode, 2
         CoordMode, Mouse, Window
-        tt = TelDig SketchTool
+        tt := TelDig SketchTool
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
             WAIT()
@@ -8204,7 +8206,7 @@ Loop, 1
 {
     SetTitleMatchMode, 2
     CoordMode, Mouse, Window
-    tt = TelDig SketchTool ahk_class WindowsForms10.Window.8.app.0.2004eee
+    tt := TelDig SketchTool ahk_class WindowsForms10.Window.8.app.0.2004eee
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
         wait()
@@ -8225,7 +8227,7 @@ Loop, 1
     Send,{Delete}
     Send, {Blind}{6}
     wait()
-    tt = TelDig SketchTool ahk_class WindowsForms10.Window.8.app.0.2004eee
+    tt := TelDig SketchTool ahk_class WindowsForms10.Window.8.app.0.2004eee
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
         wait()
@@ -8239,7 +8241,7 @@ Loop, 1
 {
     SetTitleMatchMode, 2
     CoordMode, Mouse, Window
-    tt = TelDig SketchTool ahk_class WindowsForms10.Window.8.app.0.2004eee
+    tt := TelDig SketchTool ahk_class WindowsForms10.Window.8.app.0.2004eee
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
     Sleep, 390
@@ -8272,7 +8274,7 @@ markJobNumberas2Clear()
         SetTitleMatchMode, 2
         CoordMode, Mouse, Window
         ;MouseGetPos,foundx,foundy
-        tt = TelDig Mobile - [Ticket list] ahk_class Afx:400000:8:10003:0:37026d
+        tt := TelDig Mobile - [Ticket list] ahk_class Afx:400000:8:10003:0:37026d
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
 
@@ -8286,7 +8288,7 @@ markJobNumberas2Clear()
 
         wait()
 
-        tt = Set job number ahk_class #32770
+        tt := Set job number ahk_class #32770
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
 
@@ -8294,7 +8296,7 @@ markJobNumberas2Clear()
 
         Send, {Blind}2{Enter}
 
-        tt = TelDig Mobile - [Ticket list] ahk_class Afx:400000:8:10003:0:37026d
+        tt := TelDig Mobile - [Ticket list] ahk_class Afx:400000:8:10003:0:37026d
         WinWait, %tt%
         IfWinNotActive, %tt%,, WinActivate, %tt%
 
@@ -8460,7 +8462,7 @@ drawPole()
 {
     SetTitleMatchMode, 2
     CoordMode, Mouse, Window
-    tt = TelDig SketchTool
+    tt := TelDig SketchTool
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
     Sleep, 1404
@@ -8511,7 +8513,7 @@ if (form = "BA")
 {
     SetTitleMatchMode, 2
     CoordMode, Mouse, Window
-    tt = TelDig SketchTool
+    tt := TelDig SketchTool
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
         wait()
@@ -8539,7 +8541,7 @@ else if (form = "RP")
     SetTitleMatchMode, 2
     CoordMode, Mouse, Window
 
-    tt = TelDig SketchTool - C:\TelDigMobile\2020411699_ROG ahk_class WindowsForms10.Window.8.app.0.2004eee
+    tt := TelDig SketchTool - C:\TelDigMobile\2020411699_ROG ahk_class WindowsForms10.Window.8.app.0.2004eee
     WinWait, %tt%
     IfWinNotActive, %tt%,, WinActivate, %tt%
 
@@ -9095,7 +9097,7 @@ getCoords()
 
 ;run tests - need a hotkey??
 
-#IfWinNotActive ahk_exe mobile.exe
+IfWinNotActive ahk_exe mobile.exe
 #IfWinNotActive ahk_exe sketchtoolapplication.exe
 #IfWinNotActive ahk_exe gvim.exe
 :::o::
@@ -9146,7 +9148,7 @@ editscr()
     Edit
 }
 
-getmousepos(byref x := 0,byref y := 0)
+getmousepos(&x := 0,&y := 0)
 {
     mousegetpos,x,y
     msgbox,% "X: " . x "`nY: " . y
@@ -9160,27 +9162,6 @@ save_bitmap()
 
 
 #IfWinActive, ahk_exe LocateAccess.exe
-
-^E::
-editSketch()
-return
-
-editSketch()
-{
-    Text:="|<>*99$53.wzzzzzzzzUTzzzzzzyCTzzzzzzsznUXdsuMly1020UUUXwmNYNw6Q7lYn9n0A1DX9aHUkNyC6HAX90ni11aN0k1kTzzzyTzzzzzzzwzzzzzzzzxzzzz"
-
-     if (ok:=FindText(69-150000, 49-150000, 69+150000, 49+150000, 0, 0, Text))
-     {
-        Text:="|<>*51$17.00m031zx7zlDz1zw1zk7z0Tw1zn7zWHz1bTzC00Q01zzzs"
-        if (ok:=FindText(1022-150000, 48-150000, 1022+150000, 48+150000, 0, 0, Text))
-        {
-            CoordMode, Mouse
-            X:=ok.1.x, Y:=ok.1.y, Comment:=ok.1.id
-            Click, %X%, %Y%
-        }
-     }
-
-}
 
 Esc::
 Notify("Exiting ticket...")
