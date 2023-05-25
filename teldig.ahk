@@ -21,8 +21,9 @@ ListLines, On
 #include *i scrollbox.ahk
 #include <cpuload>
 #include <UIA_Interface>
+#include <UIA_Browser>
 #include <AHKEZ>
-#include .\lib\vis2.ahk
+#include C:\Users\cr\teldig\lib\vis2.ahk
 #Include <AHKEZ_Debug>
 #Include <EntryForm>
 ;#Include Canvas.ahk
@@ -98,24 +99,26 @@ Menu, Mobile, Add, Open EZDraw, openEZDraw
 Menu, Mobile, Add, Finish and &Email, finishandemail
 Menu, Mobile, Add, Show Ticket Picture, showTicketPictures
 Menu, Mobile, Add, Load from Project, autoinsertSketches
-Menu, Mobile, Add, Get All Tickets, getAllTickets
 Menu, mobile, Add, Open Sketch E&ditor, openSketchEditor
-Menu, Mobile, Add, &Write Template File, writeTemplateFile
 Menu, Mobile, Add, Load Clear Python Template, loadClearPyTemplate
 Menu, Mobile,Add,Rogers Clear Form, rogersClearForm
 Menu("Mobile","Add","Load From Template","AFFromClearTemplate")
-Menu, Mobile, Add, Regular Sync, mobilesyncr
+Menu, Mobile, Add, Remove From Screening, removeFromScreening
 Menu, mobile, Add, Reset Form&Var, resetformVar
 Menu,Mobile,Add, Grade &QA, gradeQA
 Menu,Mobile,Add, Autocomplete QA, AutoQA
-Menu,mobile, Add, View ticket count, utilCount
 Menu,mobile,Add, Search for Sketch, sketchSearch
 Menu,mobile,Add, Clear multiple, clearMulti
 Menu,mobile,Add, Open SketchTool &Config, SketchToolConfig
+Menu,mobile,Add, Screen Tickets, screenTickets
 Menu, forms, Add, Bell Auxilliary, 2buttonbaux
 Menu, forms, Add, Bell Primary, 2buttonbprim
 Menu, forms, Add, Rogers Auxilliary, 2buttonraux
 Menu, forms, Add, Rogers Primary, 2buttonrprim
+Menu, forms, Add, Load Telmax Primary, loadTelmaxPrimary
+Menu, forms, Add, Load Telmax Auxilliary, loadTelmaxAuxilliary
+Menu, drawingtools, Add, Line from Coords, Line
+Menu, drawingtools, Add, Rect from Coords, Rect
 Menu, drawingtools, Add, Horizontal Arrow Tool, HorizontalArrowTool
 Menu, drawingtools, Add, Vertical Arrow Tool, VerticalArrowTool
 Menu, drawingtools, Add, Building, 2buttonbuilding
@@ -141,6 +144,8 @@ Menu, ST, Add, Bell Stickers, 2buttonbellstickers
 Menu, ST, Add, Dig Area, 2buttondigarea
 Menu, ST, Add, Load Sketch, 2buttoninsertsketch
 Menu, ST, Add, Save Sketch, 2buttonsavesketch
+Menu, ST, Add, Remove Checked, removeCHECKED
+Menu, ST, Add, Remove Rogers Clear, RemoveRogersClear
 Menu, ST, Add, Emergency, emergency
 Menu, ST, Add, Save and Exit, 2buttonsaveandexit
 Menu, ST, Add, HotString list, showHotStrings
@@ -156,12 +161,20 @@ else
     Notify("CapsLock OFF")
 return
 
-;OCR
-#c::OCR()
-; mobile menu
-::QAC::
-    Send, QA CAMERON
+~NumLock::
+numlock_state := GetKeyState("NumLock", "T")
+if (numlock_state == 1)
+    Notify("NumLock ON")
+else
+    Notify("NumLock OFF")
 return
+
+;OCR
+#C::
+OCR()
+ return
+; mobile menu
+
 
 ;SKETCHTOOL SPECIFIC HOTKEYS/BUTTON HANDLERS
 #IfWinActive ahk_exe SKETCHTOOLAPPLICATION.EXE
@@ -175,15 +188,44 @@ MButton::
     Menu, ST, Show
 return
 
++::NumpadAdd
+-::NumpadSub
+
+^t::
+putTimestamp()
+return
+
 ;SKETCHTOOL HOTSTRINGS
 
 ::autocua::
     autofillCUA()
 return
 
+WheelLeft::
+UIA_Interface().ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe")).FindFirstByName("Page right").Click()
+return
+
+WheelRight::
+UIA_Interface().ElementFromHandle(WinExist("ahk_exe sketchtoolapplication.exe")).FindFirstByName("Page left").Click()
+return
+
+
+
 #IfWinActive
 
 ;SKETCHTOOL FUNCTIONS
+
+loadTelmaxPrimary()
+{
+  path := "telmaxprimary.skt"
+  LoadImageNg(path)
+}
+
+loadTelmaxAuxilliary()
+{
+  path := "telmaxaux.skt"
+  LoadImageNg(path)
+}
 
 autofillCUA()
 {
@@ -198,6 +240,50 @@ autofillCUA()
     Sleep 200
     CUASAVEEXIT()
     MsgBox, Done!
+}
+
+Line()
+; opens the image called "line.skt", opens property menu in sketchtool then changes lines coordinates to x1, y1, x2, y2
+{
+  Inputbox, line, Line, Enter line coordinates separated by commmas
+  x1 := StrSplit(line, ",")[1]
+  y1 := StrSplit(line, ",")[2]
+  x2 := StrSplit(line, ",")[3]
+  y2 := StrSplit(line, ",")[4]
+  loadImage("line.skt")
+  Sleep 200
+  accessProperties()
+  Sleep 200
+  Send, {Tab}{Tab}{Space}
+  Sleep 200
+  Send, %x1%,%y1%
+  Sleep 200
+  Send, {Tab}{Space}
+  Sleep 200
+  Send, %x2%,%y2%
+  Send, {Enter}
+}
+
+Rect()
+; opens the image called "rect.skt", opens property menu in sketchtool then changes rect coordinates to x, y, w, h
+{
+  Inputbox, rect, Rect, Enter rect coordinates separated by commmas
+  x := StrSplit(rect, ",")[1]
+  y := StrSplit(rect, ",")[2]
+  w := StrSplit(rect, ",")[3]
+  h := StrSplit(rect, ",")[4]
+  loadImage("rect.skt")
+  Sleep 200
+  accessProperties()
+  Sleep 200
+  Send, {Tab 9}{Space}
+  Sleep 200
+  Send, %x%,%y%
+  Sleep 200
+  Send, {Tab}{Space}
+  Sleep 200
+  Send, %w%,%h%
+  Send, {Enter}
 }
 
 bellPrimaryPoleAutofill()
@@ -299,6 +385,34 @@ rogClear()
         rclear:=1
         return rclear
     }
+}
+
+removeRogersClear()
+{
+    Text:="|<>*134$67.s0700000DzwS03U00007zzjU1k00003zzzk0s00001k0zw0Q00000s07z0C00000Q03vU707k00C01xs3UDy00700yS1kDzU03U0T70sDVs01k0zXkQ70Q00zzzkwC3UD00TzysC73U3U0DzwQ7XVk1k070wC1tks0s03UD70QsQ0Q01k3nUDQD0C01s0xk3y70700Q0Cs0z1k7U0C07w0TUs3U0701y07kT3k03U0z01s7zk01k0C"
+
+ if (ok:=FindText(311-150000, 384-150000, 311+150000, 384+150000, 0, 0, Text))
+ {
+   CoordMode, Mouse
+   X:=ok.1.x, Y:=ok.1.y, Comment:=ok.1.id
+    Click, %X%, %Y%
+ }
+    sleep 200
+    Send, {Delete}
+}
+
+::qatc::
+SendINput, QA TEVIN - COMPLETE
+return
+
+::qanc::
+SendInput, QA NATHANIEL - COMPLETE
+return
+
+removeCHECKED()
+{
+    Click,435,95
+    Send, {Delete}
 }
 
 aptClear()
@@ -1994,16 +2108,7 @@ else ;if using different boundaries
 }
 }
 ;helpers for clear form
-#ifwinactive Clear Locate
 
-    :::pl4::
-        Inputbox,street,,Street?,,,,,,,,%street%
-        Inputbox,number,,Number?,,,,,,,,%number%
-
-        send, NPL %number% %street%{tab}SPL %number% %street%{tab}WPL %number% %street%{tab}EPL %number% %street%{tab}
-    return
-
-#IfWinActive
 
 ;MOBILE SPECIFIC BUTTON HANDLERS/HOTKEYS
 
@@ -2027,27 +2132,10 @@ else ;if using different boundaries
         Sendinput, {Left 100}
     return
 
-    ::/s::
-    $^s::
-        send,^{Left 2}
-        addressSearch()
-    return
-
-    ::/t::
-    $^t::
-        send,^{Right 2}
-        UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("Territory").Click()
-    return
 
     ^j::
         send,^{Left 2}
         UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("Job no").Click()
-    return
-
-    ::/c::
-        send, ^{Right 4}
-        sleep 50
-        UIA_Interface().ElementFromHandle(WinExist("ahk_exe mobile.exe")).FindFirstByName("City").Click()
     return
 
     ; f2::
@@ -2095,9 +2183,7 @@ else ;if using different boundaries
 
     gradeQA()
     {
-        QA.Start()
-        QA.ShowPassFailGUI()
-        QA.Finalize()
+      QA.GradeQA()
     }
 
     F10::
@@ -2108,15 +2194,6 @@ else ;if using different boundaries
             autoinsertSketches("n")
     return
 
-    ;MOBILE HOTSTRINGS
-
-    ::cua::
-        setJobNumberTo99()
-    return
-
-    :::wtf::
-        writeTemplateFile()
-    return
 
 #IfWinActive
 
@@ -2248,7 +2325,7 @@ clearMulti(){
     ;load ticket
     CraigRPA.ClearFromTemplate()
     sleep 500
-    Mobile.SelectPending()
+    ;Mobile.SelectPending()
     Mobile.FinishWithEmail()
     sleep 2000
     SetTimer,checkforNextTicket,200
@@ -2553,55 +2630,6 @@ getticketpicture:
     run,getticketpicture.ahk
 return
 
-writeTemplateFile()
-;generates a template file that can be used with above solution
-{
-    global north, south, west, east
-    t := new Ticket()
-    t.GetDataFromOneCallInfo()
-    template := {}
-    template["currentPage"] := Inputbox("Current page")
-    template["totalPages"] := Inputbox("Total pages")
-    template["units"] := Inputbox("Units?")
-    template["existingSketch"] := Inputbox("Use existing?")
-    msgbox % obj2string(template)
-return
-InputBox,totalpages,Total pages?,Total pages?,,,,,,,,1
-;units
-units := Inputbox("Enter units")
-;dig Area
-;clear reason
-
-if (useExisting() = "y")
-{
-    ;FileSelectFile, filename,, A_MyDocuments
-    FileAppend, %useexisting%, A_MyDocuments\%ticketNumber%.txt
-    MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
-return
-}
-Inputbox, type, Template, Select template type:`n1.PL4`n2.Manual
-if (type = "1")
-{
-    InputBox,house1, House 1, Enter house 1
-    InputBox,house2, House 2, Enter house 2
-    FileAppend, %useexisting%`n%house1%`n%house2%,%A_MyDocuments%\%ticketNumber%.txt
-    msgbox, %useexisting%`n%house1%`n%house2%
-    MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
-    return
-}
-else
-{
-    getRegDA()
-    FileAppend, %useexisting%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
-    FileAppend, %north%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
-    FileAppend, %south%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
-    FileAppend, %west%`n, C:\Users\Cr\Documents\%ticketNumber%.txt
-    FileAppend, %east%, C:\Users\Cr\Documents\%ticketNumber%.txt
-    MsgBox, %south%`n
-    MsgBox % "File written to " A_MyDocuments "\" ticketNumber ".txt"
-return
-}
-}
 
 ;GUI BUTTON Labels
 
@@ -3010,51 +3038,76 @@ class CraigRPA {
 
 }
 
-;~ pfButtonpass:
-;~ focusSketchTool()
-;~ loadImageNG(A_MyDocuments . "\qayes.skt")
-;~ gui,pf:submit
-;~ gui,pf:destroy
-;~ return
-
-;~ pfButtonfail:
-;~ focusSketchTool()
-;~ loadImageNG(A_MyDocuments . "\qan.skt")
-;~ gui,pf:submit
-;~ gui,pf:destroy
-;~ return
 
 QAPass()
 {
+    tk := new Ticket()
+    tk.GetDataFromOneCallInfo()
     focusSketchTool()
     loadImageNG(A_MyDocuments . "\qayes.skt")
+    QA.AddToTimesheet(tk,getLocator(),"COMPLETE")
     gui,pf:submit
     gui,pf:destroy
 }
 
 QAFail()
 {
+    tk := new Ticket()
+    tk.GetDataFromOneCallInfo()
     focusSketchTool()
     loadImageNG(A_MyDocuments . "\qan.skt")
+    QA.AddToTimesheet(tk,getLocator(),"RETURN")
     gui,pf:submit
     gui,pf:destroy
 }
 
 class QA {
 
+    locator := ""
+
     Autocomplete()
+    ;autocompletes the QA form
     {
-        inputbox,file,Write save file name
+        tk := new Ticket()
+        locator := getLocator()
+        tk.GetDataFromOneCallInfo()
+        tk.form := tk.GetFormType()
+        Notify(tk.Ticketnumber)
+        if (tk.number == tk.street)
+            tk.number := ""
+        file := tk.ticketNumber . "-" . tk.number . " " .  tk.street
+        Notify(file)
         QA.Start()
         focussketchtool()
-        loadImageNG(A_MyDocuments . "\qayes.skt")
-        picSave(file)
+        removeCHECKED()
+        Notify(tk.form)
+        this.AddProperCheckmark(tk)
+
+        picSave(locator,file)
+        this.AddToTimesheet(tk,locator,"COMPLETE")
         sleep 700
         ControlClick("OK","ahk_exe sketchtoolapplication.exe")
         focusTeldig()
+    }
 
+    AddProperCheckmark(tk)
+    {
+        if (tk.form = "RP" || tk.form = "RA")
+            loadImageNG(A_MyDocuments . "\qayes.skt")
+        else if (tk.form = "AP" || tk.form = "AA")
+            loadImageNG(A_MyDocuments . "\aptumqayes.skt")
+        else if (tk.form = "EP")
+            loadImageNG(A_MyDocuments . "\enviqayes.skt")
+        else
+            loadImageNG(A_MyDocuments . "\qayes.skt")
+    }
 
-
+    ;method that adds a line to timesheet with the following in comments section : "QA COMPLETE - {locator}"
+    AddToTimesheet(ticket, locator,status)
+    {
+      today := A_DD . " " . A_MM . " " . A_YYYY
+      Notify("Adding to timesheet")
+      FileAppend, % ticket.ticketnumber "," ticket.number " " ticket.street ",,,,,QA " locator " - " status "`n", C:\Users\Cr\timesheet%today%.txt
     }
 
     Finalize()
@@ -3075,7 +3128,7 @@ class QA {
  * 		}
         */
         focusSketchTool()
-        this.SaveMarkUp()
+        SketchTool.waitCloseDialogBox()
         Msgbox("Press OK to continue")
         ControlClick("OK","ahk_exe sketchtoolapplication.exe")
         focusTeldig()
@@ -3091,18 +3144,235 @@ class QA {
         WinWaitClose,PASS/FAIL
     }
 
-    SaveMarkUp()
-    {
-        picSave()
+    GetResult(){
+      ;use an inputbox to ask for pass ("p") or fail ("f"). return the result
+      Loop {
+        Inputbox, result, "Result", "Pass or Fail?"
+        StringLower, result, result
+      }
+      Until result in p,pass,f,fail
+      return result == "p" ? "PASS" : "FAIL"
+
     }
+
+    GradeQA()
+    {
+      ;open the sketch, ask pass or fail, add the appropriate marking, save a copy, add to timesheet with locator
+      t := new Ticket()
+      t.GetDataFromOneCallInfo()
+      t.form := t.GetFormType()
+      this.Start()
+      status := this.GetResult()
+      if (status = "PASS")
+      {
+        this.AddProperCheckmark(t)
+      }
+      else if (status = "FAIL")
+      {
+        loadImageNG(A_MyDocuments . "\qan.skt")
+      }
+      locator := getLocator()
+      if t.number == t.street
+        t.number := ""
+      this.AddToTimesheet(t,locator,status == "PASS" ? "COMPLETE" : "RETURN")
+      picSave(locator,t.ticketnumber . "-" . t.number . " " . t.street)
+      this.Finalize()
+    }
+
 
     Start()
     {
         focusTeldig()
-        ControlClick("Button7","ahk_exe mobile.exe") ;edit button
+        editSketch()
         SketchTool.WaitUntilSketchToolReady()
     }
 }
+
+screenTickets()
+{
+    s := new Screening()
+    s.Main()
+}
+
+removeFromScreening()
+{
+    s := new Screening()
+    s.RemoveFromScreening()
+}
+
+changeToAnalysed()
+{
+    uia := uia_interface()
+    win := uia.ElementFromHandle()
+    win.FindFirstBy("AutomationId=TicketOrigin.TicketStatusID").ControlClick()
+    Send, A
+    win.WaitElementExist("Value=ANALYSED")
+    SendInput, {Enter}
+    sleep 1000
+}
+
+
+saveNoEmail()
+{
+    uia := UIA_Interface()
+     uia.ElementFromHandle().FindFirstByName("Save").click()
+     uia.ElementFromHandle().WaitElementExistByNameandType("No","Button")
+     uia.ElementFromHandle().FindFirstByNameandType("No","Button").click()
+ }
+
+class Screening {
+
+
+  Main()
+  {
+    ;this.checkForMapMode()
+    ;this.Setup()
+    ;sleep 1500
+    if !(this.stillScreening()) {
+      return
+    }
+    ;if !(Winexist("ahk_exe mapinfor.exe"))
+    ;{
+      ;activateMapInfo()
+      ;setFindParams()
+      ;WinActivate("ahk_exe locateaccess.exe")
+    ;}
+
+    Loop,
+    {
+      if !(this.stillScreening())
+      {
+        return
+      }
+      this.openFirstTicket()
+      this.ViewImages()
+      ;choice loop (inner)
+      Loop
+        {
+        InputBox, choice, Make a selection, 1 = Open records at address`n2 = Remove from screening`n3 = Need Sketch or Meet`n4 = Clear Ticket`n5= Quit
+        switch choice
+        {
+            case 1:
+            recordsLookup()
+
+            case 2:
+            this.RemoveFromScreening()
+            break
+
+            Case 3:
+            MsgBox % "Not yet implemented"
+
+            Case 4:
+            CraigRPA.writeClearTemplate()
+            break
+
+            case 5:
+            break
+        }
+        if (choice == 5)
+            return
+        }
+    }
+}
+
+  RemoveFromScreening()
+  {
+
+/*     SetTitleMatchMode, 2
+ *     CoordMode, Mouse, Window
+ *     tt = LocateAccess - Cable Control Systems ahk_class Chrome_WidgetWin_1
+ *     WinWait, %tt%
+ *     IfWinNotActive, %tt%,, WinActivate, %tt%
+ *     MouseClick, L, 653, 174
+ *     Sleep, 562
+ *     MouseClick, L, 551, 209
+ *     Sleep, 609
+ *     MouseClick, L, 1088, 684
+ *     Sleep, 679
+ *     MouseClick, L, 860, 464
+ *     Sleep, 1000
+ */
+        changetoAnalysed()
+        saveNoEmail()
+
+  }
+
+  StillScreening()
+  {
+    Notify("Checking Screening status")
+    WinActivate, ahk_exe locateaccess.exe
+    screen := uia_interface().ElementFromHandle().WaitElementExistByName("filtered",0x4,2,True,5000)
+
+    if !(screen) {
+      MsgBox % "Element not found"
+      return False
+    }
+    Notify(obj2string(screen.CurrentName))
+    if (instr(screen.CurrentName, "0 filtered") == 2)
+      return False
+    else
+      return True
+  }
+
+  OpenFirstTicket()
+  {
+    Notify("Opening ticket")
+    Click("354,211")
+    Sleep(1000)
+  }
+
+  Setup() {
+    WinActivate("ahk_exe locateaccess.exe")
+    uia := uia_interface()
+    win := uia.ElementFromHandle()
+    fil := win.FindFirstByName("Filter...").SetFocus()
+    sleep 1000
+    SendInput, screening
+    sleep 1000
+  }
+
+  ;write a function that uses imagesearch to find the "map button in locateaccess and click it
+
+  CheckForMapMode()
+  {
+    Winactivate,ahk_exe locateaccess.exe
+    ;this checks for the presence of grid button and clicks it if necessary
+    Text:="|<>*158$20.Tzza489V22TzzbzztV22MEUaAANzzyMEUc"
+
+    if (ok:=FindText(1323-150000, 98-150000, 1323+150000, 98+150000, 0, 0, Text))
+    {
+
+      CoordMode, Mouse
+      X:=ok.1.x, Y:=ok.1.y, Comment:=ok.1.id
+      Click, %X%, %Y%
+
+      sleep, 1500
+      ; now click on map button
+
+      uia := uia_interface()
+      win := uia.ElementFromHandle()
+      map := win.WaitElementExistByName("Map")
+      map.click()
+    }
+    Else return
+  }
+
+  ViewImages()
+  {
+    uia := uia_interface()
+    win := uia.GetChromiumContentElement()
+    p := win.FindFirstByNameAndType("Original","text",0x4,2,True).Click()
+  }
+
+}
+
+!f3::
+Screening.Main()
+return
+
+#p::
+Mobile.SelectPending()
+return
 
 #IfWinActive, ahk_exe mobile.exe
 ^f2::
@@ -3173,11 +3443,21 @@ class Mobile
     {
         ;CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
         UIA := UIA_Interface()
-        win := uia.ElementFromHandle(Winexist("ahk_exe locateaccess.exe"))
-        r := win.FindFirstByName("ANALYSED").click()
-        Send,p
-        win.WaitElementExistByName("MOBILE")
-        Send,Enter
+        win := uia.ElementFromHandle()
+        r := win.FindFirstBy("AutomationID=TicketOrigin.TicketStatusID").Click()
+        sleep 500
+
+        ImageSearch,foundx,foundy,0,0,1366,768,pending.png
+        if (errorlevel == 1) {
+            Notify("No image found")
+            return false
+        }
+        else {
+            MouseMove, %foundx%, %foundy%
+            MouseClick,L, %foundx%,%foundy%
+            return true
+        }
+
     }
 
     ClickOK()
@@ -4036,7 +4316,7 @@ treeSketchFromTemplate(treefile)
         Mobile.SelectLocationTab()
         addtotimesheet()
         sleep 500
-        Mobile.SelectPending()
+        ;Mobile.SelectPending()
         sleep 2000
         finishemail()
         ControlGet, ticketnumbernew, line,1,edit1,ahk_exe mobile.exe
@@ -4537,15 +4817,21 @@ return
 
 statusPending() ; change ticket status to pending
 {
-    ;CONTROL, choose, 3, ComboBox1, ahk_exe mobile.exe
-    WinActivate, ahk_exe locateaccess.exe
     UIA := UIA_Interface()
-    win := UIA.ElementFromHandle()
-    r := win.FindFirstByType("ComboBox")
-    r.click()
-    Send, P
-    sleep 200
-    Send, {Enter}
+    win := uia.ElementFromHandle()
+    r := win.FindFirstBy("AutomationID=TicketOrigin.TicketStatusID").Click()
+    sleep 500
+
+    ImageSearch,foundx,foundy,0,0,1366,768,pending.png
+    if (errorlevel == 1) {
+        Notify("No image found")
+        return false
+    }
+    else {
+        MouseMove, %foundx%, %foundy%
+        MouseClick,L, %foundx%,%foundy%
+        return true
+    }
 }
 
 getTicketData()
@@ -4774,6 +5060,7 @@ getPoints(inst1, inst2) {
 return coordinates
 }
 
+;returns a point object
 getPoint(inst1) {
     Tooltip, % inst1
     Keywait, LButton, D, L
@@ -4921,28 +5208,23 @@ VerticalArrowTool()
     clickPerArrowHeadEnd()
     ;DRAW ARROW
     Send, {ShiftDown}
-    MouseClickDrag, L, % arrow1.x, % arrow1.y, % arrow1.x, % (arrow2.y > arrow1.y) ? (arrow1.y - 32) : (arrow1.y + 32)
+    MouseClickDrag, L, % arrow1.x, % arrow1.y, % arrow1.x, % (arrow2.y > arrow1.y) ? (arrow1.y - 36) : (arrow1.y + 36)
     wait()
-    MouseClickDrag, L, % arrow1.x, % arrow2.y, % arrow1.x, % (arrow2.y > arrow1.y) ? (arrow2.y + 32) : (arrow2.y - 32)
+    MouseClickDrag, L, % arrow1.x, % arrow2.y, % arrow1.x, % (arrow2.y > arrow1.y) ? (arrow2.y + 36) : (arrow2.y - 36)
     wait()
     Send, {ShiftUp}
     wait()
     ;DRAW ARROW END
+    ;select text, draw textbox, write measurement
     clickTextTool()
-    ;Text:="|<>*120$9.zwM30M30M30M30MU"
-    ;if (ok:=FindText(15-150000, 104-150000, 15+150000, 104+150000, 0, 0, Text))
-    ;{
-    ;CoordMode, Mouse
-    ;X:=ok.1.x, Y:=ok.1.y, Comment:=ok.1.id
-    ;Click, %X%, %Y%
-    ;}
-    ;wait()
-    (arrow1.y < arrow2.y) ? tloc := arrow1.y - 80 : tloc := arrow2.y - 80
-    MouseClickDrag, L, % arrow1.x - 45, % tloc, % arrow1.x + 45,% tloc + 30
+    (arrow1.y < arrow2.y) ? tloc := arrow1.y - 64 : tloc := arrow2.y - 64
+    ;MouseClickDrag, L, % arrow1.x - 16, % tloc, % arrow1.x + 16,% tloc + 80
+    MouseClickDrag, L, % arrow1.x -40, % tloc - 16, % arrow1.x + 40, % tloc + 16
     Send, {Click 2}
     clickRotate90degrees()
+    sleep 500
     Send,{F2}
-    setMeasurement()
+    multiMeasurement()
     arrow1 := "", arrow2 := ""
     Send, ^q
 }
@@ -4988,9 +5270,10 @@ clickBringtoFront(){
 
 clickRotate90degrees(){
     Acc_Get("DoAction","4.6.4.2.16",0,"ahk_exe sketchtoolapplication.exe")
-    ;~ uia := uia_interface()
-    ;~ win := uia.ElementFromHandle()
-    ;~ win.FindFirstByName("Rotate 90° CW").click()
+     ;~ uia := uia_interface()
+     ;~ win := uia.ElementFromHandle()
+     ;~ win.FindFirstByName("Rotate 90° CW").click()
+     ;~ Click 2
 }
 
 ::ugrp::
@@ -5038,9 +5321,9 @@ HorizontalArrowTool()
     clickLineTool()
     clickPerArrowHeadEnd()
     Send, {ShiftDown}
-    MouseClickDrag, L, % arrow1.x, % arrow1.y, % (arrow2.x > arrow1.x) ? (arrow1.x - 32) : (arrow1.x + 32), % arrow1.y
+    MouseClickDrag, L, % arrow1.x, % arrow1.y, % (arrow2.x > arrow1.x) ? (arrow1.x - 36) : (arrow1.x + 36), % arrow1.y
     Sleep 50
-    MouseClickDrag, L, % arrow2.x, % arrow1.y, % (arrow2.x > arrow1.x) ? (arrow2.x + 32):(arrow2.x - 32), % arrow1.y
+    MouseClickDrag, L, % arrow2.x, % arrow1.y, % (arrow2.x > arrow1.x) ? (arrow2.x + 36):(arrow2.x - 36), % arrow1.y
     Sleep 50
     Send, {ShiftUp}
     wait()
@@ -5051,20 +5334,83 @@ HorizontalArrowTool()
     Sleep 25
     Send, {Click 2}{F2}
     wait()
-    setMeasurement()
+    multiMeasurement()
     arrow1:="", arrow2 := ""
     Send, ^q
 }
 
+DiagonalArrowTool()
+{
+    arrow1 := getPoint("Click first point for measurement")
+    Sleep 200
+    arrow2 := getPoint("Click second point for measurement")
+    Notify(arrow1)
+    wait()
+    clickLineTool()
+    clickPerArrowHeadEnd()
+    pi := 4 * ATan(1)
+    angle := calculateAngle(arrow1.x, arrow1.y, arrow2.x, arrow2.y)
+    ;draw arrow by clicking and dragging from the point to 36 pixels away from the point using the angle
+    MouseClickDrag,L,% arrow1.x, % arrow1.y, % arrow1.x - Cos(angle * pi/180) * 36, % arrow1.y - Sin(angle * pi/180) * 36
+    Sleep 50
+    MouseClickDrag,L,% arrow2.x, % arrow2.y, % arrow2.x + Cos(angle * pi/180) * 36, % arrow2.y + Sin(angle * pi/180) * 36
+    wait()
+    clickTextTool()
+    wait()
+    MouseClickDrag, L,% arrow1.x - 80, % arrow1.y - 16, % arrow1.x - 16, % arrow1.y + 16
+    Sleep 25
+    Send, {Click 2}{F2}
+    wait()
+    multiMeasurement()
+    arrow1:="", arrow2 := ""
+    Send, ^q
+
+}
+
+calculateAngle(x1, y1, x2, y2)
+{
+    ;calculate the angle between two points accounting for all four quadrants. Return the number in degrees
+    pi := 4 * ATan(1)
+    if (x2 > x1 && y2 > y1)
+        return atan((y2 - y1) / (x2 - x1)) * 180 / pi
+    else if (x2 < x1 && y2 > y1)
+        return 180 - atan((y2 - y1) / (x1 - x2)) * 180 / pi
+    else if (x2 < x1 && y2 < y1)
+        return 180 + atan((y1 - y2) / (x1 - x2)) * 180 / pi
+    else if (x2 > x1 && y2 < y1)
+        return 360 - atan((y1 - y2) / (x2 - x1)) * 180 / pi
+    else if (x2 == x1 && y2 > y1)
+        return 0
+    else if (x2 == x1 && y2 < y1)
+        return 180
+    else if (x2 > x1 && y2 == y1)
+        return 90
+    else if (x2 < x1 && y2 == y1)
+        return 270
+    else
+        return 0
+}
+
+showAngle()
+{
+    arrow1 := getPoint("Click point 1")
+    sleep 200
+    arrow2 := getPoint("Click point 2")
+    pi := 4 * ATan(1)
+    angle := calculateAngle(arrow1.x, arrow1.y, arrow2.x, arrow2.y)
+    msgbox % angle
+
+
+
+}
 +!d::
-    HorizontalArrowTool()
-    VerticalArrowTool()
+    DiagonalArrowTool()
 return
 
-a::
-_::
-    drawCorner()
-return
+;~ a::
+;~ _::
+    ;~ drawCorner()
+;~ return
 
 drawCorner()
 {
@@ -5190,21 +5536,8 @@ RemoveTooltip()
     }
 Return
 
-; PASTES HIGH RISK FIBRE LETTER
-#H::
-    add_high_risk_fibre_letter()
-return
 
-add_high_risk_fibre_letter(){
-    loadImageNG("highriskletter.skt")
-    ControlClick, OK,ahk_exe SketchToolApplication.exe
-    WinActivate, ahk_exe mobile.exe
-}
 
-; ADDS HIGH RISK FIBRE STICKER
-::hiriskfibre::
-    loadImageNG("high risk fibre.png")
-return
 
 isInt(var){
     if var is Integer
@@ -5213,7 +5546,7 @@ isInt(var){
         return false
 }
 
-#IfWinActive ahk_exe mobile.exe
+#IfWinActive ahk_exe locateaccess.exe
 ^!t::
 ::tmsht::
     addtotimesheet()
@@ -5340,7 +5673,6 @@ return
 
 #ifwinactive Tel ahk_exe sketchtoolapplication.exe
 ^o::
-::insimg::
 :::L::
     ; hotkey se - o for insert image
     openImageDialog()
@@ -5348,6 +5680,7 @@ RETURN
 
 ;returns to last used tool (generally arrow)
 =::
+~s::
     clickSelection()
     {
         SendInput, ^q
@@ -5355,7 +5688,6 @@ RETURN
 return
 
 #o::
-::qacirc::
     ; win o for qa circle
     loadImage(A_MyDocuments . "\qacorrection.skt")
 return
@@ -5416,13 +5748,8 @@ setTextbox() {
     Send {click %xpos%, %ypos%, down}{click 20,20,rel,Up}
 }
 
-'::
-::lbl::
-    labelTool(InputBox("Enter Label"))
-return
 
 ^s:: ; Ctrl S to save
-::svf::
 :::S::
     saveFile()
 return
@@ -5430,24 +5757,44 @@ return
 ; HOTKEY CTRL ALT X FOR JPG SAVE
 #ifwinactive Tel ahk_exe SketchToolApplication.exe
 !^X::
-    picSave()
+    picSave(getLocator(), getFileName())
 return
 #ifwinactive
 
-picSave(filename := "", type := ".jpg")
-{
-    if (filename == "")
-      filename := inputbox("File name", "Enter save file name for jpeg")
+getFileName(){
+    InputBox, filename, Enter file name
     if ErrorLevel
         return
+    return filename
+}
+
+getLocator(){
+    loop {
+    Inputbox, locator, Enter locator, t = Tevin `n n = Nathaniel
+    StringLower, locator, locator
+    }
+    until locator in n,t
+    if ErrorLevel
+        return
+    if (locator == "t")
+        locator := "TEVIN"
+    else if (locator == "n")
+        locator := "NATHANIEL"
+    return locator
+}
+
+picSave(locator, filename, type := ".jpg")
+{
+  ;does 3 things gets save file name , gets locator name, saves file. Split this up
+    focusSketchtool()
     saveFile()
     waitDialogBox()
-    Send, % "C:\Users\Cr\Desktop\qa\" . filename
-    if (type = ".jpg")
-      Send, !tj{enter} ; changes file type to save to jpeg
-    elif (type == ".bmp")
-      Send, !tb{enter}
+    sleep 500
+    Send, % "C:\Users\Cr\Desktop\qa\" . locator . "\" . filename . ".jpg"
+    Send, {Enter}
 }
+
+
 
 ;WIN NUMPAD INSERT for ok in auxilliary, SAVES FIRST and prompts page numbers now
 
@@ -5696,7 +6043,6 @@ stproj_saveexit()
     }
 }
 
-::OKDONE::
 ^w:: ;SAVE AND EXIT CURRENT SKETCH
 :::w::
 Numpadenter::
@@ -5928,28 +6274,41 @@ return
 
 ; HOTKEY WIN + B FOR BELL PRIMARY
 #IFWINACTIVE AHK_EXE SKETCHTOOLAPPLICATION.EXE
-#B:: ; LOAD BELL PRIMARY SHEET
-::insbp::
+ ; LOAD BELL PRIMARY SHEET
+ ::insbp::
+ loadBellPrimary()
+ return
+loadBellPrimary(){
     loadImage("bell primary.skt")
-return
+}
 ;HOTKEY CTRL - ALT - B FOR BELL AUXILLIARY WITH DATE/PAGE NUMBERS
 
-^!B:: ; LOAD BELL AUXILLIARY SHEET
-::insba:: ; LOAD BELL AUXILLIARY
-    loadImage("bellaux.skt")
+::insba::
+loadBellAuxilliary()
 return
+; LOAD BELL AUXILLIARY SHEET
+loadBellAuxilliary(){ ; LOAD BELL AUXILLIARY
+    loadImage("bellaux.skt")
+}
 ;HOTKEY CTRL - ALT - R FOR ROGERS AUXILLIARY WITH DATE/PAGE NUMBERS
 
 ^!A:: ;LOAD ROGERS AUXILLIARY SHEET
-::insra:: ;LOAD ROGERS AUXILLIARY SHEET
-    loadImage("rogersaux.skt")
+::insra::
+loadRogersAuxilliary()
 return
+
+loadRogersAuxilliary(){
+    loadImage("rogersaux.skt")
+}
 ;HOTKEY CTRL - ALT - B FOR APTUM AUXILLIARY WITH DATE/PAGE NUMBERS
 
 ^!C::
 ::insaa::
+
+loadAptumAuxilliary(){
+
     loadImage("aptumaux.skt")
-return
+}
 ; WIN R FOR ROGERS PRIMARY
 
 #R:: ; LOAD ROGERS PRIMARY SHEET
@@ -6069,7 +6428,11 @@ finishemail()
     Notify("Finish and email")
     focusTeldig()
     currentpage := "", totalpages := ""
-    STATUSPENDING()
+    if !(STATUSPENDING())
+    {
+        Notify("Unable to complete ticket")
+        return
+    }
     if (form = "BP" or form = "BA")
         bellMarked := "", bellClear := ""
     else if (form = "RP" or form = "RA")
@@ -6103,7 +6466,11 @@ finishnoemail()
 {
     global
     currentpage := "", totalpages := "", timestart := ""
-    STATUSPENDING()
+    if !(STATUSPENDING())
+    {
+        Notify("Unable to complete ticket")
+        return
+    }
     form := ""
     locationDataObtained := ""
     landbase := ""
@@ -6171,14 +6538,6 @@ return ; exclusion agreement warning
     loadImage("foonly.skt")
 return
 
-; PAGE PROMPT WIN P
-#IfWinActive AHK_EXE SKETCHTOOLAPPLICATION.EXE
-#P::
-::pgnum::
-    writePageNumber()
-    RETURN
-
-#IfWinActive
 
 
 setTemplateText(template,text)
@@ -6475,12 +6834,85 @@ isInterText()
         measurementTool()
     return
 
+    ~{::
+        SendInput, {F2}
+        SendInput, {BS 50}
+        sleep 300
+        multiMeasurement()
+        return
+
+    getMultiMeasurement()
+    {
+        Inputbox, string, Measurement, Insert measurements separated by ","
+        return string
+    }
+
+    convertMultiMeasurement(string)
+    {
+        offsets := StrSplit(string, ",")
+        final := ""
+        for idx, val in offsets
+        {
+            newval := convertMeasurement(val)
+            if (idx != offsets.Length())
+            {
+                final .= newval . ", "
+            }
+            else {
+                final .= newval
+            }
+        }
+        return final
+    }
+
+    multiMeasurement()
+    {
+        setOffset(convertMultiMeasurement(getMultiMeasurement()))
+    }
+
     measurementTool()
     {
         SendInput, {F2}
         SendInput, {BS 50} ; CLEARS BOX
         Sleep 300
         setMeasurement()
+    }
+
+    getMeasurement()
+    {
+        InputBox, String, Measurement, Insert Measurement
+        return string
+    }
+
+    convertMeasurement(string)
+    {
+        if (strlen(String) = 1)
+        {
+            String := "0." String " m"
+        }
+
+        else if (strlen(String) = 2)
+        {
+            newString := strsplit(String)
+            meas1 := newString[1]
+            meas2 := newString[2]
+            String := meas1 "." meas2 " m"
+        }
+        else if (strlen(String) = 3)
+        {
+            newString := strsplit(String)
+            newString := strsplit(String)
+            meas1 := newString[1]
+            meas2 := newString[2]
+            meas3 := newString[3]
+            String := meas1 meas2 "." meas3 " m"
+        }
+        return String
+    }
+
+    setOffset(string)
+    {
+        Send, %string%{enter}
     }
 
     setMeasurement()
@@ -6729,6 +7161,7 @@ NUMPADUP::
 RETURN
 
 NUMPADRIGHT::
+^]::
     clickRotate90degrees()
 RETURN
 
@@ -7460,12 +7893,18 @@ googleLookup()
 return
 
 googleLookup() {
-    Iobj := getIxn()
-    driver := ChromeGet()
-    driver.Get("https://www.google.ca/maps/")
-    driver.findElementbyId("searchboxinput").SendKeys(Iobj.s " &" Iobj.n)
-    Send, {Enter}
-    Iobj := ""
+    InputBox, address, Enter an address,, , 300, 200
+    if (address != "")
+    {
+        ; Encode the address for use in the URL
+        StringReplace, encoded_address, address, %A_Space%, +, All
+
+        ; Construct the URL for the Google Maps search
+        search_url := "https://www.google.com/maps/search/?api=1&query=" . encoded_address
+
+        ; Open the URL in the default web browser
+        Run, %search_url%
+    }
 }
 
 getIxn() {
@@ -8011,7 +8450,22 @@ return
 
 parser()
 {
-    commands := {"?":"parserhelp","edit sketch":"focusTeldig","emergency":"emergency","grid":"changeGridSizeto16", "edit script": "editscr", "repl":"repl", "getmouse":"getmousepos", "tkt billing": "ticketBillingLookup", "qa": "gradeqa", "magick": "imtest"}
+    commands := {"?":"parserhelp"
+                ,"edit sketch":"focusTeldig"
+                ,"emergency":"emergency"
+                ,"grid":"changeGridSizeto16"
+                , "edit script": "editscr"
+                , "repl":"repl"
+                , "getmouse":"getmousepos"
+                , "tkt billing": "ticketBillingLookup"
+                , "qa": "gradeqa"
+                , "magick": "imtest"
+                , "milestokm": "runMilestoKm"
+                , "pyscriptlaunch":"runPyScriptLauncher"
+                , "rrc": "removeRogersClear"
+                , "wt": "openTerminal"
+                , "angle": "showAngle"}
+
     command := strlower(InputBox(,"Enter String"))
     if (command = "?") {
         helpstr := ""
@@ -8025,6 +8479,23 @@ parser()
             %func%()
         }
     }
+}
+openTerminal()
+{
+  ;opens windows terminal
+  Run, wt
+}
+
+
+
+runMilestoKm()
+{
+    Run, C:\Users\Cr\archived\autohotkey\milestometres.ahk
+}
+
+runPyScriptLauncher()
+{
+    Run, C:\Users\Cr\ossu\script_launcher.py
 }
 
 ticketBillingLookup()
@@ -8078,57 +8549,6 @@ else
 }
 return
 
-labelTool(text)
-{
-    INPUTBOX,LABEL,,ENTER LABEL
-    StringUpper, label, label
-    Loop, 1
-    {
-        SetTitleMatchMode, 2
-        CoordMode, Mouse, Window
-        tt = TelDig SketchTool
-        WinWait, %tt%
-        IfWinNotActive, %tt%,, WinActivate, %tt%
-            WAIT()
-        MouseClick, L, 17, 98
-        WAIT()
-        MouseClick, L, 553, 148,,, D
-        WAIT()
-        MouseClick, L, 607, 167,,, U
-        WAIT()
-        Send, %LABEL%
-        WAIT()
-        MouseClick, L, 12, 125
-        WAIT()
-        MouseClick, L, 19, 320
-        WAIT()
-        MouseClick, L, 543, 141,,, D
-        WAIT()
-        MouseClick, L, 611, 169,,, U
-        WAIT()
-        MouseClick, L, 26, 124
-        WAIT()
-        MouseClick, L, 572, 155
-        WAIT()
-        MouseClick, L, 83, 344
-        WAIT()
-        MouseClick, L, 304, 63
-        WAIT()
-        MouseClick, L, 19, 120
-        WAIT()
-        MouseClick, L, 539, 135,,, D
-        WAIT()
-        MouseClick, L, 620, 178,,, U
-        WAIT()
-        MouseClick, R, 566, 151
-        WAIT()
-        MouseClick, L, 617, 311
-        WAIT()
-        MouseClick, L, 644, 161
-        WAIT()
-    }
-
-}
     ;QUICK Label
 #IfWinActive ahk_exe sketchtoolapplication.exe
     ::label::
@@ -8325,6 +8745,13 @@ centreDrawing()
 
 #IfWinActive ahk_exe chrome.exe
 
+^+f::
+;uses the UIA_Browser class to find the search button and click it
+uiab := new UIA_Browser("ahk_exe chrome.exe")
+uiab.setfocus()
+uiab.FindFirstByNameAndType("Search","button").Click()
+return
+
 ^b:: ;change basemap to black
     ;driver := ChromeGet()
 basemap:="",g360bm:=""
@@ -8360,7 +8787,7 @@ return
     ;TEXT REPLACEMENT
 
     ::hp::HYDRO POLE
-    ::sl::STREET LIGHT
+    ;::sl::STREET LIGHT
     ::cv::CULVERT
     ::E/::EAST OF
     ::N/::NORTH OF
@@ -8443,7 +8870,7 @@ RETURN
 loadImage("cablearcsw.skt")
 Return
 
-1:: ;draw pedestal
+^1:: ;draw pedestal
 MouseGetPos, pedx, pedy
 MouseClick, L, 139, 611
 wait()
@@ -8452,7 +8879,7 @@ pedx:="",pedy:=""
 clickSelection()
 return
 
-2:: ;draw pole
+^2:: ;draw pole
 drawPole()
 return
 
@@ -8473,15 +8900,17 @@ drawPole()
 }
 
 ;DRAW TRANSFORMER
-3::
+^3::
 MouseGetPos, txx, txy
 MouseClick, L, 33, 534
 wait()
 Click,%txx%,%txy%
 txx:="",txy:=""
 clickSelection()
-
 Return
+
+^4::
+return
 
 ^E::
 activateEditMode()
@@ -8645,14 +9074,19 @@ writeAddressList()
 
 }
 
-#IfWinActive ahk_exe SketchToolApplication.exe
-^Tab::
+
 accessProperties()
 {
     MouseClick("R")
     SendInput("{Up 2}{Enter}")
     wait()
 }
+
+#IfWinActive ahk_exe SketchToolApplication.exe
+^Tab::
+accessProperties()
+return
+
 #IfWinActive
 
 ::showerror::
@@ -8827,6 +9261,20 @@ changeGridSizeTo16()
 }
 
 #IfWinActive, ahk_exe SketchToolApplication.exe
+
+putTimestamp()
+{
+    uia := UIA_Interface()
+    win := uia.ElementFromHandle()
+    win.FindFirstByName("Insert current date").click()
+    Click
+    win.FindFirstByName("Selection").click()
+}
+
++^d::
+dumpElements()
+return
+
 `::LButton
 Esc::Delete
 return
@@ -9059,30 +9507,6 @@ getCoords()
 
 
 
-    ^f3::
-    getTicketNumbersFromList()
-    {
-        ControlGet, tnlist,List,Col2, SysListView321, ahk_exe mobile.exe
-        tnlist := StrSplit(tnlist,"`n")
-        MsgBox % obj2string(tnlist)
-        Loop, Files, C:\TelDigMobile\*.tud
-        {
-            teldigfn := a_loopfilename
-            filefull := A_LoopFileFullPath
-            for index,item in tnlist
-            {
-                if (Instr(teldigfn,item))
-                {
-                    FileCopy,%filefull%, % "C:\Users\Cr\Desktop\qa\cole-april-11\"
-                    if (errorlevel > 0)
-                        msgbox, Didn't work
-                }
-            }
-        }
-        FileMove,C:\Users\Cr\Desktop\qa\cole-april-11\*.tud,C:\Users\Cr\Desktop\qa\cole-april-11\*.png
-        ToolTip
-
-    }
 
     loadClearPyTemplate()
     {
@@ -9091,50 +9515,8 @@ getCoords()
         Suspend,Off
     }
 
-;TESTS
 
-;run tests - need a hotkey??
 
-#IfWinNotActive ahk_exe mobile.exe
-#IfWinNotActive ahk_exe sketchtoolapplication.exe
-#IfWinNotActive ahk_exe gvim.exe
-:::o::
-Launcher()
-return
-
-Launcher()
-{
-    Inputbox,prog,Enter program string
-    switch prog
-    {
-        case "mobile":	if !(Winexist("ahk_exe mobile.exe"))
-                            Run, "C:\TelDigMobile\TelDigMobile.exe"
-                        else
-                            Winactivate, ahk_exe mobile.exe
-
-        case "streets":	if !(Winexist("ahk_exe streets.exe"))
-                            Run, streets.exe
-                        else
-                            Winactivate, ahk_exe streets.exe
-
-        case "envab": if !(Winexist("Envi Burial Drawings"))
-                            Run, explore C:\Users\Cr\As Builts\Envi Burial Drawings-20220331T170129Z-001\Envi Burial Drawings
-                      else
-                            Winactivate, Envi Burial Drawings
-    }
-}
-
-getAllTickets() {
-  ; get number of Tickets passed
-  ; get list of all ticket numbers passed
-  ; check main data folder to see if old tickets there that arent in list passed
-  ; for each:
-    ; check to see if ticket already in data folder - if so skip
-    ; create folder for ticket number
-    ; open drawing and get ticket data including coordinates
-    ; write data to [ticketnumber].json
-    ; lookup and get all drawings for ticket number add to folder
-}
 
 
 #IfWinActive ahk_exe cmd.exe
@@ -9152,12 +9534,6 @@ getmousepos(byref x := 0,byref y := 0)
     msgbox,% "X: " . x "`nY: " . y
 }
 
-#f11::
-save_bitmap()
-{
-  picSave(,".bmp")
-}
-
 
 #IfWinActive, ahk_exe LocateAccess.exe
 
@@ -9167,11 +9543,11 @@ return
 
 editSketch()
 {
-    Text:="|<>*99$53.wzzzzzzzzUTzzzzzzyCTzzzzzzsznUXdsuMly1020UUUXwmNYNw6Q7lYn9n0A1DX9aHUkNyC6HAX90ni11aN0k1kTzzzyTzzzzzzzwzzzzzzzzxzzzz"
+    Text:= "|<>**50$15.Tzy01bzxk6c1Z0Mc651UcM521cKR2KcEpnybza01Tzs00U"
 
      if (ok:=FindText(69-150000, 49-150000, 69+150000, 49+150000, 0, 0, Text))
      {
-        Text:="|<>*51$17.00m031zx7zlDz1zw1zk7z0Tw1zn7zWHz1bTzC00Q01zzzs"
+        Text:="|<>**50$15.Tzy01bzxk6c1Z0Mc651UcM521cKR2KcEpnybza01Tzs00U"
         if (ok:=FindText(1022-150000, 48-150000, 1022+150000, 48+150000, 0, 0, Text))
         {
             CoordMode, Mouse
@@ -9198,16 +9574,25 @@ s := gridwin.FindFirstByName("Street").SetFocus()
 Send, %result%
 return
 
-^t::
-getticketdata()
+^f::
+uia := uia_interface()
+win := uia.ElementFromHandle()
+win.FindFirstByName("Filter...").SetFocus()
 return
 
+
+
 ^d::
-uia := uia_interface()
-win := uia.ElementFromHandle(Winactive("A"))
-Clipboard := win.dumpall()
-msgbox, dumped
+dumpElements()
 return
+
+dumpElements()
+{
+  uia := uia_interface()
+  win := uia.ElementFromHandle(Winactive("A"))
+  Clipboard := win.dumpall()
+  msgbox, dumped
+}
 
 F9::
 ::SKAF::
@@ -9247,6 +9632,7 @@ return
 <::
     previousImage()
     return
+
 
 nextImage()
 {
@@ -9293,3 +9679,14 @@ showTicketPictures()
     pics := []
     return
 }
+
+ :::QAV::
+        uia := UIA_Interface()
+        win := uia.ElementFromHandle(WinActive("A"))
+        win.FindFirstByName("COGECO",,2).click()
+        return
+
+; ADDS HIGH RISK FIBRE STICKER
+::hiriskfibre::
+    loadImageNG("high risk fibre.png")
+return

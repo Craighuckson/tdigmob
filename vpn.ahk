@@ -3,7 +3,7 @@
 
 getVPNPass()
 {
-	VPNPASS := "VcZF8hkX"
+	VPNPASS := "T3yKBZby"
 	return VPNPaSS
 }
 

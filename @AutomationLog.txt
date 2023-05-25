@@ -1,1 +1,7 @@
-2023-01-03 16:18:15.466 aptum_lookup.py[6] activate_mapinfo -> 2023-01-03 16:22:24.468 aptum_lookup.py[6] activate_mapinfo -> 2023-01-03 16:25:16.485 aptum_lookup.py[7] activate_mapinfo -> 2023-01-03 16:27:35.251 aptum_lookup.py[11] activate_mapinfo -> 2023-01-03 16:40:24.939 aptum_lookup.py[15] open_find_dialog -> 2023-01-03 16:40:52.142 aptum_lookup.py[15] open_find_dialog -> 
+2023-01-03 16:18:15.466 aptum_lookup.py[6] activate_mapinfo -> 2023-01-03 16:22:24.468 aptum_lookup.py[6] activate_mapinfo -> 2023-01-03 16:25:16.485 aptum_lookup.py[7] activate_mapinfo -> 2023-01-03 16:27:35.251 aptum_lookup.py[11] activate_mapinfo -> 2023-01-03 16:40:24.939 aptum_lookup.py[15] open_find_dialog -> 2023-01-03 16:40:52.142 aptum_lookup.py[15] open_find_dialog -> 2023-03-28 10:24:50.459 aptum_lookup.py[26] set_find_params -> Find Control Timeout(10s): {SubName: 'Search Table', ControlType: ComboBoxControl}
+2023-03-28 15:20:05.207 go360_search.py[6] main -> Find Control Timeout(10s): {SubName: 'Go360', ControlType: WindowControl}
+2023-03-28 15:23:39.315 go360_search.py[6] main -> Find Control Timeout(10s): {SubName: 'Go360', ControlType: WindowControl}
+2023-03-28 15:25:53.951 go360_search.py[6] main -> Find Control Timeout(10s): {Name: 'Go360 Rogers Viewer 3.0.0.24', ControlType: WindowControl}
+2023-03-28 15:26:43.402 go360_search.py[6] main -> Find Control Timeout(10s): {Name: 'Go360 Rogers Viewer 3.0.0.24 - Google Chrome', ControlType: WindowControl}
+2023-03-28 15:30:09.066 go360_search.py[6] main -> Find Control Timeout(10s): {Name: 'Go360 Rogers Viewer 3.0.0.24 - Google Chrome', ControlType: WindowControl}
+2023-03-28 15:40:57.997 go360_search.py[6] main -> Find Control Timeout(10s): {SubName: 'Go360', ControlType: WindowControl}

@@ -1,10 +1,13 @@
-#Include, C:\Users\Cr\teldig\teldig.ahk
 #include <Yunit\Yunit>
 #include <Yunit\Window>
 
-#t::
++^t::
 Yunit.Use(YunitWindow).Test(TicketListOps)
-return
+
+class TimesheetTests
+{
+
+}
 
 class TreeTestSuite
 {
@@ -77,3 +80,6 @@ class TicketListOps
   ;   Yunit.Assert(lookForOldTickets() = true)
   ; }
 }
+
+
+#Include, C:\Users\Cr\teldig\teldig.ahk
