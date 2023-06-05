@@ -3679,7 +3679,7 @@ class Ticket
                 FileReadLine,intersection,%file%,69
                 FileReadLine,intersection2,%file%,71
                 FileReadLine,digInfo,%file%,127
-                FileReadLine,ticketnumber,%file%,9
+                FileReadLine,ticketnumber,%file%,7
                 FileReadLine,town,%file%,59
                 number := StrReplace(number,"UR_NO_CIVIC_INITI::")
                 street := StrReplace(street,"UR_NOM_ARTER_PRINC::")
