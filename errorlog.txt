@@ -2593,3 +2593,16 @@
 20230530225511 - Could not access an IAccessible Object
 20230530225915 - Could not access an IAccessible Object
 20230605104231 - Could not access an IAccessible Object
+20230605122610 - Could not access an IAccessible Object
+20230605122956 - Could not access an IAccessible Object
+20230605124504 - Could not access an IAccessible Object
+20230605124604 - Could not access an IAccessible Object
+20230605125100 - Could not access an IAccessible Object
+20230605135804 - Could not access an IAccessible Object
+20230605140116 - Could not access an IAccessible Object
+20230605140826 - Could not access an IAccessible Object
+20230605141602 - Could not access an IAccessible Object
+20230605142810 - Could not access an IAccessible Object
+20230605144312 - Could not access an IAccessible Object
+20230605145416 - Could not access an IAccessible Object
+20230605155518 - Could not access an IAccessible Object

@@ -4934,7 +4934,7 @@ getTicketData()
         FileReadLine,intersection,%file%,69
         FileReadLine,intersection2,%file%,71
         FileReadLine,digInfo,%file%,127
-        FileReadLine,ticketnumber,%file%,9
+        FileReadLine,ticketnumber,%file%,7
         FileReadLine,town,%file%,59
         number := StrReplace(number,"UR_NO_CIVIC_INITI::")
         street := StrReplace(street,"UR_NOM_ARTER_PRINC::")
@@ -5643,16 +5643,23 @@ addtotimesheet()
         aptumClear .= "C"
     InputBox, comments, Enter comments
     StringUpper, comments,comments
-    FileAppend,% ticketnumber "," number " " street "," rogersMarked "," rogersClear "," aptumMarked "," aptumClear "," comments "`n", C:\Users\Cr\timesheet%today%.txt
+    tsline := ticketnumber . "," . number . " " . street . "," . rogersMarked . "," . rogersClear . "," . aptumMarked . "," . aptumClear . "," . comments . "`n"
+    tsline := Format("{1},{2} {3},{4},{5},{6},{7},{8}`n",ticketnumber,number,street,rogersMarked,rogersClear,aptumMarked,aptumClear,comments)
+    ; Q: why is no comma appearing between ticketnumber and number?
+
+
+    ;FileAppend,% ticketnumber  . "," .  number .  " " .  street . "," .  rogersMarked .  "," .  rogersClear "," .  aptumMarked .  "," .  aptumClear .  "," .  comments .  "`n", C:\Users\Cr\timesheet%today%.txt
+    FileAppend,% tsline, C:\Users\Cr\timesheet%today%.txt
     if (ErrorLevel)
         MsgBox % "There was an error writing to timesheet`nError: " A_LastError
     SplashTextOff
 }
-
 newtimesheetentry(){
     GLOBAL
     SPLASHTEXTON ,,,Adding new comment
-    clickLocationTab() getTicketData() today := A_DD . " " . A_MM . " " . A_yyyy ;today := "timesheet24 07 2020.txt"
+    clickLocationTab()
+    getTicketData()
+    today := A_DD . " " . A_MM . " " . A_yyyy ;today := "timesheet24 07 2020.txt"
     ;ticketdata := getTicketData()
     ;if FileExist("timesheet24 07 2020.txt")
     if FileExist("timesheet" . today . ".txt")
