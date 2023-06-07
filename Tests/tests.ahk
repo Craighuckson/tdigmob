@@ -1,8 +1,43 @@
 #include <Yunit\Yunit>
 #include <Yunit\Window>
 
+
 +^t::
-Yunit.Use(YunitWindow).Test(TicketListOps)
+Yunit.Use(YunitWindow).Test(CableNearCurbTestSuite)
+
+class CableNearCurbTestSuite
+{
+  
+    
+    TestCableNearCurbLoopsUntilInputIsYOrN()
+    {
+        ; Arrange
+        input := ["a", "b", "c", "d", "y"]
+        expected := true
+        
+        ; Act
+        for i, val in input
+        {
+            if (i < 5)
+                Inputbox := Func("MockInputbox")
+            else
+                Inputbox := Func("CableNearCurb")
+            
+            result := CableNearCurb()
+            
+            if (result = true)
+                break
+        }
+        
+        ; Assert
+        Yunit.Assert(result = expected)
+    }
+    
+    MockInputbox(ByRef value)
+    {
+        value := "a"
+    }
+}
 
 class TimesheetTests
 {
@@ -41,45 +76,45 @@ class Rogers
 	}
 }
 
-class TicketListOps
-{
-  Start()
-  {
-    WinActivate("ahk_exe mobile.exe")
-  }
-  ShouldGetCorrectNumberofTickets()
-  {
-    num := 99
-    Yunit.Assert(getNumberofTickets() = num)
-  }
+; class TicketListOps
+; {
+;   Start()
+;   {
+;     WinActivate("ahk_exe mobile.exe")
+;   }
+;   ShouldGetCorrectNumberofTickets()
+;   {
+;     num := 99
+;     Yunit.Assert(getNumberofTickets() = num)
+;   }
 
-  ShouldReturnAList()
-  {
-    Yunit.Assert(IsObject(getListofTicketNumbers()) = true)
-  }
+;   ShouldReturnAList()
+;   {
+;     Yunit.Assert(IsObject(getListofTicketNumbers()) = true)
+;   }
 
-  ListLengthShouldEqualNumberofTickets()
-  {
-    Yunit.Assert(getNumberofTickets() = getListofTicketNumbers().Length())
-  }
+;   ListLengthShouldEqualNumberofTickets()
+;   {
+;     Yunit.Assert(getNumberofTickets() = getListofTicketNumbers().Length())
+;   }
 
-  ; ShouldBeFalseIfDataFolderEmpty()
-  ; {
-  ;   Yunit.Assert(lookForOldTickets() = false)
-  ; }
+;   ; ShouldBeFalseIfDataFolderEmpty()
+;   ; {
+;   ;   Yunit.Assert(lookForOldTickets() = false)
+;   ; }
 
-  ; ShouldBeFalseIfValidTicketFolderPresent()
-  ; {
-  ;   FileCreateDir("C:\Users\Cr\teldig\data\20222322655")
-  ;   Yunit.Assert(lookForOldTickets() = false)
-  ; }
+;   ; ShouldBeFalseIfValidTicketFolderPresent()
+;   ; {
+;   ;   FileCreateDir("C:\Users\Cr\teldig\data\20222322655")
+;   ;   Yunit.Assert(lookForOldTickets() = false)
+;   ; }
 
-  ; ShouldBeTrueWhenOldTicketFolderPresent()
-  ; {
+;   ; ShouldBeTrueWhenOldTicketFolderPresent()
+;   ; {
 
-  ;   Yunit.Assert(lookForOldTickets() = true)
-  ; }
-}
+;   ;   Yunit.Assert(lookForOldTickets() = true)
+;   ; }
+; }
 
 
 #Include, C:\Users\Cr\teldig\teldig.ahk

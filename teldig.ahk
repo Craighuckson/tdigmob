@@ -300,23 +300,25 @@ bellPrimaryAutofill()
     if (useExisting() = "y")
     {
         autofillExistingSketch()
-        newPagePrompt()
-        return
-    }
-    bellclear := InputBox("Ticket Clear? Y / N")
-    if (bellclear = "y")
-    {
-        ST_SAVEEXIT()
-        newPagePrompt()
-    }
-    else if (bellclear = "n")
-    {
-        bell_stickers()
-        WinWaitClose, ahk_exe SketchToolApplication.exe
-        newPagePrompt()
     }
     else
-        bellPrimaryAutofill()
+    {
+        bellclear := InputBox("Ticket Clear? Y / N")
+        if (bellclear = "y")
+        {
+            ST_SAVEEXIT()
+        }
+        else if (bellclear = "n")
+        {
+            bell_stickers()
+            WinWaitClose, ahk_exe SketchToolApplication.exe
+        }
+        else
+        {
+            bellPrimaryAutofill()
+        }
+    }
+    newPagePrompt()
 }
 
 newPagePrompt()
@@ -437,19 +439,6 @@ enviClear()
     }
 }
 
-rogersWarning()
-{
-    global rclear, waitstate
-    GUIHWND := WinExist()
-    GuiControl, 2:, fibreonly, 0
-    GuiControl, 2:, ftth, 0
-    GuiControl, 2:, highriskfibre,0
-    GuiControl, 2:, inaccuraterecords,0
-    GuiControl, 2:, railway, 0
-    Gui, 2: Show, x411 y174 h383 w483, Please select all that apply
-    WinWaitClose, ahk_id %GUIHWND%
-    return
-}
 
 setBLToBLDA()
 {
@@ -647,12 +636,10 @@ setBLToBLDA()
     }
 }
 
+; @params stationcode:str returns bool
 isTicketRogers(stationcode)
 {
-    if (stationcode="ROGYRK01") or if (stationcode = "ROGSIM01")
-    return true
-else
-    return false
+    return (stationcode = "ROGYRK01" or stationcode = "ROGSIM01")
 }
 
 writeRogersClearReason()
@@ -666,7 +653,9 @@ writeRogersClearReason()
     }
 }
 
-setBLtoBLSketch(landbase,intdir){
+; @params landbase:str, intdir:str returns void
+setBLtoBLSketch(landbase,intdir)
+{
     global
     if (intdir)
     {
@@ -683,10 +672,256 @@ setBLtoBLSketch(landbase,intdir){
             Case "single", "SINGLE": loadImage(landbase "BLTOBLSINGLE.SKT")
             Default: return
         }
+        if (CableNearCurb())
+        {
+            moveCableToCurb(landbase)
+        }
 
     }
 }
 
+;------------------------------------------------------------------------------------------------------------------
+; FUNCTION: CableNearCurb()
+;
+; PURPOSE:  Asks the user if the cable is near the curb and returns a boolean value based on the user's input.
+;
+; RETURNS:  Returns true if the cable is near the curb, false otherwise.
+;
+;------------------------------------------------------------------------------------------------------------------
+CableNearCurb(input := "")
+{
+  Loop
+  {
+    Inputbox, bycurb, By Curb?, Is the cable by the curb? (y/n)
+  }
+  Until (bycurb = "y" || bycurb = "n")
+  if (bycurb = "y")
+    return true
+  else
+    return false
+}
+
+;------------------------------------------------------------------------------------------------------------------
+; FUNCTION: moveCableToCurb(landbase)
+;
+; PURPOSE:  Moves the cable to the curb based on the landbase parameter.
+;
+; PARAMETERS:
+;           landbase - A string representing the landbase direction ("n", "s", "e", or "w").
+;
+; RETURNS:  None.
+;
+;------------------------------------------------------------------------------------------------------------------
+moveCableToCurb(landbase)
+{
+  switch landbase
+  {
+    case "n": cableToCurbN()
+    case "s": cableToCurbS()
+    case "e": cableToCurbE()
+    case "w": cableToCurbW()
+  }
+}
+
+;MACRO FUNCTIONS
+cableToCurbN()
+{
+    Loop, 1
+    {
+        SetTitleMatchMode, 2
+        CoordMode, Mouse, Window
+        tt = TelDig SketchTool
+        WinWait, %tt%
+        IfWinNotActive, %tt%,, WinActivate, %tt%
+        Sleep, 711
+        MouseClick, L, 1136, 175,,, D
+        Sleep, 383
+        MouseClick, L, 1120, 321,,, U
+        Sleep, 265
+        MouseClick, L, 688, 324
+        Sleep, 125
+        MouseClick, R, 688, 324
+        Sleep, 992
+        MouseClick, L, 731, 527
+        Sleep, 484
+        MouseClick, L, 701, 182
+        Sleep, 695
+        MouseClick, L, 666, 362
+        Sleep, 101
+        Send, {delete}
+        Sleep, 422
+        MouseClick, L, 664, 460
+        Sleep, 484
+        Send, {Delete}
+        Sleep, 406
+        MouseClick, L, 664, 437,,, D
+        Sleep, 835
+        MouseClick, L, 664, 473,,, U
+        Sleep, 672
+        MouseClick, L, 512, 429,,, D
+        Sleep, 781
+        MouseClick, L, 511, 466,,, U
+        Sleep, 664
+        MouseClick, L, 802, 430,,, D
+        Sleep, 1468
+        MouseClick, L, 802, 465,,, U
+        Sleep, 1000
+    }
+}
+
+cableToCurbS()
+;s bltobl generated macro
+{
+  Loop, 1
+  {
+      SetTitleMatchMode, 2
+      CoordMode, Mouse, Window
+      tt = TelDig SketchTool
+      WinWait, %tt%
+      IfWinNotActive, %tt%,, WinActivate, %tt%
+      Sleep, 555
+      MouseClick, L, 1130, 191,,, D
+      Sleep, 578
+      MouseClick, L, 1155, 337,,, U
+      Sleep, 250
+      MouseClick, L, 683, 388
+      MouseClick, R, 683, 388
+      Sleep, 781
+      MouseClick, L, 752, 601
+      Sleep, 773
+      MouseClick, L, 713, 168
+      Sleep, 679
+      MouseClick, L, 647, 284
+      Sleep, 812
+      Send, {Blind}{Delete}
+      Sleep, 211
+      MouseClick, L, 722, 450
+      Sleep, 211
+      Send, {Blind}{Delete}
+      Sleep, 351
+      MouseClick, L, 675, 324,,, D
+      Sleep, 937
+      MouseClick, L, 673, 280,,, U
+      Sleep, 555
+      MouseClick, L, 828, 334,,, D
+      Sleep, 718
+      MouseClick, L, 828, 293,,, U
+      Sleep, 664
+      MouseClick, L, 540, 330,,, D
+      Sleep, 1101
+      MouseClick, L, 538, 289,,, U
+      Sleep, 1000
+  }
+}
+
+cableToCurbE()
+{
+  Loop, 1
+  {
+      SetTitleMatchMode, 2
+      CoordMode, Mouse, Window
+      tt = TelDig SketchTool
+      WinWait, %tt%
+      IfWinNotActive, %tt%,, WinActivate, %tt%
+      Sleep, 562
+      MouseClick, L, 1129, 201,,, D
+      Sleep, 562
+      MouseClick, L, 1144, 369,,, U
+      Sleep, 273
+      MouseClick, L, 740, 454
+      Sleep, 351
+      MouseClick, R, 740, 454
+      Sleep, 625
+      MouseClick, L, 785, 321
+      Sleep, 211
+      MouseClick, L, 982, 417
+      Sleep, 211
+      MouseClick, L, 759, 373
+      Sleep, 585
+      Send, {Blind}{Delete}
+      Sleep, 289
+      MouseClick, L, 792, 348
+      Sleep, 312
+      Send, {Blind}{Delete}
+      Sleep, 578
+      MouseClick, L, 665, 357,,, D
+      Sleep, 781
+      MouseClick, L, 626, 359,,, U
+      Sleep, 633
+      MouseClick, L, 670, 253,,, D
+      Sleep, 781
+      MouseClick, L, 633, 253,,, U
+      Sleep, 547
+      MouseClick, L, 671, 500,,, D
+      Sleep, 1187
+      MouseClick, L, 634, 500,,, U
+      Sleep, 1000
+  }
+}
+
+cableToCurbW()
+{
+  Loop, 1
+  {
+      SetTitleMatchMode, 2
+      CoordMode, Mouse, Window
+      tt = TelDig SketchTool
+      WinWait, %tt%
+      IfWinNotActive, %tt%,, WinActivate, %tt%
+      Sleep, 640
+      MouseClick, L, 1133, 199,,, D
+      Sleep, 609
+      MouseClick, L, 1185, 376,,, U
+      Sleep, 289
+      MouseClick, L, 672, 397
+      Sleep, 133
+      MouseClick, R, 672, 397
+      Sleep, 766
+      MouseClick, L, 732, 604
+      Sleep, 336
+      MouseClick, L, 454, 408
+      Sleep, 250
+      MouseClick, L, 650, 349
+      Sleep, 648
+      Send, {Blind}{Delete}
+      Sleep, 1359
+      MouseClick, L, 702, 314
+      Sleep, 109
+      Send, {Blind}{Delete}
+      Sleep, 562
+      MouseClick, L, 755, 327,,, D
+      Sleep, 1023
+      MouseClick, L, 794, 325,,, U
+      Sleep, 539
+      MouseClick, L, 747, 230,,, D
+      Sleep, 781
+      MouseClick, L, 783, 230,,, U
+      Sleep, 578
+      MouseClick, L, 752, 484,,, D
+      Sleep, 679
+      MouseClick, L, 792, 486,,, U
+      Sleep, 297
+      MouseClick, L, 692, 482,,, D
+      Sleep, 633
+      MouseClick, L, 737, 482,,, U
+      Sleep, 461
+      MouseClick, L, 687, 222,,, D
+      Sleep, 1125
+      MouseClick, L, 726, 224,,, U
+      Sleep, 406
+      MouseClick, L, 735, 365,,, D
+      Sleep, 617
+      MouseClick, L, 780, 351,,, U
+      Sleep, 1000
+  }
+}
+
+
+;------------------------------------------------------------------
+; setCornerDigArea()
+;
+; Sets the corner dig area based on the landbase and boundaries entered by the user.
+;------------------------------------------------------------------
 setCornerDigArea()
 {
     global
@@ -1753,6 +1988,10 @@ Else
 sketchAutoFill()
 {
     ;TODO eliminate use of global variables
+    /* Form filling function. Auto chooses base form to sketch on based on ticket data given.
+
+
+*/
     global
 
     setform()
@@ -1808,7 +2047,7 @@ sketchAutoFill()
         autofillExistingSketch()
         newPagePrompt()
     return ;autofill existing module
-}
+    }
 
 ;else if (getexisting = "n") ;this is where it gets tricky...
 else
@@ -1839,9 +2078,10 @@ else
         if(digboundary = "2")
         {
             setBLtoBLSketch(landbase,intdir)
-            setBLtext(landbase,intdir,xstreet,vstreet)
             if (!intdir)
-                setOffsetLabel(landbase)
+              setOffsetLabel(landbase)
+            setBLtext(landbase,intdir,xstreet,vstreet)
+            
         }
 
         if(digboundary = "3")
@@ -2493,6 +2733,7 @@ setForm()
                     Case "ROGYRK01": Break
                     Case "APTUM01": Break
                     Case "ENVIN01": Break
+                    Case "TMAX01": Break
                     Default: continue
                 }
             }
@@ -2580,6 +2821,22 @@ setForm()
             form := "EA"
             break
         }
+        else if (stationcode == "TMAX01" and form = "")
+          {
+            win.FindFirstByName("ui-btn").click()
+            d := win.WaitElementExistByNameAndType("TELMAX", "hyperlink")
+            d.click()
+            form := "TP"
+            break
+          }
+        else if (stationcode == "TMAX01")
+          {
+            win.FindFirstByName("ui-btn").click()
+            d := win.WaitElementExistByName("SKETCH_FORM", "hyperlink")
+            d.click()
+            form := "TA"
+            break
+          }
         else
         {
             MsgBox % "Please select form manually and press OK to continue"
@@ -6069,9 +6326,11 @@ getStnCodeSuffix()
         return "R"
     else if (stationcode = "ENVIN01")
         return "ENVI"
-    else
+    else if (stationcode = "APTUM01")
         return "APT"
-}
+    else
+      return "TMAX"
+  }
 
 ST_SAVEEXIT()
 {
@@ -6120,11 +6379,11 @@ ST_SAVEEXIT()
         setTemplateText("RPtotalpages.skt",totalpages)
         Sleep 100
 
-    Case "EP":
+    Case "EP", "TP":
         enviunits := getRogersUnits()
         totalpages := getRPPAGes()
-        loadImage("catv primary.skt")
-    (InStr(enviunits[1],"M")) ? loadImageNG("rogerspaint.skt") :
+        loadImage("telmaxprimary.skt")
+    (InStr(enviunits[1],"M")) ? loadImageNG("telmaxpaint.skt") :
         setTemplateText("units.skt",enviunits[1] . enviunits[2])
         setTemplateText("rogersPrimaryDate.skt",A_YYYY . "-" . A_MM . "-" . A_DD)
         setTemplateText("RPtotalpages.skt",currentpage . "/" . totalpages)
@@ -6145,7 +6404,7 @@ ST_SAVEEXIT()
         setTemplateText("RPtotalpages.skt",currentpage . "/" . totalpages)
         Sleep 100
 
-    Case "AA" :
+    Case "AA", "TA" :
         loadImage("aptumaux.skt")
 
     Case "EA":
@@ -6165,7 +6424,7 @@ ST_SAVEEXIT()
     ;Msgbox, 4132, Page Number, Insert page numbers?
     ;ifMsgBox, Yes
     ;{
-    IF (FORM = "RP" || form = "EP" || form = "AP")
+    IF (FORM = "RP" || form = "EP" || form = "AP" || form = "TP")
         wait()
     else if (form = "BP")
         writeRPPageNumber()
