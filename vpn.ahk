@@ -15,9 +15,7 @@ class VPN
   {
     get {
       if this.state = "rogers"
-        return "T3yKBZby"
-      else if this.state = "beanfield"
-        return "HardyChall7nge"
+        return EnvGet("vpass")
       else return ""
     }
   }
@@ -28,7 +26,7 @@ class VPN
 
     Runwait, %ComSpec% /c ""C:\Program Files (x86)\Cisco\Cisco AnyConnect Secure Mobility Client\vpncli.exe" "stats" | clip ",,Hide
     stdout := Clipboard
-    if (InStr(stdout, "rogers"))
+    if (InStr(stdout, "CableFieldTech_client_profile.xml"))
       return "rogers"
     else if (InStr(stdout, "beanfield"))
       return "beanfield"
@@ -85,8 +83,7 @@ class VPN
 
 getVPNPass()
 {
-	VPNPASS := "T3yKBZby"
-	return VPNPaSS
+  return "Locatesup1"
 }
 
 
@@ -109,11 +106,11 @@ whichVPN()
 
 vpnToggle()
 {
-	isvpn := isvpn()
-	if (isvpn = 0) {
+	isvpn := VPN.GetState()
+	if (isvpn = "disconnected") {
 		vpnOn()
 	}
-	else if (isvpn = 1) {
+	else if (isvpn = "rogers") {
 		vpnOff()
 	}
 }
@@ -146,7 +143,8 @@ vpnOff() {
 	;~ ControlClick("Button1","Cisco AnyConnect Secure Mobility Client") ; disconnect
 	;~ WinClose, ahk_exe vpnui.exe
 	uia := UIA_Interface()
-	win := uia.ElementFromHandle()
-	win.FindFirstByName("Disconnect").click()
+	win := uia.ElementFromHandle("a")
+  win.WaitElementExistByNameAndType("Disconnect","Button")
+	win.FindFirstByNameAndType("Disconnect","Button").click()
 	WinClose,ahk_exe vpnui.exe
 }

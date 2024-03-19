@@ -8,7 +8,12 @@ s := new Canvas.Surface(600,600)
 b := new Canvas.Brush(0xffffffff)
 bp := new Canvas.Pen(0xff000000)
 road := bp.Width(3)
-rd := new Canvas.Brush(0xffffffff)
+
+
+;rd := new Canvas.Brush(0x00fa00ff)
+;rd a red brush
+rd := new Canvas.Brush(0xaaff0000)
+bl := new Canvas.Brush(0x100000ff)
 bluedraw = new Canvas.Brush(0xff0000ff)
 f := new Canvas.Font("Arial",12)
 

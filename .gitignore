@@ -8,7 +8,8 @@ teldig.ini
 timelog.txt
 *.png
 ahkpyinterface.py
-
+/.NET
+/Assemblies
 errorlog.txt
 bigticketlist.txt
 output.txt

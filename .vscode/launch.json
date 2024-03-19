@@ -6,16 +6,18 @@
     "configurations": [
 			{
 				"name": "AutoHotkey Attach",
-				"type": "autohotkey",
+				"type": "ahk",
 				"request": "attach"
 			},
 
       {
-        "type": "autohotkey",
+        "type": "ahkdbg",
         "request": "launch",
         "name": "AutoHotkey Debugger",
         "program": "${file}",
-        "stopOnEntry": true
+        "AhkExecutable": "C:\\Program Files\\AutoHotkey\\v1.1.37.01\\AutoHotkeyU64.exe",
+        "stopOnEntry": true,
+        "port": 9005
       }
 
     ],

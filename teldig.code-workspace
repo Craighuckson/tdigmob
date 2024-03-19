@@ -1,0 +1,41 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+  ],
+  "settings": {
+    "files.autoSave": "afterDelay",
+    "debug.internalConsoleOptions": "neverOpen",
+    "comments.openPanel": "neverOpen",
+    "launch": {
+      "inputs": [],
+      "configurations": [
+        {
+          "name": "AutoHotkey Attach",
+          "type": "autohotkey",
+          "request": "attach"
+        },
+        {
+          "type": "autohotkey",
+          "request": "launch",
+          "name": "AutoHotkey Debugger",
+          "program": "${file}",
+          "stopOnEntry": true
+        }
+      ],
+      "compounds": [],
+      "version": "0.2.0",
+      "type": "autohotkey",
+      "request": "launch",
+      "name": "AutoHotkey Debugger",
+      "program": "${file}",
+      "stopOnEntry": true
+    },
+    "git.confirmSync": false,
+    "terminal.integrated.fontFamily": "consolas",
+    "typescript.disableAutomaticTypeAcquisition": true,
+    "window.zoomLevel": 0,
+    "dotnet.defaultSolution": ".NET\\.NET.sln"
+  }
+}

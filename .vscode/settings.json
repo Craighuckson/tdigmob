@@ -95,5 +95,6 @@
 		],
 		"python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "AutoHotkey2.InterpreterPath": "c:\\Program Files\\AutoHotkey\\v2-alpha\\x64\\AutoHotkey.exe", //won't trigger on spacebar)
+    "AutoHotkey2.InterpreterPath": "c:\\Program Files\\AutoHotkey\\v2-alpha\\x64\\AutoHotkey.exe",
+    "dotnet.defaultSolution": ".NET\\.NET.sln", //won't trigger on spacebar)
 }

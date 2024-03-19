@@ -1,4 +1,13 @@
-; Enter commands here and press F5 to execute. For context based help press F1.
+#NoEnv
+#SingleInstance, Force
+SendMode, Input
+SetBatchLines, -1
+SetWorkingDir, %A_ScriptDir%
 
-craig := "Huckson"
-msgbox % craig
+
+#include <uia_interface>
+
+winactivate, ahk_exe locateaccess.exe
+uia := uia_interface()
+win := uia.ElementFromHandle()
+msgbox % win.FindFirstBy("AutomationId=Ticket.Address").Value

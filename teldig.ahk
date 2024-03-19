@@ -18,35 +18,35 @@ ListLines, On
 #include <json>
 #include <Acc>
 #include *i scrollbox.ahk
-#include <cpuload>
 #include <UIA_Interface>
 #include <UIA_Browser>
 #include <AHKEZ>
-#include C:\Users\cr\teldig\lib\vis2.ahk
-#Include <AHKEZ_Debug>
+#include <vis2>
+;#Include <AHKEZ_Debug>
 #Include <EntryForm>
 ;#Include Canvas.ahk
 #Include <printstack>
 ;#Include multiviewer.ahk
-#Include C:\Users\Cr\teldig\vpn.ahk
-#Include C:\Users\Cr\teldig\aptumlookup.ahk
-#Include <chrome>
+#Include vpn.ahk
+#Include .\aptumlookup.ahk
+;#Include <chrome>
 BlockInput, SendAndMouse
 SetControlDelay, 50
-Menu, Tray, Icon, C:\Users\Cr\teldig\tico.png
+Menu, Tray, Icon, %A_ScriptDir%\tico.png
 
 ;Iniread section to preload variables between resets
-iniread, form, C:\Users\Cr\teldig\teldig.ini, variables, form, ""
-;iniread, stationcode, C:\Users\Cr\teldig\teldig.ini, variables, stationcode, ""
-iniread, bellmarked, C:\Users\Cr\teldig\teldig.ini, variables, bellmarked, ""
-iniread, bellclear, C:\Users\Cr\teldig\teldig.ini, variables, bellclear, ""
-iniread, rogersclear, C:\Users\Cr\teldig\teldig.ini, variables, rogersclear, ""
-iniread, rogersmarked, C:\Users\Cr\teldig\teldig.ini, variables, rogersmarked, ""
-iniread, locationdataobtained, C:\Users\Cr\teldig\teldig.ini, variables, locationdataobtained, 0
-iniread, street, C:\Users\Cr\teldig\teldig.ini, variables, street, ""
-iniread, intersection, C:\Users\Cr\teldig\teldig.ini, variables, intersection, ""
-iniread, currentpage, C:\Users\Cr\teldig\teldig.ini, variables, currentpage, ""
-iniread, totalpages, C:\Users\Cr\teldig\teldig.ini, variables, totalpages, "
+inifile := % A_ScriptDir . "\teldig.ini"
+iniread, form, %inifile%, variables, form, ""
+;iniread, stationcode, %inifile%, variables, stationcode, ""
+iniread, bellmarked, %inifile%, variables, bellmarked, ""
+iniread, bellclear, %inifile%, variables, bellclear, ""
+iniread, rogersclear, %inifile%, variables, rogersclear, ""
+iniread, rogersmarked, %inifile%, variables, rogersmarked, ""
+iniread, locationdataobtained, %inifile%, variables, locationdataobtained, 0
+iniread, street, %inifile%, variables, street, ""
+iniread, intersection, %inifile%, variables, intersection, ""
+iniread, currentpage, %inifile%, variables, currentpage, ""
+iniread, totalpages, %inifile%, variables, totalpages, "
 
 ;CONSTANTS
 
@@ -60,6 +60,11 @@ tempvar5 := ""
 today:= A_DD . " " . A_MM . " " . A_YYYY
 sketch_bounds := {ulx:192, uly:512,lrx:948,lry:1152,width:756,height:640}
 YorkMaps := "https://maps.york.ca/Html5ViewerPublic/Index.html?viewer=GeneralInteractiveMap.YorkMaps"
+
+SKETCH_FOLDER := "C:\Users\" . A_UserName . "\Documents\"
+TIMESHEET_FOLDER := "C:\Users\" . A_UserName . "\"
+AHK_FOLDER := "C:\Users\" . A_UserName . "\Autohotkey\"
+LOCATE_DRAW_FOLDER := ""
 
 ;setup of GUI for Bell primary sheet
 Gui, 1: Add, CheckBox, x172 y80 w100 h30 vbellhydro, Bell Hydro
@@ -151,6 +156,10 @@ Menu, ST, Add, Save and Exit, 2buttonsaveandexit
 Menu, ST, Add, HotString list, showHotStrings
 
 ;GLOBAL HOTKEYS
+
+^d::
+dumpElements()
+return
 
 ~CapsLock::
   capstate := GetKeyState("CapsLock", "T")
@@ -360,7 +369,7 @@ getRegDA()
 isErrorNoSketchTemplate(path)
 {
 
-  if !FileExist("C:\Users\Cr\Documents\" path)
+  if !FileExist(SKETCH_FOLDER . path)
   {
     Msgbox, Unable to load sketch (template not created)
     return
@@ -679,13 +688,13 @@ setBLtoBLSketch(landbase,intdir)
     ;~ }
     ;~ if (CableNearCurb())
     ;~ {
-      ;~ moveCableToCurb(landbase)
+    ;~ moveCableToCurb(landbase)
     ;~ }
     cnc := CableNearCurb()
     if (cnc)
-        loadImage(landbase "bltobl" choice "-c.skt")
+      loadImage(landbase "bltobl" choice "-c.skt")
     else
-        loadImage(landbase "bltobl" choice)
+      loadImage(landbase "bltobl" choice)
     return cnc
   }
 }
@@ -724,13 +733,13 @@ CableNearCurb(input := "")
 ;------------------------------------------------------------------------------------------------------------------
 ;~ moveCableToCurb(landbase)
 ;~ {
-  ;~ switch landbase
-  ;~ {
-  ;~ case "n": cableToCurbN()
-  ;~ case "s": cableToCurbS()
-  ;~ case "e": cableToCurbE()
-  ;~ case "w": cableToCurbW()
-  ;~ }
+;~ switch landbase
+;~ {
+;~ case "n": cableToCurbN()
+;~ case "s": cableToCurbS()
+;~ case "e": cableToCurbE()
+;~ case "w": cableToCurbW()
+;~ }
 ;~ }
 
 ;MACRO FUNCTIONS
@@ -1671,7 +1680,7 @@ setCornerSketch(landbase)
 setRCSketch(landbase){
     global
     StringUpper,landbase,landbase
-    if !FileExist("C:\Users\Cr\Documents\" . landbase "RC.skt")
+    if !FileExist(SKETCH_FOLDER . landbase "RC.skt")
     {
         Throw, Exception("Sketch template does not exist",-1)
     }
@@ -1833,7 +1842,7 @@ autoinsertSketches(email = "n")
     ;COMMENT EITHER THE NEXT TWO LINES OR THE FOLLOWING 2 LINES AT A TIME - NOT BOTH
     if !(projfile)
     {
-        FileSelectFile, projfile,,c:\users\cr\archived\autohotkey, Select project,
+        FileSelectFile, projfile,,%AHK_Folder%, Select project,
         units := Inputbox("Enter units")
         loop, Read, %projfile%
         {
@@ -2021,7 +2030,7 @@ sketchAutoFill()
                 totalpages := 2
 
                 units := Inputbox("Enter units")
-                primary_template := FileSelectFile(,"C:\Users\Cr\Documents\","Choose bell primary form to open")
+                primary_template := FileSelectFile(,A_MyDocuments,"Choose bell primary form to open")
                 focusSketchtool()
                 loadImage("bell primary.skt")
                 wait()
@@ -2081,7 +2090,7 @@ else
         {
             ;~ Inputbox,ezd,ezdraw,EZDraw SKetch?
             ;~ if (ezd = "y") {
-                ;~ insertEZDrawRP()
+            ;~ insertEZDrawRP()
             ;~ }
             cnc := setBLtoBLSketch(landbase,intdir)
             if (!intdir)
@@ -2456,7 +2465,7 @@ setJobNumberto99()
 
 openEZDraw()
 {
-    Run, C:\Users\Cr\Locatedraw\Locate-draw\ezdrawlnew.py
+    Run, % LOCATE_DRAW_FOLDER
 }
 
 rogersClearForm()
@@ -2466,7 +2475,7 @@ rogersClearForm()
 
 SketchToolConfig()
 {
-    Run, explore "C:\Users\Cr\AppData\Local\TelDig Systems\TelDig.Fusion.SketchTool.Launcher"
+    Run, explore "C:\Users\craig\AppData\Local\TelDig Systems\TelDig.Fusion.SketchTool.Launcher"
 }
 
 addressSearch()
@@ -2488,7 +2497,7 @@ return
 
 makeJSON()
 {
-    temp := "C:\Users\Cr\Desktop"
+    temp := "C:\Users\craig\Cr\Desktop"
     j := new JSON()
     tc := ControlGet("List","Count","syslistview321","ahk_exe mobile.exe")
     ;open ticket
@@ -2502,14 +2511,14 @@ makeJSON()
         ;mb(obj2string(td))
         sleep 500
         folder := td.ticketnumber
-        FileCreateDir, C:\Users\Cr\Tickets\%folder%
+        FileCreateDir, C:\Users\craigaig\Tickets\%folder%
         if (errorlevel) {
             MsgBox("Couldn't create directory")
             exit
         }
         sleep 500
         jval := j.Dump(td,,4)
-        FileAppend, %jval%, C:\Users\Cr\Tickets\%folder%\%folder%.json
+        FileAppend, %jval%, C:\Users\craig\Tickets\%folder%\%folder%.json
         ;exit ticket
         Send, {Esc}
         sleep 500
@@ -2594,18 +2603,18 @@ locationDataCheck()
 
 newproj()
 {
-    Run, % "C:\Users\Cr\archived\autohotkey\projectfile.ahk"
+    Run, % "C:\Users\craig\archived\autohotkey\projectfile.ahk"
 }
 
 openSketchEditor()
 {
-    Run("C:\Users\Cr\Documents\LibreAutomate\Main\exe\OpenSketchEditor\OpenSketchEditor.exe")
+    Run("C:\Users\craig\Documents\LibreAutomate\Main\exe\OpenSketchEditor\OpenSketchEditor.exe")
 }
 
 readClearTemplate()
 {
     global
-    FileRead, templatefile, C:\Users\Cr\Documents\%ticketnumber%.txt
+    FileRead, templatefile, C:\Users\craigaig\Documents\%ticketnumber%.txt
     linelist := StrSplit(templatefile, "`r`n")
     msgbox % linelist
     if linelist[1] = "y"
@@ -2862,7 +2871,7 @@ return
 #IfWinActive, ahk_exe mapinfor.exe
 
 !^f::
-    aptumLookup()
+aptumLookup()
 return
 
 ^a::
@@ -2871,10 +2880,10 @@ return
 
 asBuiltLookup()
 {
-    ;Run, C:\users\cr\teldig\beanfield.pyw
+    ;Run, C:\Users\craigaig\teldig\beanfield.pyw
     global filechoice
     InputBox, filename,,Enter file name
-    dir := "C:\Users\Cr\As Builts\Aptum As Builts\Toronto_Mississauga"
+    dir := "C:\Users\craigaig\As Builts\Aptum As Builts\Toronto_Mississauga"
     fileList := ""
     Loop, Files, %dir%\*%filename%*.*, R
     {
@@ -2892,7 +2901,7 @@ asBuiltLookup()
 
     ChooseFile:
     Gui, AB:Submit
-    Run, C:\Users\Cr\As Builts\Aptum As Builts\Toronto_Mississauga\%filechoice%
+    Run, C:\Users\craigaig\As Builts\Aptum As Builts\Toronto_Mississauga\%filechoice%
     filechoice := ""
     Gui, Destroy
     return
@@ -2901,7 +2910,7 @@ asBuiltLookup()
 ChooseFile()
 {
     Gui, Submit
-    Run, C:\Users\Cr\As Builts\Aptum As Builts\Toronto_Mississauga\%filechoice%
+    Run, C:\Users\craigaig\As Builts\Aptum As Builts\Toronto_Mississauga\%filechoice%
 }
 
 #IfWinActive
@@ -3159,11 +3168,11 @@ class MultiViewer
     }
 
     asBuiltLookup()
-    ; get DSA# from user with inputbox, check for and open the pdf file in C:\Users\Cr\As Builts\stouffville as builts that contains DSA#
+    ; get DSA# from user with inputbox, check for and open the pdf file in C:\Users\craigaig\As Builts\stouffville as builts that contains DSA#
     {
       InputBox, dsa, Enter DSA#, DSA#
-      app := "C:\Users\Cr\AppData\Local\SumatraPDF\SumatraPDF.exe"
-      dir := "C:\Users\Cr\As Builts\stouffville as builts"
+      app := "C:\Users\craigaig\AppData\Local\SumatraPDF\SumatraPDF.exe"
+      dir := "C:\Users\craig\As Builts\stouffville as builts"
       Loop, Files, %dir%\*%dsa%*.*, R
       {
           Run, open %dir%\%A_LoopFileName%
@@ -3513,9 +3522,9 @@ class CraigRPA {
         SketchTool.SubmitAndExit()
         focusTeldig()
         locationDataObtained := ""
-        ;timesheetentry := ticketnumber . "," . number . " " . street  . ",,,,,TELMAX 1 MARKED" . "`n"
-        ;tslocation := "C:\Users\Cr\timesheet" today ".txt"
-       ; FileAppend, %timesheetentry%, %tslocation%
+    ;timesheetentry := ticketnumber . "," . number . " " . street  . ",,,,,TELMAX 1 MARKED" . "`n"
+    ;tslocation := "C:\Users\craig\timesheet" today ".txt"
+    ; FileAppend, %timesheetentry%, %tslocation%
 
     /*
         A form filling module that asks questions then prefills the locate sheet
@@ -3673,26 +3682,11 @@ class QA {
     {
       today := A_DD . " " . A_MM . " " . A_YYYY
       Notify("Adding to timesheet")
-      FileAppend, % ticket.ticketnumber "," ticket.number " " ticket.street ",,,,,QA " locator " - " status "`n", C:\Users\Cr\timesheet%today%.txt
+      FileAppend, % ticket.ticketnumber "," ticket.number " " ticket.street ",,,,,QA " locator " - " status "`n", C:\Users\craig\timesheet%today%.txt
     }
 
     Finalize()
     {
-    /* 		Loop
-     * 		{
-     * 			result := InputBox("Result", "(P)ass / (F)ail? ")
-     * 		}
-     * 		Until instr(result,"p") || instr(result,"f")
-     * 		focusSketchTool()
-     * 		if (result ="p")
-     * 		{
-     * 			loadImageNG(A_MyDocuments . "\qayes.skt")
-     * 		}
-     * 		else if (result = "f")
-     * 		{
-     * 			loadImageNG(A_MyDocuments . "\qan.skt")
-     * 		}
-            */
         focusSketchTool()
         SketchTool.waitCloseDialogBox()
         Msgbox("Press OK to continue")
@@ -4016,7 +4010,7 @@ class Mobile
         ;     MouseClick,L, %foundx%,%foundy%
         ;     return true
         ; }
-        Run("C:\Users\Cr\Documents\LibreAutomate\Main\exe\ChangeToPending\ChangeToPending.exe")
+        Run("C:\Users\craigaig\OneDrive\Documents\LibreAutomate\Main\exe\ChangeToPending\ChangeToPending.exe")
 
     }
 
@@ -4199,7 +4193,7 @@ class Ticket
     {
         if (this.HasData() = false) {
 
-          ladatapath := "C:\Users\Cr\AppData\Local\TelDigFusion.Data\data\"
+          ladatapath := "C:\Users\craig\AppData\Local\TelDigFusion.Data\data\"
           uia := UIA_Interface()
           win := uia.ElementFromHandle(WinExist("A"))
           doc := win.FindFirstByNameAndType("LocateAccess - Cable Control Systems","Document").Value
@@ -4221,6 +4215,7 @@ class Ticket
               FileReadLine,digInfo,%file%,64
               FileReadLine,ticketnumber,%file%,4
               FileReadLine,town,%file%,30
+    
               number := StrReplace(number,"UR_NO_CIVIC_INITI::")
               street := StrReplace(street,"UR_NOM_ARTER_PRINC::")
               intersection := StrReplace(intersection,"UR_NOM_ARTER_INTER_1::")
@@ -4237,7 +4232,7 @@ class Ticket
               while !file.AtEOF()
                 {
                   line := file.ReadLine()
-      
+
                   if (A_Index = 32)
                     number := line
                   else if (A_Index = 34)
@@ -4254,7 +4249,7 @@ class Ticket
                     town := line
                 }
               file.Close()
-      
+
               number := StrReplace(number,"UR_NO_CIVIC_INITI::")
               street := StrReplace(street,"UR_NOM_ARTER_PRINC::")
               intersection := StrReplace(intersection,"UR_NOM_ARTER_INTER_1::")
@@ -4262,7 +4257,7 @@ class Ticket
               digInfo := StrReplace(diginfo,"UR_INFO_ADDIT_TROU::")
               ticketnumber := StrReplace(ticketnumber,"UR_ID_REQUE::")
               town := StrReplace(town,"UR_NOM_TESSE_1::")
-              
+
             }
 
           else if (stationcode == "APTUM01")
@@ -4320,7 +4315,6 @@ class Ticket
                     intersection2 := win.FindFirstBy("AutomationId=Ticket.Intersection2").Value
               }
 
-          
             this.number := number
             this.street := CraigRpa.FixStreetName(street)
             this.intersection := CraigRPA.FixStreetName(intersection)
@@ -4465,7 +4459,7 @@ class Ticket
             case "TP","TA":
                 timesheetEntry := this.ticketnumber "," this.street ",,,,,TELMAX " . units . "`n"
         }
-        timesheetLocation := "C:\Users\Cr\timesheet" today ".txt"
+        timesheetLocation := "C:\Users\craigAIG\timesheet" today ".txt"
         FileAppend, %timesheetEntry%, %timesheetLocation%
         SplashImage, Off
         if (ErrorLevel)
@@ -5423,7 +5417,7 @@ return
 
 statusPending() ; change ticket status to pending
 {
-    RunWait("C:\Users\Cr\Documents\LibreAutomate\Main\exe\ChangeToPending\ChangeToPending.exe")
+    RunWait("C:\Users\craig\Documents\LibreAutomate\Main\exe\ChangeToPending\ChangeToPending.exe")
     return true
 }
 
@@ -5432,15 +5426,15 @@ statusPending() ; change ticket status to pending
 getTicketData()
 {
     global
-    ladatapath := "C:\Users\Cr\AppData\Local\TelDigFusion.Data\data\"
+    ladatapath := "C:\Users\craig\AppData\Local\TelDigFusion.Data\data\"
     uia := UIA_Interface()
     win := uia.ElementFromHandle(WinExist("A"))
     doc := win.FindFirstByNameAndType("LocateAccess - Cable Control Systems","Document").Value
     priority := win.FindFirstBy("AutomationId=Ticket.Priority").Value
     ;Notify(priority)
-    ;MB(doc)
+    MB(doc)
     a := StrSplit(doc,"/")
-    subdir := a.8 . "_" . a.9
+      subdir := a.8 . "_" . a.9
     stationcode := a.9
     ladatapath .= subdir
     ;mb("subdir: " . subdir "`nladatapath: " ladatapath "`n")
@@ -5451,8 +5445,6 @@ getTicketData()
     }
 
     ;read file, save line 32 as number, line 34 as street, line 35 as intersection, line 36 as intersection2, line 64 as digInfo, line 4 as ticketnumber, line 30 as town
-
-
 
     if (stationcode == "ROGYRK01")
     {
@@ -6187,7 +6179,7 @@ addToTimesheetFromPrevious(aptumunits := "",rogersunits := "")
 {
     global
     splashtexton,,,,Adding to logsheet
-    FileAppend,% ticketnumber "," number " " street "," rogersunits[1] "," rogersunits[2] "," aptumunits[1] "," aptumunits[2] ", `n", C:\Users\Cr\timesheet%today%.txt
+    FileAppend,% ticketnumber "," number " " street "," rogersunits[1] "," rogersunits[2] "," aptumunits[1] "," aptumunits[2] ", `n", C:\Users\craig\timesheet%today%.txt
     if ErrorLevel
         MsgBox % "Couldn't write to timesheet"
     SplashTextOff
@@ -6312,7 +6304,7 @@ addtotimesheet()
         InputBox, comments, Enter Comments
     StringUpper, comments,comments
     tsline := Format("{1},{2} {3},{4},{5},{6},{7},{8},{9},{10}`n",ticketnumber,number,street,rogersMarked,rogersClear,aptumMarked,aptumClear,TelmaxMarked, TelMaxClear,comments)
-    FileAppend,% tsline, C:\Users\Cr\timesheet%today%.txt
+    FileAppend,% tsline, C:\Users\craig\timesheet%today%.txt
     if (ErrorLevel)
         MsgBox % "There was an error writing to timesheet`nError: " A_LastError
 
@@ -6438,18 +6430,18 @@ getFileName(){
 }
 
 getLocator(){
-    loop {
-    Inputbox, locator, Enter locator, t = Tevin `n n = Nathaniel
+    Inputbox, locator, Enter locator, P=PETER`,H=HAN`,S=SHABBY`,E=EUNAH`,J=JUNE
     StringLower, locator, locator
-    }
-    until locator in n,t
     if ErrorLevel
         return
-    if (locator == "t")
-        locator := "TEVIN"
-    else if (locator == "n")
-        locator := "NATHANIEL"
-    return locator
+    switch locator {
+        case "p": return "PETER"
+        case "h": return "HAN"
+        case "s": return "SHABBY"
+        case "e": return "EUNAH"
+        case "j": return "JUNE"
+        default: return
+    }
 }
 
 picSave(locator, filename, type := ".jpg")
@@ -6458,8 +6450,8 @@ picSave(locator, filename, type := ".jpg")
     focusSketchtool()
     saveFile()
     waitDialogBox()
-    sleep 500
-    Send, % "C:\Users\Cr\Desktop\qa\" . locator . "\" . filename . ".jpg"
+    sleep 1100
+    Send, % "C:\Users\craig\qa\" . locator . "\" . filename . ".jpg"
     Send, {Enter}
 }
 
@@ -6497,6 +6489,7 @@ p::
 return
 
 x::Delete
+e::Delete
 return
 
 #IfWinActive
@@ -7472,12 +7465,14 @@ isInterText()
     ;qa yes and no (win numpad plus/ numpad minus)
     #IFWINACTIVE AHK_EXE SKETCHTOOLAPPLICATION.EXE
     #numpadadd::
+    ^=::
     ::QAYES::
         loadImage(A_MyDocuments . "\qayes.skt")
     return
 
     #IFWINACTIVE AHK_EXE SKETCHTOOLAPPLICATION.EXE
     #numpadsub::
+    ^-::
     ::QANO::
         loadImage(A_MyDocuments . "\qan.skt")
     return
@@ -7489,7 +7484,7 @@ isInterText()
 
     changeText(){
         ;SendInput,{f2}{Backspace 50}
-        SendInput("{F2}{Backspace 50}")
+        SendInput("{F2}{Backspace 60}")
         text := Inputbox("Enter text")
         text := StrUpper(text)
         Send(text)
@@ -8418,7 +8413,7 @@ isreload := ""
 return
 
 +!r::
-    run, %comspec% /c ""pytest" "-s" "test_rOGERSLOOKUP.py"",C:\Users\Cr
+    run, %comspec% /c ""pytest" "-s" "test_rOGERSLOOKUP.py"",C:\Users\craig
 return
 
 rogersLookup()
@@ -8681,24 +8676,62 @@ recordsLookup()
     }
 
     ;TODO - add beanfield lookup via patch manager
-    else if (stationCode == "APTUM01")
-    {
-        if (!WinExist("ahk_exe mapinfor.exe"))
-        {
-            MsgBox % "Please open MapInfo"
-            return
-        }
+    ;mapinfo lookup
+    ; else if (stationCode == "APTUM01")
+    ; {
+    ;     if (!WinExist("ahk_exe mapinfor.exe"))
+    ;     {
+    ;         MsgBox % "Please open MapInfo"
+    ;         return
+    ;     }
 
-        if (data.number == "")
+    ;     if (data.number == "")
+    ;     {
+    ;         msgbox % data.street
+    ;         msgbox % data.intersection
+    ;         address := data.street . "&&" . data.intersection
+    ;     }
+    ;     else
+    ;         address := data.number . " " . data.street
+    ;     aptumLookup(address)
+    ; }
+
+    else if (stationCode == "APTUM01")
+      {
+        ;check to make sure google earth opens
+        if !WinExist("ahk_exe googleearth.exe")
         {
-            msgbox % data.street
-            msgbox % data.intersection
-            address := data.street . "&&" . data.intersection
+            Run, C:\Program Files\Google\Google Earth Pro\client\googleearth.exe
+            WinWaitActive, ahk_exe googleearth.exe
+            sleep 1000
+            WinActivate, ahk_exe googleearth.exe
         }
         else
-            address := data.number . " " . data.street
-        aptumLookup(address)
-    }
+        {
+            WinActivate, ahk_exe googleearth.exe
+        }
+
+        uia := UIA_Interface()
+        win := uia.ElementFromHandle("A")
+
+        if (data.number == "")
+          {
+              address := data.street . " & " . data.intersection
+          }
+          else
+              address := data.number . " " . data.street
+
+          
+          editSearch := win.FindByPath("2.1.2.3.1.2.1.1.1")
+          editSearch.SetFocus()
+          editSearch.Click()
+          Send, {BS 100}
+          sleep(200)
+          send(address)
+          sleep(200)
+          send("{enter}")
+      }
+
 
     else if (stationCode == "BCGN01") || (stationCode = "BCGN02")
     {
@@ -8878,7 +8911,7 @@ setDWtext()
                         ,(street):(landbase "street.skt")}
         for k,v in dwtextlist
         {
-            if !FileExist("C:\Users\Cr\Documents\" v)
+            if !FileExist("C:\Users\" . A_UserName . "\Documents\" v)
             {
                 Msgbox, Unable to load sketch (template not created)
                 k:="",v:=""
@@ -8987,7 +9020,7 @@ setPLtext(landbase)
 {
     global
     num1 := num.1, num2 := num.2
-    if(!FileExist("C:\Users\Cr\Documents\" landbase "PLtext.skt")||!FileExist("C:\Users\Cr\Documents\" landbase "street.skt"))
+    if(!FileExist("C:\Users\craig\Documents\" landbase "PLtext.skt")||!FileExist("C:\Users\craig\Documents\" landbase "street.skt"))
     {
         Msgbox, Unable to load sketch (template not created)
         return
@@ -9024,7 +9057,7 @@ setPL4text(landbase)
         ;list :=["PL4TEXT1.skt","PL4TEXT2.skt","street.skt"]
         ;for i in list
         ;{
-        ;if !FileExist("C:\Users\Cr\Documents\" landbase i)
+        ;if !FileExist("C:\Users\craig\Documents\" landbase i)
         ;{
         ;Msgbox, Unable to load sketch (template not created)
         ;return
@@ -9045,12 +9078,12 @@ setPL4text(landbase)
             setTemplateText(landbase "BLTEXTVSTREET.skt", vstreet)
             RETURN
         }
-        if !FileExist("C:\Users\Cr\Documents\" landbase "PLTEXT.SKT")
+        if !FileExist("C:\Users\craig\Documents\" landbase "PLTEXT.SKT")
         {
             MsgBox, Unable to load sketch (template not created)
             return
         }
-        if !FileExist("C:\Users\Cr\Documents\" landbase "street.skt")
+        if !FileExist("C:\Users\craig\Documents\" landbase "street.skt")
         {
             Msgbox, Unable to load sketch (template not created)
             return
@@ -9161,25 +9194,25 @@ openTerminal()
 
 runMilestoKm()
 {
-    Run, C:\Users\Cr\archived\autohotkey\milestometres.ahk
+    Run, C:\Users\craig\archived\autohotkey\milestometres.ahk
 }
 
 runPyScriptLauncher()
 {
-    Run, C:\Users\Cr\ossu\script_launcher.py
+    Run, C:\Users\%A_UserName%\ossu\script_launcher.py
 }
 
 ticketBillingLookup()
 {
-    FileDelete, c:\users\cr\tbl.txt
-    Run, c:\users\cr\tbl.bat
-    fileread,billing,c:\users\cr\tbl.txt
+    FileDelete, C:\Users\%A_UserName%\tbl.txt
+    Run, C:\Users\%A_UserName%\tbl.bat
+    fileread,billing,C:\Users\%A_UserName%\tbl.txt
     msgbox % billing
 }
 
 repl()
 {
-    run, "C:\Users\Cr\archived\autohotkey\ahkcommandconsole.ahk"
+    run, "C:\Users\%A_UserName%\archived\autohotkey\ahkcommandconsole.ahk"
 }
 
     ::emerg::
@@ -9247,17 +9280,17 @@ return
 ^RShift::
 if DllCall("GetCommandLine", "str") = """" A_AhkPath """ /restart """ A_ScriptFullPath """"
     MsgBox Script will be reloaded
-iniwrite, %form%, C:\Users\Cr\teldig\teldig.ini, variables, form
-iniwrite, %stationcode%, C:\Users\Cr\teldig\teldig.ini, variables, stationcode
-iniwrite, %units%, C:\Users\Cr\teldig\teldig.ini, variables, units
-iniwrite, %bellmarked%, C:\Users\Cr\teldig\teldig.ini, variables, bellmarked
-iniwrite, %bellclear%, C:\Users\Cr\teldig\teldig.ini, variables, bellclear
-iniwrite, %rogersclear%, C:\Users\Cr\teldig\teldig.ini, variables, rogersclear
-iniwrite, %rogersmarked%, C:\Users\Cr\teldig\teldig.ini, variables, rogersmarked
-iniwrite, %locationdataobtained%, C:\Users\Cr\teldig\teldig.ini, variables, locationdataobtained
-IniWrite, %intersection%, C:\Users\Cr\teldig\teldig.ini, variables, intersection
-iniwrite, %currentpage%, C:\Users\Cr\teldig\teldig.ini, variables, currentpage
-IniWrite, %totalpages%, C:\Users\Cr\teldig\teldig.ini, variables, totalpages
+iniwrite, %form%, %inifile%, variables, form
+iniwrite, %stationcode%, %inifile%, variables, stationcode
+iniwrite, %units%, %inifile%, variables, units
+iniwrite, %bellmarked%, %inifile%, variables, bellmarked
+iniwrite, %bellclear%, %inifile%, variables, bellclear
+iniwrite, %rogersclear%, %inifile%, variables, rogersclear
+iniwrite, %rogersmarked%, %inifile%, variables, rogersmarked
+iniwrite, %locationdataobtained%, %inifile%, variables, locationdataobtained
+IniWrite, %intersection%, %inifile%, variables, intersection
+iniwrite, %currentpage%, %inifile%, variables, currentpage
+IniWrite, %totalpages%, %inifile%, variables, totalpages
 reload
 return
 
@@ -9265,13 +9298,6 @@ return
 Run,https://webapp.cablecontrol.ca/owa/auth/logon.aspx?replaceCurrent=1&url=https`%3a`%2f`%2fwebapp.cablecontrol.ca`%2fowa`%2f
 ;Run, openemail.py,,Maximize
 ;traytip, Opening Email,,3
-return
-
-mobilesyncr:
-    ::mobilesyncr::
-amt({Type:"Mouse",Action:"Left",Actual:"",ClickCount:1,Wait:2,WindowWait:2,Comment:"Mouse Click",Match:1,OffsetX:10,OffsetY:10,Area:"TelDig Mobile - [Ticket list]",Bits:"y001U00M00C00Dzs206001U00M3z60ztY00NU06sztzDyTs07y01zzyTzzby01zU0Sm",Ones:162,Zeros:238,Threshold:132,W:20,H:20})
-amt({Type:"Mouse",Action:"Left",Actual:"Yes",ClickCount:1,Wait:2,WindowWait:2,Comment:"Mouse Click",Match:1,OffsetX:80,OffsetY:35,Area:"Connection to TelDig Mobile ahk_class #32770",Bits:"00000000000000001000E2040U1MAtN2FIEbp491F2FIEHY00000000000000000002",Ones:48,Zeros:352,Threshold:104,W:20,H:20})
-TrayTip, Sync, Sync will now begin..., 5
 return
 
 #IfWinActive ahk_exe SketchToolApplication.exe
@@ -9397,8 +9423,6 @@ markJobNumberas2Clear()
 
 #IfWinActive ahk_exe sketchtoolapplication.exe
 
-
-
 $^F12::
 ::`:cd::
 centreDrawing()
@@ -9422,23 +9446,24 @@ uiab.setfocus()
 uiab.FindFirstByNameAndType("Search","button").Click()
 return
 
-^b:: ;change basemap to black
-;driver := ChromeGet()
-basemap:="",g360bm:=""
-if !(driver)
-{
-    driver := ChromeGet()
-}
-driver.findElementbyid("form_maplayer_btn").click()
-wait()
-basemap := driver.findElementbyId("GROUP_F_BASE1")
-g360bm := driver.findElementbyId("GROUP_F_ROGERS_GO360")
-if (g360bm.IsSelected = -1)
-    g360bm.Click()
-if (basemap.IsSelected = 0)
-    basemap.Click()
-;msgbox % g360bm.IsSelected
-return
+    /* ^b:: ;change basemap to black
+     * ;driver := ChromeGet()
+     * basemap:="",g360bm:=""
+     * if !(driver)
+     * {
+     *     driver := ChromeGet()
+     * }
+     * driver.findElementbyid("form_maplayer_btn").click()
+     * wait()
+     * basemap := driver.findElementbyId("GROUP_F_BASE1")
+     * g360bm := driver.findElementbyId("GROUP_F_ROGERS_GO360")
+     * if (g360bm.IsSelected = -1)
+     *     g360bm.Click()
+     * if (basemap.IsSelected = 0)
+     *     basemap.Click()
+     * ;msgbox % g360bm.IsSelected
+     * return
+     */
 
 NumpadAdd::
 Go360.ZoomIn()
@@ -9448,8 +9473,8 @@ NumpadSub::
 Go360.ZoomOut()
 return
 
-^s::
-Run, "C:\Users\Cr\Documents\LibreAutomate\Main\exe\OpenSurveys\openSurveys.exe"
+::opsurv::
+Run, "C:\Users\%A_UserName%\Documents\LibreAutomate\Main\exe\OpenSurveys\openSurveys.exe"
 return
 
 #IfWinActive
@@ -9506,7 +9531,13 @@ Progress, off
 return
 
 ::owmmap::
+Notify("Opening Google MyMaps...")
 Run, https://www.google.com/maps/d/u/0/
+return
+
+::owtmax::
+Notify("Opening telmax egnyte server access")
+Run, % "https://telmaxinc.egnyte.com"
 return
 
 ;CABLE HOTKEYS
@@ -9693,38 +9724,15 @@ Else
     return
 return
 
-amt({Type:"Mouse",Action:"Left",Actual:1,ClickCount:2,Wait:2,WindowWait:2,Comment:"Mouse Click",Match:1,OffsetX:10,OffsetY:10,Area:"TelDi ahk_class WindowsForms10.Window.8.app.0.2004eee",Bits:"00000000000001U00g00D003zw0z10zWEDlo1xz07LkDYjzvnzywzzjDzvzzzzzzzzy",Ones:193,Zeros:207,Threshold:230,W:20,H:20})
-amt({Type:"Window",Area:"Open ahk_class #32770",WindowWait:2})
-amt({Type:"InsertText",Text:"building.skt",Wait:2,WindowWait:2,SelectAll:1,Comment:"Mouse Click",Match:1,OffsetX:65,OffsetY:-5,Area:"Open ahk_class #32770",Bits:"0000000U008002000XUy94AWT28Y0W9U8WD2800000Tk00000000000000000000002",Ones:49,Zeros:351,Threshold:115,W:20,H:20})
-amt({Type:"Mouse",Action:"Left",Actual:1,ClickCount:1,Wait:2,WindowWait:2,Comment:"Mouse Click",Match:1,OffsetX:63,OffsetY:437,Area:"Open ahk_class #32770",Bits:"bzTwzMAEk30jnzjyTxzrk",Ones:81,Zeros:40,Threshold:170,W:11,H:11})
-amt({Type:"Mouse",Action:"Left",Actual:1,ClickCount:1,Wait:2,WindowWait:2,Comment:"Mouse Click",Match:1,OffsetX:757,OffsetY:574,Area:"TelDig SketchTool  ahk_class WindowsForms10.Window.8.app.0.2004eee",Bits:"0000000000zz000E0S40Al02AE02401100kE004021000E3yQ00Y00+003000000002",Ones:54,Zeros:346,Threshold:159,W:20,H:20})
-amt({Type:"Mouse"
-    ,Action:"Left"
-    ,Actual:""
-    ,ClickCount:1
-    ,Wait:2
-    ,WindowWait:2
-    ,Comment:"Mouse Click"
-    ,Match:1
-    ,OffsetX:849
-    ,OffsetY:109
-    ,Area:"TelDig ahk_class WindowsForms10.Window.8.app.0.2004eee"
-    ,Bits:"BYEMQA4308"
-    ,Ones:16
-    ,Zeros:40
-    ,Threshold:180
-    ,W:7
-    ,H:8})
-
 ::writeaddlist::
 writeAddressList()
 return
 
 writeAddressList()
 {
-    if (InStr(FileExist("C:\Users\Cr\addlist.csv"), "A"))
+    if (InStr(FileExist("C:\Users\%A_UserName%\addlist.csv"), "A"))
     {
-        FileDelete, C:\Users\Cr\addlist.csv
+        FileDelete, C:\Users\%A_UserName%\addlist.csv
     }
     CONTROLGET, LISTTEXT, LIST, , SYSLISTVIEW321, ahk_exe mobile.exe
     rowlist := StrSplit(listtext, "`n")
@@ -9738,12 +9746,12 @@ writeAddressList()
         columnlist.6:= RegExReplace(columnlist.6,"^ |^\d+ | \(REGIONAL.*")
         columnlist.14:= RegExReplace(columnlist.14,"^ | \(REGIONAL.*")
         if (columnlist[5])
-            FileAppend, % columnlist[5] . " " . columnlist[6] . ", " . columnlist[9] . "`n", C:\Users\Cr\addlist3.txt
+            FileAppend, % columnlist[5] . " " . columnlist[6] . ", " . columnlist[9] . "`n", C:\Users\%A_UserName%\addlist3.txt
         else
-            FileAppend, % columnlist[6] . " & " . columnlist[14] . ", " . columnlist[9] . "`n", C:\Users\Cr\addlist3.txt
+            FileAppend, % columnlist[6] . " & " . columnlist[14] . ", " . columnlist[9] . "`n", C:\Users\%A_UserName%\addlist3.txt
     }
-    FileCopy, C:\Users\Cr\addlist3.txt, C:\Users\Cr\addresslistbackup.txt,1
-    FileMove, C:\Users\Cr\addlist3.txt,C:\Users\Cr\addlist.csv,
+    FileCopy, C:\Users\%A_UserName%\addlist3.txt, C:\Users\%A_UserName%\addresslistbackup.txt,1
+    FileMove, C:\Users\%A_UserName%\addlist3.txt,C:\Users\%A_UserName%\addlist.csv,
     Msgbox, Done!
 
 }
@@ -9765,7 +9773,7 @@ return
 ::showerror::
 displayErrorLog()
 {
-    Run, C:\Users\Cr\errorlog.txt
+    Run, C:\Users\%A_UserName%\errorlog.txt
 }
 
 ::showts::
@@ -9775,9 +9783,9 @@ return
 displayTimesheet(date)
 {
     ;count := 0
-    FileRead, TS, C:\Users\Cr\Desktop\archived\autohotkey\timesheet%date%.txt
-    if !(FileExist("C:\Users\Cr\Desktop\archived\autohotkey\timesheet" . date . ".txt"))
-        FileRead, TS, C:\Users\Cr\timesheet%date%.txt
+    FileRead, TS, C:\Users\%A_UserName%\Desktop\archived\autohotkey\timesheet%date%.txt
+    if !(FileExist("C:\Users\" A_UserName "\Desktop\archived\autohotkey\timesheet" . date . ".txt"))
+        FileRead, TS, C:\Users\%A_UserName%\timesheet%date%.txt
     count := StrSplit(TS, "`n").Length()
     MsgBox % "Tickets = " count "`n" TS
 }
@@ -9796,7 +9804,7 @@ openCommandLine()
 openMapInfo()
 {
     Notify("Opening MapInfo")
-    Run, % "C:\Users\Cr\As Builts\MAPINFO APT. JULY 06 2020\Aptum.wor"
+    Run, % "C:\Users\craig\As Builts\MAPINFO APT. JULY 06 2020\Aptum.wor"
 }
 
 ::getdiginfo::
@@ -9963,14 +9971,14 @@ return
 
 insertEZDrawRP(filename:=""){
     if !(filename) {
-      FileSelectFile("C:\Users\Cr\Documents\")
+      FileSelectFile("C:\Users\craig\Documents\")
     }
     drawElement(filename,189,437,757,733)
     clickSelection()
 }
 
 insertEZDrawBA:
-drawElement(FileSelectFile("C:\Users\Cr\Documents\"),115,496)
+drawElement(FileSelectFile("C:\Users\craig\Documents\"),115,496)
 clickSelection()
 return
 
@@ -10021,7 +10029,7 @@ return
 openTeldigCache()
 {
     ;open teldig cache
-    Run, explore C:\Users\Cr\AppData\Local\TelDig Systems\SketchTool\Cache\
+    Run, explore C:\Users\craig\AppData\Local\TelDig Systems\SketchTool\Cache\
 }
 
 addTemplateToDocs()
@@ -10066,7 +10074,7 @@ utilCount()
 
 sketchSearch()
 {
-    run, C:\Users\Cr\archived\autohotkey\sketchsearch.ahk
+    run, C:\Users\craig\archived\autohotkey\sketchsearch.ahk
 }
 
 :::note::
@@ -10080,10 +10088,10 @@ editTimesheet()
 ;opens timesheet for editing in Notepad
 {
     global today
-    if (fileexist("C:\Users\Cr\timesheet" today ".txt"))
-        Run,gvim "C:\Users\Cr\timesheet%today%.txt"
+    if (fileexist("C:\Users\craig\timesheet" today ".txt"))
+        Run,gvim "C:\Users\craig\timesheet%today%.txt"
     else
-        Run, gvim  "C:\Users\Cr\Desktop\archived\autohotkey\timesheet%today%.txt"
+        Run, gvim  "C:\Users\craig\Desktop\archived\autohotkey\timesheet%today%.txt"
 }
 
 ::propfib::
@@ -10167,7 +10175,7 @@ return
 getCoords()
 {
     coords := []
-    ladatapath := "C:\Users\Cr\AppData\Local\TelDigFusion.Data\data\"
+    ladatapath := "C:\Users\craig\AppData\Local\TelDigFusion.Data\data\"
     uia := UIA_Interface()
     win := uia.ElementFromHandle(WinExist("A"))
     doc := win.FindFirstByNameAndType("LocateAccess - Cable Control Systems","Document").Value
@@ -10190,7 +10198,7 @@ getCoords()
     loadClearPyTemplate()
     {
         Suspend,On
-        RunWait,% "C:\Users\Cr\rogers_clear_script.py"
+        RunWait,% "C:\Users\craig\rogers_clear_script.py"
         Suspend,Off
     }
 
@@ -10254,9 +10262,7 @@ win := uia.ElementFromHandle()
 win.FindFirstByName("Filter...").SetFocus()
 return
 
-^d::
-dumpElements()
-return
+
 
 dumpElements()
 {
@@ -10319,7 +10325,7 @@ showTicketPictures()
 {
     pics := []
     static Pic
-    ladatapath := "C:\Users\Cr\AppData\Local\TelDigFusion.Data\data\"
+    ladatapath := "C:\Users\craig\AppData\Local\TelDigFusion.Data\data\"
     uia := UIA_Interface()
     win := uia.ElementFromHandle(WinExist("A"))
     doc := win.FindFirstByNameAndType("LocateAccess - Cable Control Systems","Document").Value
@@ -10360,6 +10366,8 @@ showTicketPictures()
 ::hiriskfibre::
     loadImageNG("high risk fibre.png")
 return
+
+; This code remaps the mouse wheel scrolling direction when the window with the title "LACMultiViewer.exe" is active.
 
 #IfWinActive ahk_exe LACMultiViewer.exe
 WheelDown::WheelUp

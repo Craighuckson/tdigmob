@@ -2,119 +2,70 @@
 #include <Yunit\Window>
 
 
-+^t::
-Yunit.Use(YunitWindow).Test(CableNearCurbTestSuite)
 
-class CableNearCurbTestSuite
+
+
+Yunit.Use(YunitWindow).test(Form, Measurements)
+
+class Form
 {
   
-    
-    TestCableNearCurbLoopsUntilInputIsYOrN()
-    {
-        ; Arrange
-        input := ["a", "b", "c", "d", "y"]
-        expected := true
-        
-        ; Act
-        for i, val in input
-        {
-            if (i < 5)
-                Inputbox := Func("MockInputbox")
-            else
-                Inputbox := Func("CableNearCurb")
-            
-            result := CableNearCurb()
-            
-            if (result = true)
-                break
-        }
-        
-        ; Assert
-        Yunit.Assert(result = expected)
-    }
-    
-    MockInputbox(ByRef value)
-    {
-        value := "a"
-    }
+  tIsAnObject()
+  {
+    Yunit.Assert(isObject(Ticket) > 0)
+  }
+  ROGYRK01ShouldReturnRPWithNoForm()
+  {
+    Ticket.stationcode := "ROGYRK01"
+    Ticket.form := ""
+    Yunit.Assert(Ticket.getFormtype() = "RP")
+  }
+  ENVIN01ShouldReturnEPWithNoForm()
+  {
+    Ticket.stationcode := "ENVIN01"
+    Ticket.form := ""
+    Yunit.Assert(Ticket.getFormtype() = "EP")
+  }
+  ENVIN01ShouldNotReturnEPWithFormPresent()
+  {
+    Ticket.stationcode := "ENVIN01"
+    Ticket.form := "EP"
+    Yunit.Assert(Ticket.getFormtype() != "EP")
+  }
+  TLMXF01ShouldReturnTAWithForm()
+  {
+    Ticket.stationcode := "TLMXF01"
+    Ticket.form := "TP"
+    Yunit.Assert(Ticket.getFormtype() = "TA")
+  }
+  HasDataShouldBeFalse()
+  {
+    Yunit.Assert(Ticket.hasdata() = false)
+  }
+  ROGYRK01ShouldReturnRAWhenFormexists()
+  {
+    Ticket.stationcode := "ROGYRK01"
+    Ticket.form := "RA"
+    Yunit.Assert(Ticket.getFormtype() = "RA")
+  }
 }
 
-class TimesheetTests
+class Measurements
 {
-
+  SingleDigitMeasurementShouldBeProperlyFormatatted()
+  {
+    ;msgbox % convertMeasurement("6")
+    Yunit.Assert(convertMeasurement("6"), "0.6m")
+  }
+  DoubleDigitMeasurementShouldBeProperlyFormatatted()
+  {
+    Yunit.Assert(convertMeasurement("60"), "6.0m")
+  }
+  TripleDigitMeasurementShouldBeProperlyFormatatted()
+  {
+    Yunit.Assert(convertMeasurement("103"),"10.3m")
+  }
 }
-
-class TreeTestSuite
-{
-	ConstructorExists()
-	{
-		t := new TreeSketch
-		Yunit.Assert(isObject(t) != 0)
-	}
-}
-
-class Bell
-{
-	ShouldReturn1IfBellClearIsY()
-	{
-		msgbox % isBellClear()
-	}
-}
-
-class Rogers
-{
-	ShouldPassIfStationCodeStartsWithRog()
-	{
-		stationcode := "ROGYRK01"
-		Yunit.Assert(isTicketRogers(stationcode) = true)
-	}
-
-	ShouldBeFalseIfNotRogStationCode()
-	{
-		stationcode := "BCGN01"
-		Yunit.Assert(isTicketRogers(stationcode) = false)
-	}
-}
-
-; class TicketListOps
-; {
-;   Start()
-;   {
-;     WinActivate("ahk_exe mobile.exe")
-;   }
-;   ShouldGetCorrectNumberofTickets()
-;   {
-;     num := 99
-;     Yunit.Assert(getNumberofTickets() = num)
-;   }
-
-;   ShouldReturnAList()
-;   {
-;     Yunit.Assert(IsObject(getListofTicketNumbers()) = true)
-;   }
-
-;   ListLengthShouldEqualNumberofTickets()
-;   {
-;     Yunit.Assert(getNumberofTickets() = getListofTicketNumbers().Length())
-;   }
-
-;   ; ShouldBeFalseIfDataFolderEmpty()
-;   ; {
-;   ;   Yunit.Assert(lookForOldTickets() = false)
-;   ; }
-
-;   ; ShouldBeFalseIfValidTicketFolderPresent()
-;   ; {
-;   ;   FileCreateDir("C:\Users\Cr\teldig\data\20222322655")
-;   ;   Yunit.Assert(lookForOldTickets() = false)
-;   ; }
-
-;   ; ShouldBeTrueWhenOldTicketFolderPresent()
-;   ; {
-
-;   ;   Yunit.Assert(lookForOldTickets() = true)
-;   ; }
-; }
 
 
 #Include, C:\Users\Cr\teldig\teldig.ahk

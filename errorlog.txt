@@ -2623,3 +2623,23 @@
 20230606225543 - Could not access an IAccessible Object
 20230606225823 - Could not access an IAccessible Object
 20230606230225 - Could not access an IAccessible Object
+20230612224805 - Could not access an IAccessible Object
+20230612225859 - Could not access an IAccessible Object
+20230629121908 - Could not access an IAccessible Object
+20230630085609 - Cannot access ChildPath Item #12 -> 1
+20230630085610 - Cannot access ChildPath Item #12 -> 3
+20230630085611 - Cannot access ChildPath Item #12 -> 1
+20230706141613 - Cannot access ChildPath Item #2 -> 7
+20230706152656 - Could not access an IAccessible Object
+20230707141828 - Could not access an IAccessible Object
+20230720122844 - Cannot access ChildPath Item #2 -> 7
+20230720140046 - Could not access an IAccessible Object
+20230721134731 - Could not access an IAccessible Object
+20230724105920 - Could not access an IAccessible Object
+20230731112226 - Could not access an IAccessible Object
+20230808101249 - Could not access an IAccessible Object
+20230809112238 - Could not access an IAccessible Object
+20230906163948 - Could not access an IAccessible Object
+20230906163952 - Could not access an IAccessible Object
+20230907082856 - Could not access an IAccessible Object
+20230911085720 - Cannot access ChildPath Item #2 -> 7
