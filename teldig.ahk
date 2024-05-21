@@ -1,4 +1,4 @@
-﻿;TELDIG MASTER SCRIPT;
+;TELDIG MASTER SCRIPT;
 
 ;TODO - ADD APTUM TO TIMESHEET, UPDATE PYTHON TIMESHEET AS WELL
 ; TAKE HOTSTRINGS OUT OF MULTIVIEWER.AHK AND ADD TO MAIN SCRIPT
@@ -155,6 +155,8 @@ Menu, ST, Add, Emergency, emergency
 Menu, ST, Add, Save and Exit, 2buttonsaveandexit
 Menu, ST, Add, HotString list, showHotStrings
 
+;AUTOMATIC EVENT HANDLERS
+MsgBox, Hello moto
 ;GLOBAL HOTKEYS
 
 ^d::
@@ -4010,6 +4012,7 @@ class Mobile
         ;     MouseClick,L, %foundx%,%foundy%
         ;     return true
         ; }
+        WinActivate("ahk_exe locateaccess.exe")
         Run("C:\Users\craigaig\OneDrive\Documents\LibreAutomate\Main\exe\ChangeToPending\ChangeToPending.exe")
 
     }
@@ -4215,7 +4218,7 @@ class Ticket
               FileReadLine,digInfo,%file%,64
               FileReadLine,ticketnumber,%file%,4
               FileReadLine,town,%file%,30
-    
+
               number := StrReplace(number,"UR_NO_CIVIC_INITI::")
               street := StrReplace(street,"UR_NOM_ARTER_PRINC::")
               intersection := StrReplace(intersection,"UR_NOM_ARTER_INTER_1::")
@@ -6451,8 +6454,19 @@ picSave(locator, filename, type := ".jpg")
     saveFile()
     waitDialogBox()
     sleep 1100
-    Send, % "C:\Users\craig\qa\" . locator . "\" . filename . ".jpg"
-    Send, {Enter}
+    savedFile := "C:\Users\craig\qa\" . locator . "\" . filename . ".jpg"
+    ; check to see if a file with the same name already exists in that location
+    if (FileExist(savedFile))
+    {
+      seed := Random(1,10)
+      savedFile := Format("C:\Users\craig\qa\{1}\{2}{3}.jpg", locator, filename, seed)
+      Send % savedFile
+    }
+    else
+    {
+        Send % savedFile
+    }
+    Send,{Enter}
 }
 
 ;WIN NUMPAD INSERT for ok in auxilliary, SAVES FIRST and prompts page numbers now
@@ -6706,6 +6720,7 @@ stproj_saveexit()
 ^w:: ;SAVE AND EXIT CURRENT SKETCH
 :::w::
 Numpadenter::
+^+Enter::
     ST_SAVEEXIT()
 return
 
@@ -6929,6 +6944,7 @@ STQLSAVEEXIT() {
 
 ;NUMPAD DEL FOR CANCEL IN AUXILLIARY
 NUMPADDEL::
+^PgDn::
     ControlClick("Cancel","ahk_exe sketchtoolapplication.exe")
     Sleep 100
     if WinExist("AHK_CLASS #32770") {
@@ -6982,7 +6998,8 @@ loadAptumAuxilliary(){
 return
 
 ; win numpad keys for preloaded template
-#numpadup:: ;INSERT NORTH TEMPLATE
+#numpadup::
+^+Up:: ;INSERT NORTH TEMPLATE
 ::rdn:: ;INSERT NORTH TEMPLATE
     loadImage("b - north.skt")
 return
@@ -7156,6 +7173,7 @@ finishnoemail()
 }
 
 +numpaddel::
+
     cancelticket()
 return
 
@@ -8653,27 +8671,37 @@ recordsLookup()
           return
         }
 
-        currenturl := driver.Url
-            if (currenturl != "http://10.13.218.247/go360rogersviewer/map.jsp?m=0&isIE=-1&isTOUCH=0&lang=EN#")
-            {
-                driver.Get("http://10.13.218.247/go360rogersviewer/")
-                driver.findElementbyId("username").SendKeys("craig.huckson")
-                driver.findElementbyId("password").SendKeys("locates1")
-                driver.findElementbyxpath("/html/body/div/form/div[3]/div[2]/div/button").click()
-                sleep 1000
-            }
+        try
+        {
+            currenturl := driver.Url
+                if (currenturl != "http://10.13.218.247/go360rogersviewer/map.jsp?m=0&isIE=-1&isTOUCH=0&lang=EN#")
+                {
+                    driver.Get("http://10.13.218.247/go360rogersviewer/")
+                    driver.findElementbyId("username").SendKeys("craig.huckson")
+                    driver.findElementbyId("password").SendKeys("locates1")
+                    driver.findElementbyxpath("/html/body/div/form/div[3]/div[2]/div/button").click()
+                    sleep 1000
+                }
 
-            driver.findElementbyId("form_marqueezoom_btn").click() ; clicks marquee zoom to clear stuff
-            if !(driver.findElementbyId("id_search_div").IsDisplayed())
-                driver.findElementbyId("form_btn").click() ;search button
-            driver.findElementbyxpath("//*[@id='tab_featureform']/div[1]/div[3]/ul/li[1]/a/span[1]").click()
-            driver.FindElementbyId("longitudeSearchInput").clear()
-            driver.findElementbyId("longitudeSearchInput").SendKeys(long)
-            driver.findElementbyId("latitudeSearchInput").clear()
-            driver.findElementbyId("latitudeSearchInput").SendKeys(lat)
-            driver.findElementbyCss("#id_search_div > div:nth-child(1) > table > tbody > tr:nth-child(8) > td:nth-child(4) > a").click()
-        driver.findElementbyCss("body > div:nth-child(7) > div.panel-header.panel-header-noborder.window-header > div.panel-tool > a.panel-tool-close").click()
+                driver.findElementbyId("form_marqueezoom_btn").click() ; clicks marquee zoom to clear stuff
+                if !(driver.findElementbyId("id_search_div").IsDisplayed())
+                    driver.findElementbyId("form_btn").click() ;search button
+                driver.findElementbyxpath("//*[@id='tab_featureform']/div[1]/div[3]/ul/li[1]/a/span[1]").click()
+                driver.FindElementbyId("longitudeSearchInput").clear()
+                driver.findElementbyId("longitudeSearchInput").SendKeys(long)
+                driver.findElementbyId("latitudeSearchInput").clear()
+                driver.findElementbyId("latitudeSearchInput").SendKeys(lat)
+                driver.findElementbyCss("#id_search_div > div:nth-child(1) > table > tbody > tr:nth-child(8) > td:nth-child(4) > a").click()
+            driver.findElementbyCss("body > div:nth-child(7) > div.panel-header.panel-header-noborder.window-header > div.panel-tool > a.panel-tool-close").click()
+        }
+
+        catch, e
+        {
+            msgbox % "Error: " . e.message
+            return
+        }
     }
+   
 
     ;TODO - add beanfield lookup via patch manager
     ;mapinfo lookup
@@ -8721,7 +8749,7 @@ recordsLookup()
           else
               address := data.number . " " . data.street
 
-          
+
           editSearch := win.FindByPath("2.1.2.3.1.2.1.1.1")
           editSearch.SetFocus()
           editSearch.Click()
@@ -9301,15 +9329,12 @@ Run,https://webapp.cablecontrol.ca/owa/auth/logon.aspx?replaceCurrent=1&url=http
 return
 
 #IfWinActive ahk_exe SketchToolApplication.exe
-#IfWinActive Enter Text ahk_class #32770
-    ::lacob::
-Send, LOCATED AREA CLEAR OF BELL
-return
-#IfWinActive
+
 
 NumpadIns::
+^PgUp::
 ControlClick, OK,ahk_exe SketchToolApplication.exe
-WinActivate, ahk_exe mobile.exe
+WinActivate, ahk_exe locateaccess.exe
 return
 
 #IfWinActive
@@ -9380,46 +9405,7 @@ Loop, 1
 }
 return
 
-markJobNumberas2Clear()
-{
 
-    Loop, 1
-    {
-
-        SetTitleMatchMode, 2
-        CoordMode, Mouse, Window
-        ;MouseGetPos,foundx,foundy
-        tt = TelDig Mobile - [Ticket list] ahk_class Afx:400000:8:10003:0:37026d
-        WinWait, %tt%
-        IfWinNotActive, %tt%,, WinActivate, %tt%
-
-        wait()
-
-        ;MouseClick, R, %foundx%, %foundy%
-        Send, !fnS
-        wait()
-
-        Send, {Blind}n
-
-        wait()
-
-        tt = Set job number ahk_class #32770
-        WinWait, %tt%
-        IfWinNotActive, %tt%,, WinActivate, %tt%
-
-        wait()
-
-        Send, {Blind}2{Enter}
-
-        tt = TelDig Mobile - [Ticket list] ahk_class Afx:400000:8:10003:0:37026d
-        WinWait, %tt%
-        IfWinNotActive, %tt%,, WinActivate, %tt%
-
-        wait()
-
-    }
-
-}
 
 #IfWinActive ahk_exe sketchtoolapplication.exe
 
@@ -10373,3 +10359,72 @@ return
 WheelDown::WheelUp
 WheelUp::WheelDown
 #IfWinActive
+
+#h::  ; Win+H hotkey
+; Get the text currently selected. The clipboard is used instead of
+; "ControlGet Selected" because it works in a greater variety of editors
+; (namely word processors).  Save the current clipboard contents to be
+; restored later. Although this handles only plain text, it seems better
+; than nothing:
+ClipboardOld := Clipboard
+Clipboard := "" ; Must start off blank for detection to work.
+Send ^c
+ClipWait 1
+if ErrorLevel  ; ClipWait timed out.
+    return
+; Replace CRLF and/or LF with `n for use in a "send-raw" hotstring:
+; The same is done for any other characters that might otherwise
+; be a problem in raw mode:
+ClipContent := StrReplace(Clipboard, "``", "````")  ; Do this replacement first to avoid interfering with the others below.
+ClipContent := StrReplace(ClipContent, "`r`n", "``n")
+ClipContent := StrReplace(ClipContent, "`n", "``n")
+ClipContent := StrReplace(ClipContent, "`t", "``t")
+ClipContent := StrReplace(ClipContent, "`;", "```;")
+Clipboard := ClipboardOld  ; Restore previous contents of clipboard.
+ShowInputBox(":T:`::" ClipContent)
+return
+
+ShowInputBox(DefaultValue)
+{
+    ; This will move the input box's caret to a more friendly position:
+    SetTimer, MoveCaret, 10
+    ; Show the input box, providing the default hotstring:
+    InputBox, UserInput, New Hotstring,
+    (
+    Type your abreviation at the indicated insertion point. You can also edit the replacement text if you wish.
+
+    Example entry: :R:btw`::by the way
+    ),,,,,,,, %DefaultValue%
+    if ErrorLevel  ; The user pressed Cancel.
+        return
+
+    if RegExMatch(UserInput, "O)(?P<Label>:.*?:(?P<Abbreviation>.*?))::(?P<Replacement>.*)", Hotstring)
+    {
+        if !Hotstring.Abbreviation
+            MsgText := "You didn't provide an abbreviation"
+        else if !Hotstring.Replacement
+            MsgText := "You didn't provide a replacement"
+        else
+        {
+            Hotstring(Hotstring.Label, Hotstring.Replacement)  ; Enable the hotstring now.
+            FileAppend, `n%UserInput%, %A_ScriptFullPath%  ; Save the hotstring for later use.
+        }
+    }
+    else
+        MsgText := "The hotstring appears to be improperly formatted"
+
+    if MsgText
+    {
+        MsgBox, 4,, %MsgText%. Would you like to try again?
+        IfMsgBox, Yes
+            ShowInputBox(DefaultValue)
+    }
+    return
+
+    MoveCaret:
+    WinWait, New Hotstring
+    ; Otherwise, move the input box's insertion point to where the user will type the abbreviation.
+    Send {Home}{Right 3}
+    SetTimer,, Off
+    return
+}

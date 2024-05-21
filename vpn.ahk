@@ -83,7 +83,7 @@ class VPN
 
 getVPNPass()
 {
-  return "Locatesup1"
+  return "Locatesup2"
 }
 
 
