@@ -159,7 +159,7 @@ Menu, ST, Add, HotString list, showHotStrings
 MsgBox, Hello moto
 ;GLOBAL HOTKEYS
 
-^d::
++^d::
 dumpElements()
 return
 
@@ -2728,9 +2728,10 @@ setForm()
         else if (stationCode == "ROGYRK01" and form = "") or if (stationCode == "ROGSIM01" and form = "") or if (stationCode == "ROGPEL01" and form = "")
         {
             ;openForm("|<>*122$51.D33l1sTw+0MF880EWU2W91024I0YF880EWU4Xl1s22Y0WF880EIUDm91022W12F880EADM/lxw214","RP")
-            TrayTip,Form,Opening Rogers Primary form,5
             ;openCATVPrimary()
-            win.FindFirstByName("ui-btn").click()
+            WinActivate, ahk_exe locateaccess.exe
+            uib := win.FindByPath("1.61")
+            uib.click()
             d := win.WaitElementExistByNameAndType("CABLE TV","hyperlink")
             form := "RP"
             d.click()
@@ -2739,8 +2740,9 @@ setForm()
         else if (stationCode == "ROGYRK01") or if (stationCode == "ROGSIM01")
         {
             ;openForm("|<>*119$71.6xz7Y41wSD60N0EE88216FA4W0V0EE444WQC4120UU8894ccD241z0SEHlF8E48220UUYWI8U8E441118Yc90EE88216F8kPsUSEE41kVF000000000000000000T00000E","RA")
-            TrayTip,Form,Opening Rogers Auxilliary Form,5
-            win.FindFirstByName("ui-btn").click()
+            WinActivate, ahk_exe locateaccess.exe
+            uib := win.FindByPath("1.61")
+            uib.click()
             d := win.WaitElementExistByNameAndType("SKETCH_FORM","hyperlink")
             form := "RA"
             d.click()
@@ -2751,7 +2753,9 @@ setForm()
         else if (stationCode == "APTUM01" and form = "")
         {
             ;openForm("|<>*135$46.D3kSS7Vt0FW90U8s22E4411U890EE460UYNt0EM22EY411U892EE450FW90U8nks7blsQU","AP")
-            win.FindFirstByName("ui-btn").click()
+            WinActivate, ahk_exe locateaccess.exe
+            uib := win.FindByPath("1.61")
+            uib.click()
             d := win.WaitElementExistByNameAndType("COGECO","hyperlink")
             d.click()
             form := "AP"
@@ -2761,7 +2765,9 @@ setForm()
         else if(stationCode == "APTUM01")
         {
             ;openForm("|<>*134$68.jTlt10T7XlUG0UUEE42AWMAU8E441118b3824110EEG9FHkV0Tk7Y4wIIU8E4411194d824110EEG9+G0UUEE42AWFay87Y410Q8IF00000000000000007k00002","AA")
-            win.FindFirstByName("ui-btn").click()
+            WinActivate, ahk_exe locateaccess.exe
+            uib := win.FindByPath("1.61")
+            uib.click()
             d := win.WaitElementExistByNameAndType("SKETCH_FORM", "hyperlink")
             d.click()
             form := "AA"
@@ -2770,7 +2776,9 @@ setForm()
         else if(stationCode == "ENVIN01" and form = "")
         {
             ;openForm("|<>*141$60.wkgD32SzkVUkYG32E48lUcYG2WE48mUgYG2mE49GwYWW2GS49GUWWW2+E45+UWWW2+E46AUVVW26E46AyUV722T42AU","EP")
-            win.FindFirstByName("ui-btn").click()
+            WinActivate, ahk_exe locateaccess.exe
+            uib := win.FindByPath("1.61")
+            uib.click()
             d := win.WaitElementExistByNameAndType("ENVI NETWORKS", "hyperlink")
             d.click()
             form := "EP"
@@ -2779,7 +2787,9 @@ setForm()
         else if (stationCode == "ENVIN01")
         {
             ;openForm("|<>*119$71.6xz7Y41wSD60N0EE88216FA4W0V0EE444WQC4120UU8894ccD241z0SEHlF8E48220UUYWI8U8E441118Yc90EE88216F8kPsUSEE41kVF000000000000000000T00000E","EA")
-            win.FindFirstByName("ui-btn").click()
+            WinActivate, ahk_exe locateaccess.exe
+            uib := win.FindByPath("1.61")
+            uib.click()
             d:= win.WaitElementExistByNameAndType("SKETCH_FORM", "hyperlink")
             d.click()
             form := "EA"
@@ -2787,7 +2797,9 @@ setForm()
         }
         else if (stationcode == "TLMXF01" and form = "")
           {
-            win.FindFirstByName("ui-btn").click()
+            WinActivate, ahk_exe locateaccess.exe
+            uib := win.FindByPath("1.61")
+            uib.click()
             d := win.WaitElementExistByNameAndType("TELMAX", "hyperlink")
             d.click()
             form := "TP"
@@ -2795,7 +2807,9 @@ setForm()
           }
         else if (stationcode == "TLMXF01")
           {
-            win.FindFirstByName("ui-btn").click()
+            WinActivate, ahk_exe locateaccess.exe
+            uib := win.FindByPath("1.61")
+            uib.click()
             win.WaitElementExistByNameAndType("SKETCH_FORM", "hyperlink")
             d := win.FindFirstByNameAndType("SKETCH_FORM", "hyperlink")
             d.click()
@@ -5435,7 +5449,6 @@ getTicketData()
     doc := win.FindFirstByNameAndType("LocateAccess - Cable Control Systems","Document").Value
     priority := win.FindFirstBy("AutomationId=Ticket.Priority").Value
     ;Notify(priority)
-    MB(doc)
     a := StrSplit(doc,"/")
       subdir := a.8 . "_" . a.9
     stationcode := a.9
@@ -8701,7 +8714,7 @@ recordsLookup()
             return
         }
     }
-   
+
 
     ;TODO - add beanfield lookup via patch manager
     ;mapinfo lookup
@@ -8920,7 +8933,7 @@ setCornerText(landbase)
 {
     global
     setTemplateText(landbase "cornerxstreet.skt", inter.x)
-    setTemplateText(landbase "cornervstreet.skt", inter.y)
+    setTemplateText(landbase "cornerystreet.skt", inter.y)
   ;setTemplateText(landbase "cornerhouse.skt", haddress)
 }
 
@@ -10260,7 +10273,6 @@ dumpElements()
 
 F9::
 ::SKAF::
-Notify(A_ThisFunc)
 sketchAutoFill()
 return
 
