@@ -2649,3 +2649,5 @@
 20240401120912 - Could not access an IAccessible Object
 20240417153518 - Cannot access ChildPath Item #2 -> 7
 20240503110216 - Could not access an IAccessible Object
+20240604133021 - Could not access an IAccessible Object
+20240614102056 - Cannot access ChildPath Item #1 -> 4

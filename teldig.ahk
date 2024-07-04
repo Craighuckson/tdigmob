@@ -3353,7 +3353,7 @@ class CraigRPA {
                 s.WriteTemplateText("units.skt",units)
 
             ;date is only written on the first page
-            if (t.form = "RP" || t.form = "EP" || t.form = "AP")
+            if (t.form = "RP" || t.form = "EP" || t.form = "AP" || t.form = "TP")
                 s.WriteTemplateText("rogersPrimarydate.skt",A_YYYY "-" A_MM "-" A_DD)
             sleep 500
 
@@ -3636,7 +3636,7 @@ QAPass()
     tk.GetDataFromOneCallInfo()
     focusSketchTool()
     loadImageNG(A_MyDocuments . "\qayes.skt")
-    QA.AddToTimesheet(tk,getLocator(),"COMPLETE")
+    QA.AddToTimesheet(tk,getLocator())
     gui,pf:submit
     gui,pf:destroy
 }
@@ -3647,7 +3647,7 @@ QAFail()
     tk.GetDataFromOneCallInfo()
     focusSketchTool()
     loadImageNG(A_MyDocuments . "\qan.skt")
-    QA.AddToTimesheet(tk,getLocator(),"RETURN")
+    QA.AddToTimesheet(tk,getLocator())
     gui,pf:submit
     gui,pf:destroy
 }
@@ -3675,7 +3675,8 @@ class QA {
         this.AddProperCheckmark(tk)
 
         picSave(locator,file)
-        this.AddToTimesheet(tk,locator,"COMPLETE")
+        this.LogResult(locator,tk.ticketNumber,tk.number,tk.street,"PASS")
+        this.AddToTimesheet(tk,locator)
         sleep 700
         ControlClick("OK","ahk_exe sketchtoolapplication.exe")
         focusTeldig()
@@ -3694,11 +3695,11 @@ class QA {
     }
 
     ;method that adds a line to timesheet with the following in comments section : "QA COMPLETE - {locator}"
-    AddToTimesheet(ticket, locator,status)
+    AddToTimesheet(ticket, locator)
     {
       today := A_DD . " " . A_MM . " " . A_YYYY
       Notify("Adding to timesheet")
-      FileAppend, % ticket.ticketnumber "," ticket.number " " ticket.street ",,,,,QA " locator " - " status "`n", C:\Users\craig\timesheet%today%.txt
+      FileAppend, % ticket.ticketnumber "," ticket.number " " ticket.street ",,,,,,,QA " locator "`n", C:\Users\craig\timesheet%today%.txt
     }
 
     Finalize()
@@ -3710,25 +3711,33 @@ class QA {
         focusTeldig()
     }
 
+    LogResult(locator,ticketnumber, number, street,status) {
+        qalogfile := "C:\Users\craig\qa\" . locator . "\" . locator . "qalog.txt"
+        f := fileopen(qalogfile,"a")
+        f.WriteLine(Format("{1}-{2}-{3},{4},{5} {6},{7}", A_MMMM, A_DD, A_YYYY, ticketnumber, number, street,status))
+        f.Close()
+    }
+
     showPassFailGUI()
     {
         Gui,pf: Add, Text, x198 y20 w70 h20 , Locate Result:
         Gui,pf: Add, Button,gqapass x52 y70 w100 h30 , &PASS
+        Gui, pf: Add, Button,gqaerror x182 y70 w100 h30 , &ERROR
         Gui,pf: Add, Button,gqafail x312 y70 w100 h30 , &FAIL
         ; Generated using SmartGUI Creator for SciTE
-        Gui,pf: Show, w470 h168,PASS/FAIL
-        WinWaitClose,PASS/FAIL
+        Gui,pf: Show, w470 h168,PASS/FAIL/ERROR
+        WinWaitClose,PASS/FAIL/ERROR
     }
 
     GetResult(){
       ;use an inputbox to ask for pass ("p") or fail ("f"). return the result
+      results := {"p": "PASS", "pass" : "PASS", "e": "ERROR", "error": "ERROR", "f": "FAIL", "fail": "FAIL"}
       Loop {
-        Inputbox, result, "Result", "Pass or Fail?"
+        Inputbox, result, "Result", "(P)ass / (E)rror / (F)ail?"
         StringLower, result, result
       }
-      Until result in p,pass,f,fail
-      return result == "p" ? "PASS" : "FAIL"
-
+      Until result in p,pass,f,fail,e,error
+      return results[result]
     }
 
     GradeQA()
@@ -3739,7 +3748,7 @@ class QA {
       t.form := t.GetFormType()
       this.Start()
       status := this.GetResult()
-      if (status = "PASS")
+      if (status = "PASS") || (status = "ERROR")
       {
         this.AddProperCheckmark(t)
       }
@@ -3750,7 +3759,9 @@ class QA {
       locator := getLocator()
       if t.number == t.street
         t.number := ""
-      this.AddToTimesheet(t,locator,status == "PASS" ? "COMPLETE" : "RETURN")
+      status := "FAIL" ? "RETURN" : "COMPLETE"
+      this.AddToTimesheet(t,locator)
+      this.LogResult(locator,t.ticketnumber,t.number,t.street,status)
       picSave(locator,t.ticketnumber . "-" . t.number . " " . t.street)
       this.Finalize()
     }
@@ -6446,14 +6457,13 @@ getFileName(){
 }
 
 getLocator(){
-    Inputbox, locator, Enter locator, P=PETER`,H=HAN`,S=SHABBY`,E=EUNAH`,J=JUNE
+    Inputbox, locator, Enter locator, A=ANTONIO`nB=BRUCE`nE=EUNAH`nJ=JUNE
     StringLower, locator, locator
     if ErrorLevel
         return
     switch locator {
-        case "p": return "PETER"
-        case "h": return "HAN"
-        case "s": return "SHABBY"
+        case "a": return "ANTONIO"
+        case "b": return "BRUCE"
         case "e": return "EUNAH"
         case "j": return "JUNE"
         default: return
