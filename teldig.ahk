@@ -4486,7 +4486,7 @@ class Ticket
             case "TP","TA":
                 timesheetEntry := this.ticketnumber "," this.street ",,,,,TELMAX " . units . "`n"
         }
-        timesheetLocation := "C:\Users\craigAIG\timesheet" today ".txt"
+        timesheetLocation := "C:\Users\craig\timesheet" today ".txt"
         FileAppend, %timesheetEntry%, %timesheetLocation%
         SplashImage, Off
         if (ErrorLevel)
