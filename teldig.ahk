@@ -6205,7 +6205,7 @@ addToTimesheetFromPrevious(aptumunits := "",rogersunits := "")
 {
     global
     splashtexton,,,,Adding to logsheet
-    FileAppend,% ticketnumber "," number " " street "," rogersunits[1] "," rogersunits[2] "," aptumunits[1] "," aptumunits[2] ", `n", C:\Users\craig\timesheet%today%.txt
+    FileAppend,% ticketnumber "," number " " street "," rogersunits[1] "," rogersunits[2] "," aptumunits[1] "," aptumunits[2] ",,, `n", C:\Users\craig\timesheet%today%.txt
     if ErrorLevel
         MsgBox % "Couldn't write to timesheet"
     SplashTextOff
