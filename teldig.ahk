@@ -3759,7 +3759,6 @@ class QA {
       locator := getLocator()
       if t.number == t.street
         t.number := ""
-      status := "FAIL" ? "RETURN" : "COMPLETE"
       this.AddToTimesheet(t,locator)
       this.LogResult(locator,t.ticketnumber,t.number,t.street,status)
       picSave(locator,t.ticketnumber . "-" . t.number . " " . t.street)
@@ -6457,15 +6456,14 @@ getFileName(){
 }
 
 getLocator(){
-    Inputbox, locator, Enter locator, A=ANTONIO`nB=BRUCE`nE=EUNAH`nJ=JUNE
+    Inputbox, locator, Enter locator, B=BRUCE`nJ=JUNE`nT=THEO
     StringLower, locator, locator
     if ErrorLevel
         return
     switch locator {
-        case "a": return "ANTONIO"
         case "b": return "BRUCE"
-        case "e": return "EUNAH"
         case "j": return "JUNE"
+        case "t": return "THEO"
         default: return
     }
 }
