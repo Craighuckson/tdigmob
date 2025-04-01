@@ -2656,3 +2656,21 @@
 20240705123806 - Could not access an IAccessible Object
 20240712141339 - Could not access an IAccessible Object
 20240716091855 - Could not access an IAccessible Object
+20240905140911 - Could not access an IAccessible Object
+20240913070306 - Could not access an IAccessible Object
+20241004123032 - Could not access an IAccessible Object
+20241004123203 - Could not access an IAccessible Object
+20241004123240 - Could not access an IAccessible Object
+20241004151455 - Could not access an IAccessible Object
+20241004151600 - Could not access an IAccessible Object
+20241004153926 - Could not access an IAccessible Object
+20241004154000 - Could not access an IAccessible Object
+20241004154034 - Could not access an IAccessible Object
+20241009144256 - Could not access an IAccessible Object
+20241009144301 - Could not access an IAccessible Object
+20241203144009 - Cannot access ChildPath Item #2 -> 7
+20241203144009 - Cannot access ChildPath Item #2 -> 7
+20241203144010 - Cannot access ChildPath Item #2 -> 7
+20241203144010 - Cannot access ChildPath Item #2 -> 6
+20250212154033 - Cannot access ChildPath Item #12 -> 1
+20250401130400 - Could not access an IAccessible Object
